@@ -8,6 +8,7 @@ import {
   Animated,
   Dimensions,
   GestureResponderEvent,
+  Modal,
   PanResponder,
   Platform,
   Pressable,
@@ -47,13 +48,21 @@ export default function ListenScreen() {
   const [duration, setDuration] = useState(0);
   const [momentMarks, setMomentMarks] = useState<number[]>([]);
   const [finished, setFinished] = useState(false);
-  const [storyExpanded, setStoryExpanded] = useState(false);
+  const [storyVisible, setStoryVisible] = useState(false);
   const [sheet, setSheet] = useState<Sheet>("none");
   const [reacted, setReacted] = useState(false);
 
   const momentBtnScale = useRef(new Animated.Value(1)).current;
   const sheetAnim = useRef(new Animated.Value(0)).current;
+  const storyAnim = useRef(new Animated.Value(0)).current;
   const waveWidth = useRef(0);
+  const lyricScrollRef = useRef<ScrollView | null>(null);
+  const lyricYs = useRef<Record<number, number>>({});
+
+  // Four staggered animated values drive the "dancing" equalizer bars
+  const danceRefs = useRef(
+    [0, 1, 2, 3].map(() => new Animated.Value(1))
+  ).current;
 
   // Deterministic waveform heights per song
   const barHeights = useMemo(() => {
@@ -85,6 +94,52 @@ export default function ListenScreen() {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [song?.audioUrl]);
+
+  // Dancing equalizer bars — loop while playing, freeze when paused
+  useEffect(() => {
+    if (!isPlaying) {
+      danceRefs.forEach((v) => v.stopAnimation());
+      return;
+    }
+    const loops = danceRefs.map((v, idx) =>
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(v, {
+            toValue: 0.4,
+            duration: 300 + idx * 80,
+            useNativeDriver: true,
+          }),
+          Animated.timing(v, {
+            toValue: 1,
+            duration: 300 + idx * 80,
+            useNativeDriver: true,
+          }),
+        ])
+      )
+    );
+    loops.forEach((l) => l.start());
+    return () => loops.forEach((l) => l.stop());
+  }, [isPlaying, danceRefs]);
+
+  // Auto-scroll synced lyrics to keep the active line in view
+  const lastScrolledLrc = useRef(-1);
+  useEffect(() => {
+    if (sheet !== "lyrics") return;
+    const lines = parseLrc(song?.lrc);
+    if (lines.length === 0) return;
+    let idx = -1;
+    for (let i = 0; i < lines.length; i++) {
+      if (position >= lines[i].timeMs) idx = i;
+      else break;
+    }
+    if (idx >= 0 && idx !== lastScrolledLrc.current) {
+      lastScrolledLrc.current = idx;
+      const y = lyricYs.current[idx];
+      if (y != null) {
+        lyricScrollRef.current?.scrollTo({ y: Math.max(0, y - 90), animated: true });
+      }
+    }
+  }, [position, sheet, song?.lrc]);
 
   async function loadAudio() {
     if (!song) return;
@@ -191,6 +246,24 @@ export default function ListenScreen() {
     router.back();
   }
 
+  const openStory = useCallback(() => {
+    setStoryVisible(true);
+    Animated.spring(storyAnim, {
+      toValue: 1,
+      useNativeDriver: true,
+      tension: 120,
+      friction: 14,
+    }).start();
+  }, [storyAnim]);
+
+  const closeStory = useCallback(() => {
+    Animated.timing(storyAnim, {
+      toValue: 0,
+      duration: 200,
+      useNativeDriver: true,
+    }).start(() => setStoryVisible(false));
+  }, [storyAnim]);
+
   const openSheet = useCallback(
     (which: Sheet) => {
       setSheet(which);
@@ -259,10 +332,28 @@ export default function ListenScreen() {
     ? song.lyrics.split(/\n+/).map((l) => l.trim()).filter(Boolean)
     : [];
 
+  const lrcLines = parseLrc(song.lrc);
+  const hasSynced = lrcLines.length > 0;
+  let activeLrc = -1;
+  for (let i = 0; i < lrcLines.length; i++) {
+    if (position >= lrcLines[i].timeMs) activeLrc = i;
+    else break;
+  }
+
   const sheetTranslate = sheetAnim.interpolate({
     inputRange: [0, 1],
     outputRange: [SCREEN_H, 0],
   });
+
+  const storyScale = storyAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0.92, 1],
+  });
+
+  async function seekToMs(ms: number) {
+    if (!soundRef.current || !duration) return;
+    await soundRef.current.setPositionAsync(Math.max(0, Math.min(ms, duration)));
+  }
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -319,24 +410,29 @@ export default function ListenScreen() {
             <Feather name="chevron-right" size={15} color={colors.midBlue} />
           </TouchableOpacity>
 
-          {/* Behind the song */}
+          {/* Behind the song → opens animated dialog */}
           {song.story ? (
-            <View style={[styles.storyCard, { backgroundColor: colors.blueGrey + "80" }]}>
+            <TouchableOpacity
+              style={[styles.storyCard, { backgroundColor: colors.blueGrey + "80" }]}
+              onPress={openStory}
+              activeOpacity={0.85}
+            >
               <Text style={[styles.storyEyebrow, { color: colors.midBlue }]}>
                 BEHIND THE SONG
               </Text>
               <Text
                 style={[styles.storyText, { color: colors.navy }]}
-                numberOfLines={storyExpanded ? undefined : 2}
+                numberOfLines={2}
               >
                 {song.story}
               </Text>
-              <TouchableOpacity onPress={() => setStoryExpanded((v) => !v)}>
+              <View style={styles.storyToggleRow}>
                 <Text style={[styles.storyToggle, { color: colors.midBlue }]}>
-                  {storyExpanded ? "Show less" : "Read the full story"}
+                  Read the full story
                 </Text>
-              </TouchableOpacity>
-            </View>
+                <Feather name="arrow-up-right" size={13} color={colors.midBlue} />
+              </View>
+            </TouchableOpacity>
           ) : null}
         </View>
 
@@ -344,6 +440,23 @@ export default function ListenScreen() {
 
         {/* Waveform */}
         <View style={styles.waveSection}>
+          {/* Glowing moment dots floating above the bar */}
+          <View style={styles.momentDotsRow} pointerEvents="none">
+            {duration > 0 &&
+              momentMarks.map((ts, i) => (
+                <View
+                  key={`${ts}-${i}`}
+                  style={[
+                    styles.momentDot,
+                    {
+                      left: `${Math.min(98, (ts / duration) * 100)}%`,
+                      backgroundColor: colors.amber,
+                      shadowColor: colors.amber,
+                    },
+                  ]}
+                />
+              ))}
+          </View>
           <Pressable
             style={styles.waveform}
             onLayout={(e) => (waveWidth.current = e.nativeEvent.layout.width)}
@@ -355,12 +468,10 @@ export default function ListenScreen() {
                 if (!duration) return false;
                 return Math.round((ts / duration) * BAR_COUNT) === i;
               });
+              const scaleY = isActive ? danceRefs[i % 4] : 1;
               return (
                 <View key={i} style={styles.barWrap}>
-                  {markedHere && (
-                    <View style={[styles.momentTick, { backgroundColor: colors.amber }]} />
-                  )}
-                  <View
+                  <Animated.View
                     style={[
                       styles.bar,
                       {
@@ -368,8 +479,17 @@ export default function ListenScreen() {
                         backgroundColor: markedHere
                           ? colors.amber
                           : isActive
-                            ? colors.navy
+                            ? colors.brightBlue
                             : colors.blueGrey,
+                        transform: [{ scaleY }],
+                        ...(isActive && !markedHere
+                          ? {
+                              shadowColor: colors.brightBlue,
+                              shadowOpacity: 0.7,
+                              shadowRadius: 4,
+                              shadowOffset: { width: 0, height: 0 },
+                            }
+                          : null),
                       },
                     ]}
                   />
@@ -478,6 +598,7 @@ export default function ListenScreen() {
             styles.sheet,
             {
               backgroundColor: colors.background,
+              paddingTop: topPad,
               transform: [{ translateY: sheetTranslate }],
             },
           ]}
@@ -494,14 +615,61 @@ export default function ListenScreen() {
 
           {sheet === "lyrics" ? (
             <ScrollView
+              ref={lyricScrollRef}
               style={styles.sheetScroll}
               contentContainerStyle={{ paddingBottom: botPad + 24 }}
               showsVerticalScrollIndicator={false}
             >
-              <Text style={[styles.sheetEyebrow, { color: colors.midBlue }]}>
-                LYRICS
-              </Text>
-              {lyricLines.length > 0 ? (
+              <View style={styles.lyricsHeaderRow}>
+                <Text style={[styles.sheetEyebrow, { color: colors.midBlue, marginBottom: 0 }]}>
+                  LYRICS
+                </Text>
+                {hasSynced && (
+                  <View style={[styles.syncedPill, { backgroundColor: colors.brightBlue + "1A" }]}>
+                    <Feather name="zap" size={10} color={colors.brightBlue} />
+                    <Text style={[styles.syncedPillText, { color: colors.brightBlue }]}>
+                      SYNCED
+                    </Text>
+                  </View>
+                )}
+              </View>
+              <View style={{ height: 12 }} />
+
+              {hasSynced ? (
+                <View style={{ gap: 12, marginBottom: 8 }}>
+                  {lrcLines.map((ln, i) => {
+                    const isActive = i === activeLrc;
+                    const isPast = i < activeLrc;
+                    return (
+                      <TouchableOpacity
+                        key={i}
+                        activeOpacity={0.6}
+                        onPress={() => seekToMs(ln.timeMs)}
+                        onLayout={(e) => {
+                          lyricYs.current[i] = e.nativeEvent.layout.y;
+                        }}
+                      >
+                        <Text
+                          style={[
+                            styles.syncedLine,
+                            {
+                              color: isActive
+                                ? colors.brightBlue
+                                : isPast
+                                  ? colors.mutedForeground
+                                  : colors.navy,
+                              opacity: isActive ? 1 : isPast ? 0.55 : 0.8,
+                              fontWeight: isActive ? "900" : "700",
+                            },
+                          ]}
+                        >
+                          {ln.text}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              ) : lyricLines.length > 0 ? (
                 <View style={{ gap: 8, marginBottom: 8 }}>
                   {lyricLines.map((line, i) => (
                     <Text key={i} style={[styles.lyricLine, { color: colors.navy }]}>
@@ -548,6 +716,27 @@ export default function ListenScreen() {
                       .join(" · ")}
                   </Text>
                 </View>
+              )}
+
+              {song.credits && hasCredits(song.credits) && (
+                <>
+                  <View style={[styles.divider, { backgroundColor: colors.navy + "12" }]} />
+                  <Text style={[styles.sheetEyebrow, { color: colors.midBlue }]}>
+                    CREDITS
+                  </Text>
+                  <View style={[styles.creditsCard, { backgroundColor: colors.blueGrey + "80", gap: 10 }]}>
+                    {creditRows(song.credits).map((row) => (
+                      <View key={row.label} style={styles.creditRow}>
+                        <Text style={[styles.creditRole, { color: colors.mutedForeground }]}>
+                          {row.label}
+                        </Text>
+                        <Text style={[styles.creditName, { color: colors.navy }]}>
+                          {row.value}
+                        </Text>
+                      </View>
+                    ))}
+                  </View>
+                </>
               )}
             </ScrollView>
           ) : (
@@ -613,8 +802,97 @@ export default function ListenScreen() {
           )}
         </Animated.View>
       )}
+
+      {/* Behind the song — animated dialog */}
+      <Modal
+        visible={storyVisible}
+        transparent
+        animationType="none"
+        onRequestClose={closeStory}
+      >
+        <Pressable style={styles.modalBackdrop} onPress={closeStory}>
+          <Animated.View
+            style={[
+              styles.storyDialog,
+              {
+                backgroundColor: colors.card,
+                opacity: storyAnim,
+                transform: [{ scale: storyScale }],
+              },
+            ]}
+          >
+            <Pressable>
+              <View style={styles.storyDialogHandle}>
+                <View
+                  style={[styles.storyDialogIcon, { backgroundColor: colors.midBlue + "1A" }]}
+                >
+                  <Feather name="feather" size={18} color={colors.midBlue} />
+                </View>
+                <TouchableOpacity onPress={closeStory} hitSlop={10}>
+                  <Feather name="x" size={22} color={colors.mutedForeground} />
+                </TouchableOpacity>
+              </View>
+              <Text style={[styles.storyDialogEyebrow, { color: colors.midBlue }]}>
+                BEHIND THE SONG
+              </Text>
+              <Text style={[styles.storyDialogTitle, { color: colors.navy }]}>
+                {song.title}
+              </Text>
+              <Text style={[styles.storyDialogArtist, { color: colors.mutedForeground }]}>
+                {song.artist}
+              </Text>
+              <ScrollView
+                style={{ maxHeight: SCREEN_H * 0.4 }}
+                showsVerticalScrollIndicator={false}
+              >
+                <Text style={[styles.storyDialogBody, { color: colors.navy }]}>
+                  {song.story}
+                </Text>
+              </ScrollView>
+            </Pressable>
+          </Animated.View>
+        </Pressable>
+      </Modal>
     </View>
   );
+}
+
+interface LrcLine {
+  timeMs: number;
+  text: string;
+}
+
+function parseLrc(lrc?: string): LrcLine[] {
+  if (!lrc) return [];
+  const out: LrcLine[] = [];
+  for (const raw of lrc.split(/\r?\n/)) {
+    const m = raw.match(/^\[(\d+):(\d+(?:\.\d+)?)\]\s*(.*)$/);
+    if (!m) continue;
+    const min = parseInt(m[1], 10);
+    const sec = parseFloat(m[2]);
+    const text = m[3].trim();
+    if (!text) continue;
+    out.push({ timeMs: (min * 60 + sec) * 1000, text });
+  }
+  return out;
+}
+
+function hasCredits(c: NonNullable<DemoSong["credits"]>): boolean {
+  return Boolean(
+    c.lyricist || c.composer || c.vocalist || c.mixEngineer || c.producer
+  );
+}
+
+function creditRows(
+  c: NonNullable<DemoSong["credits"]>
+): { label: string; value: string }[] {
+  const rows: { label: string; value: string }[] = [];
+  if (c.lyricist) rows.push({ label: "Lyrics", value: c.lyricist });
+  if (c.composer) rows.push({ label: "Composer", value: c.composer });
+  if (c.vocalist) rows.push({ label: "Vocals", value: c.vocalist });
+  if (c.producer) rows.push({ label: "Producer", value: c.producer });
+  if (c.mixEngineer) rows.push({ label: "Mix Engineer", value: c.mixEngineer });
+  return rows;
 }
 
 function Detail({
@@ -722,8 +1000,31 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   storyText: { fontSize: 12.5, fontWeight: "500", lineHeight: 19 },
-  storyToggle: { fontSize: 11, fontWeight: "700", marginTop: 6 },
+  storyToggleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 3,
+    marginTop: 6,
+  },
+  storyToggle: { fontSize: 11, fontWeight: "700" },
   waveSection: { marginBottom: 16 },
+  momentDotsRow: {
+    height: 12,
+    marginBottom: 4,
+    position: "relative",
+  },
+  momentDot: {
+    position: "absolute",
+    top: 2,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginLeft: -4,
+    shadowOpacity: 0.9,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 0 },
+    elevation: 5,
+  },
   waveform: {
     height: 46,
     flexDirection: "row",
@@ -736,13 +1037,6 @@ const styles = StyleSheet.create({
     height: "100%",
     justifyContent: "flex-end",
     alignItems: "center",
-  },
-  momentTick: {
-    position: "absolute",
-    top: 0,
-    width: 6,
-    height: 6,
-    borderRadius: 3,
   },
   bar: { width: "100%", borderRadius: 4 },
   timeRow: {
@@ -860,6 +1154,28 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   lyricLine: { fontSize: 18, fontWeight: "700", lineHeight: 24 },
+  lyricsHeaderRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  syncedPill: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 10,
+  },
+  syncedPillText: { fontSize: 9, fontWeight: "900", letterSpacing: 1 },
+  syncedLine: { fontSize: 20, lineHeight: 27, letterSpacing: -0.3 },
+  creditRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  creditRole: { fontSize: 12, fontWeight: "700", letterSpacing: 0.4 },
+  creditName: { fontSize: 13, fontWeight: "800" },
   divider: { height: 1, marginVertical: 20 },
   detailsGrid: {
     flexDirection: "row",
@@ -910,4 +1226,47 @@ const styles = StyleSheet.create({
     borderRadius: 14,
   },
   moodTagText: { fontSize: 13, fontWeight: "700" },
+  modalBackdrop: {
+    flex: 1,
+    backgroundColor: "rgba(15, 18, 30, 0.55)",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 28,
+  },
+  storyDialog: {
+    width: "100%",
+    borderRadius: 28,
+    padding: 22,
+    shadowColor: "#1B2A4A",
+    shadowOpacity: 0.3,
+    shadowRadius: 30,
+    shadowOffset: { width: 0, height: 18 },
+    elevation: 16,
+  },
+  storyDialogHandle: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 14,
+  },
+  storyDialogIcon: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  storyDialogEyebrow: {
+    fontSize: 10,
+    fontWeight: "800",
+    letterSpacing: 1.8,
+  },
+  storyDialogTitle: {
+    fontSize: 24,
+    fontWeight: "900",
+    letterSpacing: -0.5,
+    marginTop: 4,
+  },
+  storyDialogArtist: { fontSize: 14, fontWeight: "700", marginBottom: 14 },
+  storyDialogBody: { fontSize: 15, fontWeight: "500", lineHeight: 24 },
 });

@@ -32,6 +32,10 @@ const palette = {
   skipGlow: "rgba(232, 149, 107, 0.22)",
   surface: "#E5DFD5",
   surfaceElevated: "#FFFFFF",
+  // Player accents
+  brightBlue: "#1E7BFF",
+  brightBlueDeep: "#0A4FCC",
+  brightBlueGlow: "rgba(30, 123, 255, 0.45)",
 };
 
 const colors = {

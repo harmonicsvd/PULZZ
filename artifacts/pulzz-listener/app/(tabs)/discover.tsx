@@ -11,18 +11,25 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { SongCard } from "@/components/SongCard";
 import { useApp } from "@/contexts/AppContext";
 import { useColors } from "@/hooks/useColors";
+import { rankSongs } from "@/lib/recommend";
 
 export default function DiscoverScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
-  const { profile, listenedSongIds, songs } = useApp();
+  const { profile, listenedSongIds, songs, discoveries, momentMarks } = useApp();
 
   const topPad = Platform.OS === "web" ? 67 : insets.top;
   const botPad = Platform.OS === "web" ? 34 : insets.bottom;
 
   const availableSongs = useMemo(() => {
-    return songs.filter((s) => !listenedSongIds.includes(s.id));
-  }, [songs, listenedSongIds]);
+    return rankSongs({
+      songs,
+      profile,
+      discoveries,
+      momentMarks,
+      listenedSongIds,
+    });
+  }, [songs, profile, discoveries, momentMarks, listenedSongIds]);
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>

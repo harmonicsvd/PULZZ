@@ -60,6 +60,14 @@ export const SongDetailStatus = {
   released: 'released',
 } as const;
 
+export interface SongCredits {
+  lyricist?: string;
+  composer?: string;
+  vocalist?: string;
+  mixEngineer?: string;
+  producer?: string;
+}
+
 export interface SongDetail {
   id: number;
   title: string;
@@ -73,6 +81,12 @@ export interface SongDetail {
   story: string;
   /** @nullable */
   lyrics?: string | null;
+  /**
+     * Synced lyrics in LRC format ([mm:ss.xx] line)
+     * @nullable
+     */
+  lrc?: string | null;
+  credits?: SongCredits | null;
   /** @nullable */
   audioUrl?: string | null;
   /** @nullable */
@@ -86,6 +100,16 @@ export interface SongDetail {
   skipCount?: number | null;
   /** @nullable */
   momentCount?: number | null;
+}
+
+export interface UpdateSongLyrics {
+  /** Synced lyrics in LRC format */
+  lrc: string;
+}
+
+export interface UpdateSongLyricsResult {
+  ok: boolean;
+  lrc: string;
 }
 
 export type SongReactionsTopMomentsItem = {
@@ -217,6 +241,45 @@ export interface ListenerInput {
   discoveryPersonality: ListenerInputDiscoveryPersonality;
 }
 
+export interface MusixmatchGenre {
+  id: number;
+  name: string;
+  /** @nullable */
+  parentId?: number | null;
+}
+
+export interface MusixmatchTrack {
+  id: number;
+  name: string;
+  artistId: number;
+  artistName: string;
+  /** @nullable */
+  albumName?: string | null;
+  genres: string[];
+  /** @nullable */
+  artworkUrl?: string | null;
+  hasSubtitles: boolean;
+  hasRichsync: boolean;
+  instrumental: boolean;
+  /** @nullable */
+  spotifyId?: string | null;
+}
+
+export interface MusixmatchSubtitle {
+  trackId: number;
+  found: boolean;
+  format: string;
+  body: string;
+  /** @nullable */
+  language?: string | null;
+}
+
+export interface MusixmatchAnalysis {
+  trackId: number;
+  moods: string[];
+  themes: string[];
+}
+
 export type ListSongsParams = {
 genre?: string;
 status?: ListSongsStatus;
@@ -229,4 +292,17 @@ export const ListSongsStatus = {
   active: 'active',
   released: 'released',
 } as const;
+
+export type SearchMusixmatchTracksParams = {
+q: string;
+pageSize?: number;
+};
+
+export type GetMusixmatchSubtitleParams = {
+trackId: number;
+};
+
+export type GetMusixmatchAnalysisParams = {
+trackId: number;
+};
 

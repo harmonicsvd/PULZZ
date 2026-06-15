@@ -1,4 +1,4 @@
-import type { DemoSong } from "@/data/songs";
+import type { DemoSong, SongCredits } from "@/data/songs";
 
 const getBase = () => {
   const domain = process.env.EXPO_PUBLIC_DOMAIN;
@@ -33,7 +33,9 @@ export interface ApiSong {
 
 export interface ApiSongDetail extends ApiSong {
   story: string;
-  lyrics: string;
+  lyrics: string | null;
+  lrc: string | null;
+  credits: SongCredits | null;
   isrc: string;
   instruments: string[];
 }
@@ -72,8 +74,44 @@ export function apiSongDetailToDemoSong(s: ApiSongDetail): DemoSong {
     ...apiSongToDemoSong(s),
     story: s.story ?? "",
     lyrics: s.lyrics ?? "",
+    lrc: s.lrc ?? undefined,
+    credits: s.credits ?? undefined,
     instruments: s.instruments ?? [],
   };
+}
+
+export interface MxmGenre {
+  id: number;
+  name: string;
+  parentId: number | null;
+}
+
+export interface MxmTrack {
+  id: number;
+  name: string;
+  artistId: number;
+  artistName: string;
+  albumName: string | null;
+  genres: string[];
+  artworkUrl: string | null;
+  hasSubtitles: boolean;
+  hasRichsync: boolean;
+  instrumental: boolean;
+  spotifyId: string | null;
+}
+
+export interface MxmSubtitle {
+  trackId: number;
+  found: boolean;
+  format: string;
+  body: string;
+  language: string | null;
+}
+
+export interface MxmAnalysis {
+  trackId: number;
+  moods: string[];
+  themes: string[];
 }
 
 export const api = {
@@ -111,4 +149,18 @@ export const api = {
       method: "POST",
       body: JSON.stringify(data),
     }),
+
+  fetchMusixmatchGenres: () =>
+    apiFetch<MxmGenre[]>("/musixmatch/genres"),
+
+  searchMusixmatchTracks: (q: string, pageSize = 10) =>
+    apiFetch<MxmTrack[]>(
+      `/musixmatch/search-tracks?q=${encodeURIComponent(q)}&pageSize=${pageSize}`
+    ),
+
+  getMusixmatchSubtitle: (trackId: number) =>
+    apiFetch<MxmSubtitle>(`/musixmatch/subtitle?trackId=${trackId}`),
+
+  getMusixmatchAnalysis: (trackId: number) =>
+    apiFetch<MxmAnalysis>(`/musixmatch/track-analysis?trackId=${trackId}`),
 };

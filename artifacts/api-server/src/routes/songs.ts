@@ -10,6 +10,9 @@ import {
   ListSongsQueryParams,
   ListSongsResponse,
   SubmitSongBody,
+  UpdateSongLyricsBody,
+  UpdateSongLyricsParams,
+  UpdateSongLyricsResponse,
 } from "@workspace/api-zod";
 
 const router: IRouter = Router();
@@ -122,6 +125,8 @@ router.get("/songs/:id", async (req, res): Promise<void> => {
       durationSeconds: songsTable.durationSeconds,
       story: songsTable.story,
       lyrics: songsTable.lyrics,
+      lrc: songsTable.lrc,
+      credits: songsTable.credits,
       instruments: songsTable.instruments,
       isrc: songsTable.isrc,
     })
@@ -164,6 +169,34 @@ router.get("/songs/:id", async (req, res): Promise<void> => {
       skipCount: skip,
       momentCount,
     })
+  );
+});
+
+router.put("/songs/:id/lyrics", async (req, res): Promise<void> => {
+  const params = UpdateSongLyricsParams.safeParse(req.params);
+  if (!params.success) {
+    res.status(400).json({ error: params.error.message });
+    return;
+  }
+  const body = UpdateSongLyricsBody.safeParse(req.body);
+  if (!body.success) {
+    res.status(400).json({ error: body.error.message });
+    return;
+  }
+
+  const updated = await db
+    .update(songsTable)
+    .set({ lrc: body.data.lrc })
+    .where(eq(songsTable.id, params.data.id))
+    .returning({ id: songsTable.id, lrc: songsTable.lrc });
+
+  if (updated.length === 0) {
+    res.status(404).json({ error: "Song not found" });
+    return;
+  }
+
+  res.json(
+    UpdateSongLyricsResponse.parse({ ok: true, lrc: updated[0].lrc ?? "" })
   );
 });
 

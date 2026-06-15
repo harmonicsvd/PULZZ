@@ -79,6 +79,14 @@ export const GetSongResponse = zod.object({
   "tags": zod.array(zod.string()),
   "story": zod.string(),
   "lyrics": zod.string().nullish(),
+  "lrc": zod.string().nullish().describe('Synced lyrics in LRC format ([mm:ss.xx] line)'),
+  "credits": zod.union([zod.object({
+  "lyricist": zod.string().optional(),
+  "composer": zod.string().optional(),
+  "vocalist": zod.string().optional(),
+  "mixEngineer": zod.string().optional(),
+  "producer": zod.string().optional()
+}),zod.null()]).optional(),
   "audioUrl": zod.string().nullish(),
   "durationSeconds": zod.number().nullish(),
   "instruments": zod.array(zod.string()).optional(),
@@ -86,6 +94,23 @@ export const GetSongResponse = zod.object({
   "discoveredCount": zod.number().nullish(),
   "skipCount": zod.number().nullish(),
   "momentCount": zod.number().nullish()
+})
+
+
+/**
+ * @summary Save synced (LRC) lyrics for a song
+ */
+export const UpdateSongLyricsParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const UpdateSongLyricsBody = zod.object({
+  "lrc": zod.string().describe('Synced lyrics in LRC format')
+})
+
+export const UpdateSongLyricsResponse = zod.object({
+  "ok": zod.boolean(),
+  "lrc": zod.string()
 })
 
 
@@ -270,6 +295,71 @@ export const GetListenerResponse = zod.object({
   "discoveryCount": zod.number().optional(),
   "points": zod.number().optional(),
   "createdAt": zod.string()
+})
+
+
+/**
+ * @summary List Musixmatch music genres
+ */
+export const ListMusixmatchGenresResponseItem = zod.object({
+  "id": zod.number(),
+  "name": zod.string(),
+  "parentId": zod.number().nullish()
+})
+export const ListMusixmatchGenresResponse = zod.array(ListMusixmatchGenresResponseItem)
+
+
+/**
+ * @summary Search released tracks for taste seeding
+ */
+export const SearchMusixmatchTracksQueryParams = zod.object({
+  "q": zod.coerce.string(),
+  "pageSize": zod.coerce.number().optional()
+})
+
+export const SearchMusixmatchTracksResponseItem = zod.object({
+  "id": zod.number(),
+  "name": zod.string(),
+  "artistId": zod.number(),
+  "artistName": zod.string(),
+  "albumName": zod.string().nullish(),
+  "genres": zod.array(zod.string()),
+  "artworkUrl": zod.string().nullish(),
+  "hasSubtitles": zod.boolean(),
+  "hasRichsync": zod.boolean(),
+  "instrumental": zod.boolean(),
+  "spotifyId": zod.string().nullish()
+})
+export const SearchMusixmatchTracksResponse = zod.array(SearchMusixmatchTracksResponseItem)
+
+
+/**
+ * @summary Get synced (LRC) lyrics for a released track
+ */
+export const GetMusixmatchSubtitleQueryParams = zod.object({
+  "trackId": zod.coerce.number()
+})
+
+export const GetMusixmatchSubtitleResponse = zod.object({
+  "trackId": zod.number(),
+  "found": zod.boolean(),
+  "format": zod.string(),
+  "body": zod.string(),
+  "language": zod.string().nullish()
+})
+
+
+/**
+ * @summary Get lyrics analysis (moods and themes) for a released track
+ */
+export const GetMusixmatchAnalysisQueryParams = zod.object({
+  "trackId": zod.coerce.number()
+})
+
+export const GetMusixmatchAnalysisResponse = zod.object({
+  "trackId": zod.number(),
+  "moods": zod.array(zod.string()),
+  "themes": zod.array(zod.string())
 })
 
 

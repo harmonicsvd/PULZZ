@@ -1,6 +1,7 @@
 import {
   date,
   integer,
+  jsonb,
   pgTable,
   serial,
   text,
@@ -9,6 +10,14 @@ import {
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 import { artistsTable } from "./artists";
+
+export interface SongCredits {
+  lyricist?: string;
+  composer?: string;
+  vocalist?: string;
+  mixEngineer?: string;
+  producer?: string;
+}
 
 export const songsTable = pgTable("songs", {
   id: serial("id").primaryKey(),
@@ -23,6 +32,8 @@ export const songsTable = pgTable("songs", {
   audioUrl: text("audio_url").notNull(),
   story: text("story").notNull().default(""),
   lyrics: text("lyrics"),
+  lrc: text("lrc"),
+  credits: jsonb("credits").$type<SongCredits>(),
   instruments: text("instruments").array().default([]),
   durationSeconds: integer("duration_seconds"),
   coverColor: text("cover_color").notNull().default("#7B61FF"),

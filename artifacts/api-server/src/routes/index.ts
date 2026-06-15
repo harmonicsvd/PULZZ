@@ -6,6 +6,7 @@ import momentsRouter from "./moments";
 import wallRouter from "./wall";
 import artistsRouter from "./artists";
 import listenersRouter from "./listeners";
+import musixmatchRouter from "./musixmatch";
 
 const router: IRouter = Router();
 
@@ -16,5 +17,6 @@ router.use(momentsRouter);
 router.use(wallRouter);
 router.use(artistsRouter);
 router.use(listenersRouter);
+router.use(musixmatchRouter);
 
 export default router;

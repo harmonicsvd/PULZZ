@@ -5,6 +5,7 @@
  * Pulzz — pre-release music discovery platform API
  * OpenAPI spec version: 0.1.0
  */
+import type { SongCredits } from './songCredits';
 import type { SongDetailStatus } from './songDetailStatus';
 
 export interface SongDetail {
@@ -20,6 +21,12 @@ export interface SongDetail {
   story: string;
   /** @nullable */
   lyrics?: string | null;
+  /**
+     * Synced lyrics in LRC format ([mm:ss.xx] line)
+     * @nullable
+     */
+  lrc?: string | null;
+  credits?: SongCredits | null;
   /** @nullable */
   audioUrl?: string | null;
   /** @nullable */

@@ -9,6 +9,7 @@ import {
 } from "@workspace/api-client-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { LyricSyncTool } from "@/components/lyric-sync-tool";
 import {
   Loader2,
   ArrowLeft,
@@ -241,6 +242,13 @@ export default function SongDetailPage({ id }: Props) {
                 </Card>
               )}
             </div>
+
+            <LyricSyncTool
+              songId={songId}
+              audioUrl={song.audioUrl}
+              lyrics={song.lyrics}
+              lrc={song.lrc}
+            />
 
             <Card className="bg-card border-border">
               <CardHeader>

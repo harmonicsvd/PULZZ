@@ -23,18 +23,27 @@ import type {
   Artist,
   ArtistDashboard,
   ArtistInput,
+  GetMusixmatchAnalysisParams,
+  GetMusixmatchSubtitleParams,
   HealthStatus,
   ListSongsParams,
   Listener,
   ListenerInput,
   MomentMark,
   MomentMarkInput,
+  MusixmatchAnalysis,
+  MusixmatchGenre,
+  MusixmatchSubtitle,
+  MusixmatchTrack,
   Reaction,
   ReactionInput,
+  SearchMusixmatchTracksParams,
   Song,
   SongDetail,
   SongInput,
   SongReactions,
+  UpdateSongLyrics,
+  UpdateSongLyricsResult,
   WallEntry
 } from './api.schemas';
 
@@ -358,6 +367,78 @@ export function useGetSong<TData = Awaited<ReturnType<typeof getSong>>, TError =
 
 
 
+
+export const getUpdateSongLyricsUrl = (id: number,) => {
+
+
+
+
+  return `/api/songs/${id}/lyrics`
+}
+
+/**
+ * @summary Save synced (LRC) lyrics for a song
+ */
+export const updateSongLyrics = async (id: number,
+    updateSongLyrics: UpdateSongLyrics, options?: RequestInit): Promise<UpdateSongLyricsResult> => {
+
+  return customFetch<UpdateSongLyricsResult>(getUpdateSongLyricsUrl(id),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateSongLyrics,)
+  }
+);}
+
+
+
+
+export const getUpdateSongLyricsMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateSongLyrics>>, TError,{id: number;data: BodyType<UpdateSongLyrics>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateSongLyrics>>, TError,{id: number;data: BodyType<UpdateSongLyrics>}, TContext> => {
+
+const mutationKey = ['updateSongLyrics'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateSongLyrics>>, {id: number;data: BodyType<UpdateSongLyrics>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateSongLyrics(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateSongLyricsMutationResult = NonNullable<Awaited<ReturnType<typeof updateSongLyrics>>>
+    export type UpdateSongLyricsMutationBody = BodyType<UpdateSongLyrics>
+    export type UpdateSongLyricsMutationError = ErrorType<void>
+
+    /**
+ * @summary Save synced (LRC) lyrics for a song
+ */
+export const useUpdateSongLyrics = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateSongLyrics>>, TError,{id: number;data: BodyType<UpdateSongLyrics>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateSongLyrics>>,
+        TError,
+        {id: number;data: BodyType<UpdateSongLyrics>},
+        TContext
+      > => {
+      return useMutation(getUpdateSongLyricsMutationOptions(options));
+    }
 
 export const getGetSongReactionsUrl = (id: number,) => {
 
@@ -1170,6 +1251,335 @@ export function useGetListener<TData = Awaited<ReturnType<typeof getListener>>, 
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
   const queryOptions = getGetListenerQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getListMusixmatchGenresUrl = () => {
+
+
+
+
+  return `/api/musixmatch/genres`
+}
+
+/**
+ * @summary List Musixmatch music genres
+ */
+export const listMusixmatchGenres = async ( options?: RequestInit): Promise<MusixmatchGenre[]> => {
+
+  return customFetch<MusixmatchGenre[]>(getListMusixmatchGenresUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListMusixmatchGenresQueryKey = () => {
+    return [
+    `/api/musixmatch/genres`
+    ] as const;
+    }
+
+
+export const getListMusixmatchGenresQueryOptions = <TData = Awaited<ReturnType<typeof listMusixmatchGenres>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listMusixmatchGenres>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListMusixmatchGenresQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listMusixmatchGenres>>> = ({ signal }) => listMusixmatchGenres({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listMusixmatchGenres>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListMusixmatchGenresQueryResult = NonNullable<Awaited<ReturnType<typeof listMusixmatchGenres>>>
+export type ListMusixmatchGenresQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List Musixmatch music genres
+ */
+
+export function useListMusixmatchGenres<TData = Awaited<ReturnType<typeof listMusixmatchGenres>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listMusixmatchGenres>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListMusixmatchGenresQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getSearchMusixmatchTracksUrl = (params: SearchMusixmatchTracksParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/musixmatch/search-tracks?${stringifiedParams}` : `/api/musixmatch/search-tracks`
+}
+
+/**
+ * @summary Search released tracks for taste seeding
+ */
+export const searchMusixmatchTracks = async (params: SearchMusixmatchTracksParams, options?: RequestInit): Promise<MusixmatchTrack[]> => {
+
+  return customFetch<MusixmatchTrack[]>(getSearchMusixmatchTracksUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getSearchMusixmatchTracksQueryKey = (params?: SearchMusixmatchTracksParams,) => {
+    return [
+    `/api/musixmatch/search-tracks`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getSearchMusixmatchTracksQueryOptions = <TData = Awaited<ReturnType<typeof searchMusixmatchTracks>>, TError = ErrorType<unknown>>(params: SearchMusixmatchTracksParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof searchMusixmatchTracks>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getSearchMusixmatchTracksQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof searchMusixmatchTracks>>> = ({ signal }) => searchMusixmatchTracks(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof searchMusixmatchTracks>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type SearchMusixmatchTracksQueryResult = NonNullable<Awaited<ReturnType<typeof searchMusixmatchTracks>>>
+export type SearchMusixmatchTracksQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Search released tracks for taste seeding
+ */
+
+export function useSearchMusixmatchTracks<TData = Awaited<ReturnType<typeof searchMusixmatchTracks>>, TError = ErrorType<unknown>>(
+ params: SearchMusixmatchTracksParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof searchMusixmatchTracks>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getSearchMusixmatchTracksQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetMusixmatchSubtitleUrl = (params: GetMusixmatchSubtitleParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/musixmatch/subtitle?${stringifiedParams}` : `/api/musixmatch/subtitle`
+}
+
+/**
+ * @summary Get synced (LRC) lyrics for a released track
+ */
+export const getMusixmatchSubtitle = async (params: GetMusixmatchSubtitleParams, options?: RequestInit): Promise<MusixmatchSubtitle> => {
+
+  return customFetch<MusixmatchSubtitle>(getGetMusixmatchSubtitleUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetMusixmatchSubtitleQueryKey = (params?: GetMusixmatchSubtitleParams,) => {
+    return [
+    `/api/musixmatch/subtitle`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetMusixmatchSubtitleQueryOptions = <TData = Awaited<ReturnType<typeof getMusixmatchSubtitle>>, TError = ErrorType<unknown>>(params: GetMusixmatchSubtitleParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getMusixmatchSubtitle>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetMusixmatchSubtitleQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getMusixmatchSubtitle>>> = ({ signal }) => getMusixmatchSubtitle(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getMusixmatchSubtitle>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetMusixmatchSubtitleQueryResult = NonNullable<Awaited<ReturnType<typeof getMusixmatchSubtitle>>>
+export type GetMusixmatchSubtitleQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Get synced (LRC) lyrics for a released track
+ */
+
+export function useGetMusixmatchSubtitle<TData = Awaited<ReturnType<typeof getMusixmatchSubtitle>>, TError = ErrorType<unknown>>(
+ params: GetMusixmatchSubtitleParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getMusixmatchSubtitle>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetMusixmatchSubtitleQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetMusixmatchAnalysisUrl = (params: GetMusixmatchAnalysisParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/musixmatch/track-analysis?${stringifiedParams}` : `/api/musixmatch/track-analysis`
+}
+
+/**
+ * @summary Get lyrics analysis (moods and themes) for a released track
+ */
+export const getMusixmatchAnalysis = async (params: GetMusixmatchAnalysisParams, options?: RequestInit): Promise<MusixmatchAnalysis> => {
+
+  return customFetch<MusixmatchAnalysis>(getGetMusixmatchAnalysisUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetMusixmatchAnalysisQueryKey = (params?: GetMusixmatchAnalysisParams,) => {
+    return [
+    `/api/musixmatch/track-analysis`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetMusixmatchAnalysisQueryOptions = <TData = Awaited<ReturnType<typeof getMusixmatchAnalysis>>, TError = ErrorType<unknown>>(params: GetMusixmatchAnalysisParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getMusixmatchAnalysis>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetMusixmatchAnalysisQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getMusixmatchAnalysis>>> = ({ signal }) => getMusixmatchAnalysis(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getMusixmatchAnalysis>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetMusixmatchAnalysisQueryResult = NonNullable<Awaited<ReturnType<typeof getMusixmatchAnalysis>>>
+export type GetMusixmatchAnalysisQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Get lyrics analysis (moods and themes) for a released track
+ */
+
+export function useGetMusixmatchAnalysis<TData = Awaited<ReturnType<typeof getMusixmatchAnalysis>>, TError = ErrorType<unknown>>(
+ params: GetMusixmatchAnalysisParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getMusixmatchAnalysis>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetMusixmatchAnalysisQueryOptions(params,options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 

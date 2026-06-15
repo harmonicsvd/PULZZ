@@ -10,12 +10,28 @@ import { DEMO_SONGS } from "@/data/songs";
 import type { DemoSong } from "@/data/songs";
 import { api, apiSongToDemoSong } from "@/lib/api";
 
+export interface FavoriteTrack {
+  id: number;
+  name: string;
+  artistName: string;
+  artworkUrl: string | null;
+  genres: string[];
+}
+
+export interface TasteProfile {
+  genres: string[];
+  moods: string[];
+  themes: string[];
+}
+
 export interface ListenerProfile {
   id: string;
   name: string;
   genres: string[];
   discoveryPersonality: "explorer" | "balanced" | "familiar";
   createdAt: string;
+  favoriteTracks?: FavoriteTrack[];
+  taste?: TasteProfile;
 }
 
 export interface Discovery {

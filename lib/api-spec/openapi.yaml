@@ -22,6 +22,8 @@ tags:
     description: Listener profiles
   - name: wall
     description: Discovery Wall leaderboard
+  - name: musixmatch
+    description: Musixmatch catalog proxy (genres, search, synced lyrics, analysis)
 
 paths:
   /healthz:
@@ -97,6 +99,33 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/SongDetail"
+        "404":
+          description: Not found
+
+  /songs/{id}/lyrics:
+    put:
+      operationId: updateSongLyrics
+      tags: [songs]
+      summary: Save synced (LRC) lyrics for a song
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateSongLyrics"
+      responses:
+        "200":
+          description: Saved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdateSongLyricsResult"
         "404":
           description: Not found
 
@@ -309,6 +338,84 @@ paths:
               schema:
                 $ref: "#/components/schemas/Listener"
 
+  /musixmatch/genres:
+    get:
+      operationId: listMusixmatchGenres
+      tags: [musixmatch]
+      summary: List Musixmatch music genres
+      responses:
+        "200":
+          description: Genre list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MusixmatchGenre"
+
+  /musixmatch/search-tracks:
+    get:
+      operationId: searchMusixmatchTracks
+      tags: [musixmatch]
+      summary: Search released tracks for taste seeding
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Matching tracks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MusixmatchTrack"
+
+  /musixmatch/subtitle:
+    get:
+      operationId: getMusixmatchSubtitle
+      tags: [musixmatch]
+      summary: Get synced (LRC) lyrics for a released track
+      parameters:
+        - name: trackId
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Subtitle result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MusixmatchSubtitle"
+
+  /musixmatch/track-analysis:
+    get:
+      operationId: getMusixmatchAnalysis
+      tags: [musixmatch]
+      summary: Get lyrics analysis (moods and themes) for a released track
+      parameters:
+        - name: trackId
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Analysis result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MusixmatchAnalysis"
+
 components:
   schemas:
     HealthStatus:
@@ -411,6 +518,13 @@ components:
           type: string
         lyrics:
           type: ["string", "null"]
+        lrc:
+          type: ["string", "null"]
+          description: Synced lyrics in LRC format ([mm:ss.xx] line)
+        credits:
+          oneOf:
+            - $ref: "#/components/schemas/SongCredits"
+            - type: "null"
         audioUrl:
           type: ["string", "null"]
         durationSeconds:
@@ -427,6 +541,37 @@ components:
           type: ["integer", "null"]
         momentCount:
           type: ["integer", "null"]
+
+    SongCredits:
+      type: object
+      properties:
+        lyricist:
+          type: string
+        composer:
+          type: string
+        vocalist:
+          type: string
+        mixEngineer:
+          type: string
+        producer:
+          type: string
+
+    UpdateSongLyrics:
+      type: object
+      required: [lrc]
+      properties:
+        lrc:
+          type: string
+          description: Synced lyrics in LRC format
+
+    UpdateSongLyricsResult:
+      type: object
+      required: [ok, lrc]
+      properties:
+        ok:
+          type: boolean
+        lrc:
+          type: string
 
     SongReactions:
       type: object
@@ -612,3 +757,73 @@ components:
         discoveryPersonality:
           type: string
           enum: [explorer, balanced, familiar]
+
+    MusixmatchGenre:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        parentId:
+          type: ["integer", "null"]
+
+    MusixmatchTrack:
+      type: object
+      required: [id, name, artistId, artistName, genres, hasSubtitles, hasRichsync, instrumental]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        artistId:
+          type: integer
+        artistName:
+          type: string
+        albumName:
+          type: ["string", "null"]
+        genres:
+          type: array
+          items:
+            type: string
+        artworkUrl:
+          type: ["string", "null"]
+        hasSubtitles:
+          type: boolean
+        hasRichsync:
+          type: boolean
+        instrumental:
+          type: boolean
+        spotifyId:
+          type: ["string", "null"]
+
+    MusixmatchSubtitle:
+      type: object
+      required: [trackId, found, format, body]
+      properties:
+        trackId:
+          type: integer
+        found:
+          type: boolean
+        format:
+          type: string
+        body:
+          type: string
+        language:
+          type: ["string", "null"]
+
+    MusixmatchAnalysis:
+      type: object
+      required: [trackId, moods, themes]
+      properties:
+        trackId:
+          type: integer
+        moods:
+          type: array
+          items:
+            type: string
+        themes:
+          type: array
+          items:
+            type: string
