@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+
 .tide-breathing {
   animation: tide-breathe 4s ease-in-out infinite alternate;
 }
@@ -25,8 +27,6 @@
   100% { transform: translateY(-8px); }
 }
 
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
-
 .daybreak-waveform-bar {
   animation-duration: 1.2s;
   animation-iteration-count: infinite;
@@ -43,3 +43,20 @@
 .daybreak-anim-2 { animation-name: daybreak-pulse-2; animation-duration: 1.3s; }
 .daybreak-anim-3 { animation-name: daybreak-pulse-3; animation-duration: 0.9s; }
 .daybreak-anim-4 { animation-name: daybreak-pulse-4; animation-duration: 1.4s; }
+
+.merged-waveform-bar {
+  animation-duration: 1.2s;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+  transform-origin: bottom;
+}
+
+@keyframes merged-pulse-1 { 0%, 100% { transform: scaleY(0.3); } 50% { transform: scaleY(1); } }
+@keyframes merged-pulse-2 { 0%, 100% { transform: scaleY(0.6); } 50% { transform: scaleY(0.2); } }
+@keyframes merged-pulse-3 { 0%, 100% { transform: scaleY(0.4); } 50% { transform: scaleY(0.8); } }
+@keyframes merged-pulse-4 { 0%, 100% { transform: scaleY(0.8); } 50% { transform: scaleY(0.3); } }
+
+.merged-anim-1 { animation-name: merged-pulse-1; animation-duration: 1.1s; }
+.merged-anim-2 { animation-name: merged-pulse-2; animation-duration: 1.3s; }
+.merged-anim-3 { animation-name: merged-pulse-3; animation-duration: 0.9s; }
+.merged-anim-4 { animation-name: merged-pulse-4; animation-duration: 1.4s; }
