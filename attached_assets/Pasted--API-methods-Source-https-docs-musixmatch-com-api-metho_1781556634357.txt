@@ -1,0 +1,2745 @@
+# API methods
+Source: https://docs.musixmatch.com/api-methods
+
+
+
+## What does the Musixmatch API do?
+
+The Musixmatch API allows you to read objects from our huge 100% licensed lyrics database.
+
+**Note: all these methods require authentication.**
+
+To make your life easier we are providing you with one or more examples to show you how it could work in the wild. You’ll find both the **API request** and **API response** in all the available output formats for each API call.
+If you see certain fields in the responses which are not documented/not present in the examples, such data are not to be used.
+
+Supported input parameters can be found in the input parameters section. Use `UTF-8` to encode arguments when calling API methods.
+
+Also, every response includes a `status_code`. A list of all status codes can be consulted below in the status codes section.
+
+<Tip>
+  **Do you have an idea or suggestion for an API call that you don’t see here?**\
+  Write us at [sales@musixmatch.com](mailto:sales@musixmatch.com) and we’ll do our best to respond!
+</Tip>
+
+## Input parameters
+
+Use `UTF-8` to encode arguments. These are the supported input parameters:
+
+### Authentication
+
+| Name     | Description                                                                                                                                              |
+| -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `apikey` | Your personal api key, you must use it in every api call. You can pass this parameter as `GET` parameter in your api call, like `track.get?apikey=xxxx.` |
+
+### Objects
+
+| Name             | Description                |
+| ---------------- | -------------------------- |
+| `track_id`       | Musixmatch track id.       |
+| `artist_id`      | Musixmatch artist id.      |
+| `album_id`       | Musixmatch album id.       |
+| `commontrack_id` | Musixmatch commontrack id. |
+
+### Querying
+
+| Name       | Description                                                          |
+| ---------- | -------------------------------------------------------------------- |
+| `q_track`  | Search for a text string among song titles.                          |
+| `q_artist` | Search for a text string among artist names.                         |
+| `q_lyrics` | Search for a text string among lyrics.                               |
+| `q`        | Search for a text string among song titles, artist names and lyrics. |
+
+### Filtering
+
+| Name                              | Description                                                  |
+| --------------------------------- | ------------------------------------------------------------ |
+| `f_has_lyrics`                    | Filter by objects with available lyrics.                     |
+| `f_is_instrumental`               | Filter instrumental songs.                                   |
+| `f_has_subtitle`                  | Filter by objects with available subtitles.                  |
+| `f_music_genre_id`                | Filter by objects with a specific music category.            |
+| `f_subtitle_length`               | Filter subtitles by a given duration in seconds.             |
+| `f_subtitle_length_max_deviation` | Apply a deviation to a given subtitle duration (in seconds). |
+| `f_lyrics_language`               | Filter the tracks by lyrics language.                        |
+| `f_artist_id`                     | Filter by objects with a given Musixmatch artist\_id.        |
+
+### Grouping
+
+| Name            | Description                                  |
+| --------------- | -------------------------------------------- |
+| `g_commontrack` | Group a track result set by commontrack\_id. |
+
+### Sorting
+
+| Name                   | Description                                                                             |
+| ---------------------- | --------------------------------------------------------------------------------------- |
+| `s_track_rating`       | Sort the results by our popularity index for tracks, possible values are `ASC / DESC`.  |
+| `s_track_release_date` | Sort the results by track release date, possible values are `ASC / DESC`.               |
+| `s_artist_rating`      | Sort the results by our popularity index for artists, possible values are `ASC / DESC.` |
+
+### Result set pagination
+
+| Name        | Description                                                              |
+| ----------- | ------------------------------------------------------------------------ |
+| `page`      | Request specific result page (default=1).                                |
+| `page_size` | Specify number of items per result page (default=10, range is 1 to 100). |
+
+### Output format
+
+| Name              | Description                                                                                  |
+| ----------------- | -------------------------------------------------------------------------------------------- |
+| `subtitle_format` | Desired output format for the subtitle body. Possible values `LRC / DFXP`. Default to `LRC`. |
+
+### Localization
+
+| Name      | Description                              |
+| --------- | ---------------------------------------- |
+| `country` | The country code of the desired country. |
+
+## Status codes
+
+All responses include a status code indicating whether a request was successful or not.
+
+Successful responses have a status code `200`; failed requests may have different status code providing you an indication of the problem.
+
+| Code    | Description                                                                                                    |
+| ------- | -------------------------------------------------------------------------------------------------------------- |
+| **200** | The request was successful.                                                                                    |
+| **400** | The request had bad syntax or was inherently impossible to be satisfied.                                       |
+| **401** | Authentication failed, probably because of invalid/missing API key.                                            |
+| **402** | The usage limit has been reached, either you exceeded per day requests limits or your balance is insufficient. |
+| **403** | You are not authorized to perform this operation.                                                              |
+| **404** | The requested resource was not found.                                                                          |
+| **405** | The requested method was not found.                                                                            |
+| **500** | Ops. Something were wrong.                                                                                     |
+| **503** | Our system is a bit busy at the moment and your request can’t be satisfied.                                    |
+
+
+# Analysis API
+Source: https://docs.musixmatch.com/api-reference/analysis/analysis-overview
+
+
+
+The Analysis API by Musixmatch provides detailed insights into song themes, moods, meanings, content ratings, and moderation flags, facilitating scalable song classification and interpretation. With licensed rights from music publishers, Musixmatch uses advanced analysis to create enriched metadata, enhancing the understanding of song lyrics and enabling robust classifications for contextual and thematic insights.
+
+**Accessible exclusively through the [Analysis API](/api-reference/analysis/track-lyrics-analysis-get)**, this metadata serves as a powerful tool for applications in content discovery, recommendation, and audience engagement.
+With a straightforward API call, users can retrieve detailed lyrical metadata for any song by its Musixmatch Track ID or ISRC code, unlocking a world of contextual and thematic information to enhance the listening experience and support diverse use cases.
+
+Find below the list of the Lyrics Analysis metadata you will receive for each song.
+
+## Lyrics Analysis metadata overview
+
+### Meaning
+
+Generates a simple, short explanation of the lyrics' content.
+
+**Sample output:**
+
+* **Title**: Flowers
+* **Artist**: Miley Cyrus
+* **Explanation**:
+  The song 'Flowers' by Miley Cyrus talks about self-love and empowerment after a breakup. The lyrics convey the message of finding inner strength and happiness within oneself, symbolized by buying flowers, painting nails, and enjoying personal activities, emphasizing the ability to love oneself better than relying on someone else.
+
+***
+
+### Moderation
+
+Identifies a set of content categories that may require moderation.
+
+**Sample output:**
+
+* **Title**: Look At Me!
+* **Artist**: XXXTENTACION
+* **Categories**:
+
+```json theme={null}
+[{
+  "category": "harassment",
+  "is_present": true,
+  "score": 0.8076742617342823
+}, 
+{
+  "category": "hate",
+  "is_present": true,
+  "score": 0.6933337275467522
+},
+{
+  "category": "illicit",
+  "is_present": false,
+  "score": 0.016620672563316466
+},
+{
+  "category": "sexual",
+  "is_present": true,
+  "score": 0.9281824295472227
+},
+{
+  "category": "violence",
+  "is_present": true,
+  "score": 0.6850510703048678
+},
+{
+  "category": "harassment/threatening",
+  "is_present": false,
+  "score": 0.11442913287272342
+},
+{
+   "category": "hate/threatening",
+   "is_present": false,
+   "score": 0.023609190664637875
+},
+{
+  "category": "illicit/violent",
+  "is_present": false,
+  "score": 0.0020301693889894067
+},
+{
+  "category": "self-harm/intent",
+  "is_present": false,
+  “score”: 0.0045969851961812705
+},
+{
+  "category": "self-harm/instructions",
+  "is_present": false,
+  "score": 0.0003475999993060529
+},
+{
+   "category": "self-harm",
+   "is_present": false,
+   "score": 0.040972273201981844
+},
+{
+   "category": "sexual/minors",
+   "is_present": false,
+   "score": 0.0005220125693558398
+},
+{
+    "category": "violence/graphic",
+    "is_present": false,
+    "score": 0.005553221405372517
+}]
+```
+
+***
+
+### Moods
+
+Extracts a list of an arbitrary number of moods from the lyric corpus to establish a form of lyrics classification through sentiment analysis.
+
+**Sample output:**
+
+* **Title**: Wish You Were Here
+* **Artist**: Pink Floyd
+* **Main moods**: Reflection, Heartbreak, Angst, Nostalgia, Love
+
+***
+
+### Rating
+
+Assigns to the provided song’s lyrics a parental guide rating, much like the ones from the Motion Picture Association film rating system.
+
+**Sample output:**
+**G, PG, PG-13, R, NC-17**
+
+* **Title**: Lose Yourself
+* **Artist**: Eminem
+* **Audience**: R
+* **Description**: The lyrics contain strong language and themes of struggle, including references to drug use, violence, and adult situations, which are not suitable for children under 17 without parental guidance.
+
+***
+
+### Religions
+
+Identifies references to religions, religious themes or religious groups within a song’s lyrics.
+
+**Sample output:**
+
+* **Title**: Il cantico delle creature
+* **Artist**: Angelo Branduardi
+* **Has references**: true
+* **Referenced religions**: “christianity”
+
+***
+
+### Themes
+
+Extracts a list of the main themes covered by the song’s lyrics, referring to the portion of the songs that better convey such messages.
+
+**Sample output:**
+
+* **Title**: Beautiful Things
+* **Artist**: Benson Boone
+* **Main themes**:
+  * “Gratitude and appreciation”:
+    * *"I found a girl my parents love"*,
+    * *"I thank God every day"*
+  * "Fear of loss":
+    * *"But there's no man as terrified"*,
+    * *"Oh, I hope I don't lose you"*,
+    * *"I just might lose it all"*
+  * "Personal growth and stability":
+    * *"I found my mind, I'm feelin' sane"*,
+    * *"It's been a while, but I'm finding my faith"*
+
+***
+
+### Language Detection
+
+Identifies the language of a given text.
+
+**Sample output:**
+
+* **Title**: Mas Que Nada
+* **Artist**: Sérgio Mendes
+* **Languages**:
+
+```json theme={null}
+[{ 
+  "is_romanized": false
+  "language_iso_code_1": "pt"
+  "language_iso_code_3": "por"
+  "language_name": "portuguese"
+  "percentage": 100.0
+}]
+```
+
+***
+
+### Entities
+
+Identifies and categorizes specific elements like names, locations, dates, organizations, and more.
+
+**Sample output:**
+
+```json theme={null}
+"entity_list": [
+    {
+        "entity_name": "Tupac Shakur",
+        "wikidata": {
+            "id": "Q6107",
+            "types": [
+                "human"
+            ],
+            "description": "American rapper (1971–1996)",
+            "thumbnail": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Tupac_Shakur.jpg/50px-Tupac_Shakur.jpg",
+            "rank": 556934
+        },
+        "categories": [
+            "Things",
+            "People & Groups",
+            "Artists"
+        ],
+        "model_metadata": {
+            "type": "human",
+            "description": "American rapper (1971–1996)"
+        },
+        "matches": [
+            {
+                "matched_text": "Pac",
+                "start_char": 1409,
+                "end_char": 1412
+            },
+            {
+                "matched_text": "Pac",
+                "start_char": 2672,
+                "end_char": 2675
+            }
+        ],
+        "occurrences": 2,
+        "wikipedia": [
+            {
+                "language": "en",
+                "url": "https://en.wikipedia.org/wiki/Tupac_Shakur"
+            }
+        ]
+    }
+]
+```
+
+
+# track.lyrics.analysis.get
+Source: https://docs.musixmatch.com/api-reference/analysis/track-lyrics-analysis-get
+
+get /ws/1.1/track.lyrics.analysis.get
+Retrieve music lyrics analysis data for a specific track.
+
+This example serves as a guide for developers and technical teams to integrate and utilize Musixmatch's lyrics analysis API efficiently.
+At least one of the query parameters must be indicated: **commontrack\_id**, **track\_id** or **track\_isrc**.
+
+For detailed information about the metadata returned by this endpoint, please refer to the [Analysis documentation](/api-reference/analysis/analysis-overview).
+
+
+# track.lyrics.analysis.search
+Source: https://docs.musixmatch.com/api-reference/analysis/track-lyrics-analysis-search
+
+post /ws/1.1/track.lyrics.analysis.search
+Search tracks by lyrics analysis criteria — moods, themes, meaning, entities, moderation, rating, and more. Discover music based on what songs are about rather than just metadata like title or artist.
+
+Search tracks by lyrics analysis criteria — moods, themes, meaning, entities, moderation, rating, and more.
+
+This endpoint enables analysis-driven discovery: find songs about specific topics, with certain moods, mentioning particular entities, or matching content safety criteria. Search parameters are passed in the request body under a `data` key, while pagination is controlled via query parameters.
+
+For detailed information about the analysis metadata returned in the response, please refer to the [Analysis documentation](/api-reference/analysis/analysis-overview).
+
+## Input Constraints
+
+* **Maximum string length**: 500 characters (`meaning`, `themes[]`, `genre[]`, `entities[].name`)
+* **Maximum array size**: 20 items (`themes`, `entities`, `genre`, `moods`, `religions`, `moderation_categories`)
+
+## Entities
+
+The `entities` parameter accepts an array of objects. Each object must have at least one of `name` or `category`.
+
+* Fields **within** an object are AND-ed (e.g. name=Paris AND category=Geographical Locations)
+* **Multiple** objects are OR-ed (e.g. Paris OR London)
+
+## Available Moods
+
+Love, Heartbreak, Joy, Empowerment, Angst, Reflection, Inspiration, Nostalgia, Despair, Celebration, Anger, Peace, Solitude, Adventure, Social Commentary, Hope, Spirituality, Freedom, Party, Nature
+
+## Rating Values
+
+| Value | Description                                    |
+| ----- | ---------------------------------------------- |
+| G     | General audiences                              |
+| PG    | Parental guidance suggested                    |
+| PG-13 | Parents strongly cautioned (includes G and PG) |
+| R     | Restricted (includes G, PG, and PG-13)         |
+| NC-17 | Adults only (includes all)                     |
+
+Rating is **hierarchical** — filtering by `PG-13` returns tracks rated G, PG, and PG-13.
+
+## Entity Categories
+
+People & Groups, Geographical Locations, Events & Periods, Cultural Works, Organizations & Institutions, Products & Brands, Concepts & Ideas, Diseases
+
+## Religions
+
+The `religions` parameter accepts an array of **strings** (religion names). Use `exclude_religions: true` to exclude tracks with any religious references instead.
+
+## Moderation Categories
+
+The `moderation_categories` parameter accepts an array of **strings** (category names).
+
+Available categories: `harassment`, `hate`, `illicit`, `sexual`, `violence`, `harassment/threatening`, `hate/threatening`, `illicit/violent`, `self-harm/intent`, `self-harm/instructions`, `self-harm`, `sexual/minors`, `violence/graphic`
+
+```json theme={null}
+"moderation_categories": ["violence"]
+```
+
+## Example
+
+A request combining multiple parameters:
+
+```json theme={null}
+{
+  "data": {
+    "meaning": "songs about overcoming personal struggles and finding inner strength after loss",
+    "moods": ["Empowerment", "Reflection", "Hope"],
+    "themes": ["resilience", "self-discovery", "moving on"],
+    "rating": "PG-13",
+    "genre": ["Pop", "Alternative"],
+    "moderation_categories": ["violence"],
+    "entities": [
+      {
+        "name": "freedom",
+        "category": "Concepts & Ideas"
+      }
+    ],
+    "lyrics_language": "en",
+    "first_release_date": "20200101",
+    "needs_moderation": false,
+    "lyrics_explicit": false
+  }
+}
+```
+
+## Notes
+
+* The `available` count in the response header reflects total search engine hits. Actual items in `track_list` may be fewer, as tracks without analysis data or with metadata restrictions are skipped.
+* The `analysis` object in the response matches the structure of [track.lyrics.analysis.get](/api-reference/analysis/track-lyrics-analysis-get).
+
+
+# track.lyricslens.get
+Source: https://docs.musixmatch.com/api-reference/analysis/track-lyricslens-get
+
+get /ws/1.1/track.lyricslens.get
+Retrieve music lyrics analysis data for a specific track.
+
+<Warning>
+  This endpoint is deprecated and will be removed on **September 1, 2026**. Use [track.lyrics.analysis.get](/api-reference/analysis/track-lyrics-analysis-get) instead.
+</Warning>
+
+This example serves as a guide for developers and technical teams to integrate and utilize Musixmatch's lyrics analysis API efficiently.
+At least one of the query parameters must be indicated: **commontrack\_id**, **track\_id** or **track\_isrc**.
+
+For detailed information about the metadata returned by this endpoint, please refer to the [Analysis documentation](/api-reference/analysis/analysis-overview).
+
+
+# Lyric Fingerprint API
+Source: https://docs.musixmatch.com/api-reference/fingerprint/fingerprint-overview
+
+
+
+The Lyric Fingerprint API uses its comprehensive database of millions of lyrics and advanced search technology to provide a powerful text-matching service. This enables platforms to **detect potential copyrighted musical material** at scale.
+
+<Callout icon="circle-chevron-right">
+  Want to integrate Lyric Fingerprint API into your app? [Contact us](mailto:apisupport@musixmatch.com?subject=Sentinel%20integration%20request)
+</Callout>
+
+In today's generative AI landscape, platforms face the critical challenge of identifying copyrighted material in user-generated text. Lyric Fingerprint acts as a key component, allowing platforms to proactively flag potential copyright concerns and significantly strengthen their compliance strategies. More information on the [Sentinel website](https://sentinel.musixmatch.com?utm_source=docs\&utm_medium=web\&utm_content=site_link).
+
+Through a simple `POST` request to the `track.lyrics.fingerprint.post` endpoint, developers can submit any text containing at least 10 words and receive a ranked list of matching tracks from the Musixmatch catalog. The `size` parameter impacts the API performance and latency. It controls the number of candidate lyrics retrieved for comparison against your input. It is set to 10 by default with a maximum of 20, allowing platforms to balance between detection accuracy and processing efficiency. The `limit` parameter defines how many of the top matching tracks to return in the response.
+
+```JSON theme={null}
+{
+  "data": {
+    "text": "Was dressed to the nines And we were dancing, dancing Like we're made of starlight, starlight nLike we're made of starlight, starlight"
+  }
+}
+```
+
+> Each `track` response property includes detailed metadata about the matched track, such as `track_name`, `artist_name`, `album_name` and `primary_genres`. The same data you would get from a `track.get` endpoint. The `similarity` score instead, indicates how closely the input text matches the lyrics of the track, with higher values representing a closer match.
+
+```JSON theme={null}
+{
+  "track_list": [
+    {
+      "similarity": 99.23664122137404,
+      "track": {
+        "track_id": 226270199,
+        "track_isrc": "USUG12103675",
+        "commontrack_isrcs": [
+            [
+                "USUG12103675"
+            ]
+        ],
+        "track_spotify_id": "7A2cNLRT0YJc1yjxHlKihs",
+        "track_name": "Starlight (Taylor's Version)",
+        "track_rating": 60,
+        "track_length": 220,
+        "commontrack_id": 135756858,
+        "instrumental": 0,
+        "explicit": 0,
+        "has_lyrics": 1,
+        "has_subtitles": 1,
+        "has_richsync": 1,
+        "num_favourite": 16,
+        "album_id": 47387431,
+        "album_name": "Red (Taylor's Version)",
+        "artist_id": 259675,
+        "artist_name": "Taylor Swift",
+        "album_coverart_100x100": "http://s.mxmcdn.net/images-storage/albums/nocover.png",
+        "album_coverart_350x350": "",
+        "album_coverart_500x500": "",
+        "album_coverart_800x800": "",
+        "track_share_url": "https://www.musixmatch.com/lyrics/Taylor-Swift/Starlight-Taylor-s-Version?utm_source=application&utm_campaign=api&utm_medium=individual%3A1409626377500",
+        "track_edit_url": "https://www.musixmatch.com/lyrics/Taylor-Swift/Starlight-Taylor-s-Version/edit?utm_source=application&utm_campaign=api&utm_medium=individual%3A1409626377500",
+        "restricted": 0,
+        "updated_time": "2021-11-16T05:26:09Z",
+        "primary_genres": {
+            "music_genre_list": [
+                {
+                    "music_genre": {
+                        "music_genre_id": 14,
+                        "music_genre_parent_id": 34,
+                        "music_genre_name": "Pop",
+                        "music_genre_name_extended": "Pop",
+                        "music_genre_vanity": "Pop"
+                    }
+                }
+            ]
+        }
+      }
+    }
+  ]
+}
+```
+
+<Callout icon="circle-chevron-right">
+  Want to integrate Lyric Fingerprint API into your app? [Contact us](mailto:apisupport@musixmatch.com?subject=Sentinel%20integration%20request)
+</Callout>
+
+
+# track.lyrics.fingerprint.post
+Source: https://docs.musixmatch.com/api-reference/fingerprint/track-lyrics-fingerprint-post
+
+post /ws/1.1/track.lyrics.fingerprint.post
+Detect potential copyrighted lyrics within any text string and retrieve a ranked list of matching tracks.
+
+<PlanIndicator />
+
+Use this API to screen any text for potential lyrical content.
+
+This service is designed for digital platforms, especially those implementing generative AI, to automatically identify potential copyright concerns in user-generated content. The API supports the submission of any text string, returning a ranked list of track matches with corresponding similarity scores.
+
+
+# album.get
+Source: https://docs.musixmatch.com/api-reference/lyrics-catalog/album-get
+
+get /ws/1.1/album.get
+Get album data from our database, including its name, release date, and artist name.
+
+<PlanIndicator />
+
+
+# album.tracks.get
+Source: https://docs.musixmatch.com/api-reference/lyrics-catalog/album-tracks-get
+
+get /ws/1.1/album.tracks.get
+Get the list of songs in an album.
+
+<PlanIndicator />
+
+
+# artist.albums.get
+Source: https://docs.musixmatch.com/api-reference/lyrics-catalog/artist-albums-get
+
+get /ws/1.1/artist.albums.get
+Get albums for an artist.
+
+<PlanIndicator />
+
+
+# artist.get
+Source: https://docs.musixmatch.com/api-reference/lyrics-catalog/artist-get
+
+get /ws/1.1/artist.get
+Get the artist data from our database.
+
+<PlanIndicator />
+
+
+# artist.search
+Source: https://docs.musixmatch.com/api-reference/lyrics-catalog/artist-search
+
+get /ws/1.1/artist.search
+Search for artists in our database.
+
+<PlanIndicator />
+
+
+# chart.artists.get
+Source: https://docs.musixmatch.com/api-reference/lyrics-catalog/chart-artists-get
+
+get /ws/1.1/chart.artists.get
+Get the list of the top artists for a given country.
+
+<PlanIndicator />
+
+
+# chart.tracks.get
+Source: https://docs.musixmatch.com/api-reference/lyrics-catalog/chart-tracks-get
+
+get /ws/1.1/chart.tracks.get
+Get the list of the top songs for a given country.
+
+<PlanIndicator />
+
+
+# languages.get
+Source: https://docs.musixmatch.com/api-reference/lyrics-catalog/languages-get
+
+get /ws/1.1/languages.get
+Retrieve a list of the languages supported by Musixmatch for lyrics.
+
+<PlanIndicator />
+
+
+# Lyrics & Catalog API
+Source: https://docs.musixmatch.com/api-reference/lyrics-catalog/lyrics-catalog-overview
+
+
+
+The Lyrics & Catalog API provides comprehensive access to the world's largest lyrics database and music catalog metadata. Use these endpoints to search, match, and retrieve lyrics, translations, and detailed music metadata.
+
+### Available endpoints
+
+| Category         | Endpoints                                                                                                        | Description                                                            |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| **Matcher**      | `matcher.lyrics.get`, `matcher.track.get`, `matcher.subtitle.get`                                                | Match content by artist name and track title                           |
+| **Track**        | `track.get`, `track.search`, `track.lyrics.get`, `track.subtitle.get`, `track.richsync.get`, `track.snippet.get` | Retrieve track data by IDs such as Spotify ID, ISRC, or Apple Music ID |
+| **Translations** | `track.lyrics.translation.get`, `track.subtitle.translation.get`                                                 | Get translated lyrics and subtitles                                    |
+| **Artist**       | `artist.get`, `artist.albums.get`, `artist.search`                                                               | Artist metadata and discography                                        |
+| **Album**        | `album.get`, `album.tracks.get`                                                                                  | Album metadata and tracklists                                          |
+| **Charts**       | `chart.tracks.get`, `chart.artists.get`, `music.genres.get`                                                      | Top charts and genre listings                                          |
+
+
+# matcher.lyrics.get
+Source: https://docs.musixmatch.com/api-reference/lyrics-catalog/matcher-lyrics-get
+
+get /ws/1.1/matcher.lyrics.get
+Get the lyrics for a track based on title and artist.
+
+<PlanIndicator />
+
+This API uses fuzzy search to match your input parameters with our catalogue’s metadata.
+
+**Make sure to:**
+
+* fulfill the [country restrictions](/content-restrictions) you receive for every copyrighted content;
+* apply the [tracking method](/lyrics-views-tracking) of your choice.
+
+
+# matcher.subtitle.get
+Source: https://docs.musixmatch.com/api-reference/lyrics-catalog/matcher-subtitle-get
+
+get /ws/1.1/matcher.subtitle.get
+Get the syncs for a song given its title, artist and duration.
+
+<PlanIndicator />
+
+You can use the 'f\_subtitle\_length\_max\_deviation' to fetch syncs within the given duration range.
+
+**Make sure to:**
+
+* fulfill the [country restrictions](/content-restrictions) you receive for every copyrighted content;
+* apply the [tracking method](/lyrics-views-tracking) of your choice.
+
+
+# matcher.track.get
+Source: https://docs.musixmatch.com/api-reference/lyrics-catalog/matcher-track-get
+
+get /ws/1.1/matcher.track.get
+Match your song against our database.
+
+<PlanIndicator />
+
+In some cases you already have some information about the track title, artist name, album, etc.\
+A possible strategy to get the corresponding lyrics could be:
+
+* search our catalogue with a precise match;
+* try using fuzzy search;
+* try again using artist aliases, and so on.
+
+The matcher.track.get method does all the job for you in a single call.
+This way you don’t need to worry about details, and you’ll get instant benefits for your application without changing a row in your code, while we take care of improving the implementation behind.
+
+**Make sure to:**
+
+* fulfill the [country restrictions](/content-restrictions) you receive for every copyrighted content;
+* apply the [tracking method](/lyrics-views-tracking) of your choice.
+
+
+# music.genres.get
+Source: https://docs.musixmatch.com/api-reference/lyrics-catalog/music-genres-get
+
+get /ws/1.1/music.genres.get
+Get the list of the music genres available in Musixmatch catalogue.
+
+<PlanIndicator />
+
+
+# track.get
+Source: https://docs.musixmatch.com/api-reference/lyrics-catalog/track-get
+
+get /ws/1.1/track.get
+Get a track info from our database: title, artist, ISRC(s), 'instrumental' flag.
+
+<PlanIndicator />
+
+At least one of the query parameters must be indicated: **commontrack\_id**, **track\_isrc**, **track\_spotify\_id** or **track\_itunes\_id**.
+
+
+# track.lyrics.get
+Source: https://docs.musixmatch.com/api-reference/lyrics-catalog/track-lyrics-get
+
+get /ws/1.1/track.lyrics.get
+Get the lyrics for a track.
+
+<PlanIndicator />
+
+At least one of the query parameters must be indicated: **commontrack\_id**, or **track\_isrc**.
+
+Make sure to fulfill the [country restrictions](/content-restrictions) you receive for every copyrighted content.\
+See also: [Lyrics views tracking](/lyrics-views-tracking)
+
+
+# track.lyrics.translation.get
+Source: https://docs.musixmatch.com/api-reference/lyrics-catalog/track-lyrics-translation-get
+
+get /ws/1.1/track.lyrics.translation.get
+Get a translation of the lyrics for a track.
+
+<PlanIndicator />
+
+The API will return both the lyrics and its translation. The lyrics and its translation will always have the same number of lines, ensuring that each lyrics line can be easily associated with its translation.\
+If no translation exists for the indicated ID, the translated lyrics object is empty but other lyrics' metadata are still returned. At least one of the query parameters must be indicated: **commontrack\_id**, **track\_id**, or **track\_isrc**.
+
+**Make sure to:**
+
+* fulfill the [country restrictions](/content-restrictions) you receive for every copyrighted content;
+* apply the [tracking method](/lyrics-views-tracking) of your choice.
+
+
+# track.richsync.get
+Source: https://docs.musixmatch.com/api-reference/lyrics-catalog/track-richsync-get
+
+get /ws/1.1/track.richsync.get
+Get the richsync data for a track. A rich sync is an enhanced version of the standard sync, allowing position offsets by a single characther.
+
+<PlanIndicator />
+
+At least one of the query parameters must be indicated: **commontrack\_id**, **track\_id**, or **track\_isrc**.
+
+**A rich sync also allows:**
+
+* endless formatting options at single char level;
+* multiple concurrent voices;
+* multiple scrolling direction.
+
+**Make sure to:**
+
+* fulfill the [country restrictions](/content-restrictions) you receive for every copyrighted content;
+* apply the [tracking method](/lyrics-views-tracking) of your choice.
+
+> If you're looking for **a list of popular songs with an available rich sync you can use our track.search** endpoint with the following parameters:
+>
+> * f\_has\_rich\_sync=1
+> * s\_track\_rating=desc
+
+
+# track.search
+Source: https://docs.musixmatch.com/api-reference/lyrics-catalog/track-search
+
+get /ws/1.1/track.search
+Search for track in our database.
+
+<PlanIndicator />
+
+
+# track.snippet.get
+Source: https://docs.musixmatch.com/api-reference/lyrics-catalog/track-snippet-get
+
+get /ws/1.1/track.snippet.get
+Get a snippet of the lyrics for a track.
+
+<PlanIndicator />
+
+At least one of the query parameters must be indicated: **commontrack\_id**, **track\_id**, or **track\_isrc**.
+
+Make sure to fulfill the [country restrictions](/content-restrictions) you receive for every copyrighted content.
+
+
+# track.subtitle.get
+Source: https://docs.musixmatch.com/api-reference/lyrics-catalog/track-subtitle-get
+
+get /ws/1.1/track.subtitle.get
+Get the subtitle for a track.
+
+<PlanIndicator />
+
+At least one of the query parameters must be indicated: **commontrack\_id**, **track\_id**, or **track\_isrc**.
+
+Make sure to:
+
+* fulfill the [country restrictions](/content-restrictions) you receive for every copyrighted content;
+* apply the [tracking method](/lyrics-views-tracking) of your choice.
+
+
+# track.subtitle.translation.get
+Source: https://docs.musixmatch.com/api-reference/lyrics-catalog/track-subtitle-translation-get
+
+get /ws/1.1/track.subtitle.translation.get
+Get a translated sync for a given language.
+
+<PlanIndicator />
+
+The API will return both the sync and its translation. The sync and its translation will always have the same number of lines, ensuring that each synched line can be easily associated with its translation.\
+At least one of the query parameters must be indicated: **commontrack\_id**, **track\_id**, or **track\_isrc**.
+
+**Make sure to:**
+
+* fulfill the [country restrictions](/content-restrictions) you receive for every copyrighted content;
+* apply the [tracking method](/lyrics-views-tracking) of your choice.
+
+
+# Musixmatch Pro API
+Source: https://docs.musixmatch.com/api-reference/overview
+
+Explore the Musixmatch Pro API categories.
+
+<CardGroup>
+  <Card title="Lyrics & Catalog" icon="layer-group" href="/api-reference/lyrics-catalog/lyrics-catalog-overview">
+    Search and retrieve lyrics, translations, subtitles, and rich music metadata.
+  </Card>
+
+  <Card title="Fingerprint (Sentinel)" icon="shield-halved" href="/api-reference/fingerprint/fingerprint-overview">
+    Detect and identify copyrighted lyrics at scale using audio fingerprinting.
+  </Card>
+
+  <Card title="Analysis" icon="wand-magic-sparkles" href="/api-reference/analysis/analysis-overview">
+    Analyze lyrics to extract enriched insights and structured data.
+  </Card>
+</CardGroup>
+
+
+# Checklist before going live
+Source: https://docs.musixmatch.com/checklist
+
+
+
+Before your product goes live, please take a moment to read this checklist and make sure you’ve got everything covered:
+
+* Read the [API Terms of Services](https://about.musixmatch.com/apiterms) to be sure your application complies
+* Check your API call limits in order to match the expected traffic
+* Handle `UTF-8` encoding in your pages required to display Musixmatch lyrics
+* Show the value of `lyrics_copyright` you received from [track.lyrics.get](/api-reference/lyrics-catalog/track-lyrics-get) whenever you display lyrics in a page
+* Implement the [country restrictions](/content-restrictions) you receive within every copyrighted content
+* Add the [lyrics tracking script](/lyrics-views-tracking) to count the lyrics visualisations when using [track.lyrics.get](/api-reference/lyrics-catalog/track-lyrics-get)
+* Add the "Lyrics powered by" image [provided by Musixmatch](https://about.musixmatch.com/brand-resources) and link it to the `backlink_url` field received from [track.lyrics.get](/api-reference/lyrics-catalog/track-lyrics-get)
+* Disable the “copy and paste” function of web traffic from Japan
+
+
+# Content Restrictions
+Source: https://docs.musixmatch.com/content-restrictions
+
+
+
+<Info>This page is written for the users of the non-enterprise plans. Information on restrictions for the Enterprise plan can be found [here](/enterprises/content-restrictions).</Info>
+
+Restrictions on content are applied for a number of reasons; however, it all comes down to preserving copyright owners and preventing legal queries.
+
+Within every API response that includes certain track-related content (e.g., lyrics or subtitles) we will provide information whether it is restricted or not. When we are not authorized to display certain content, we will not display it (e.g., lyrics body or subtitle body) in the endpoint’s response and will mark it as restricted. Where suitable, we will provide an appropriate message of not being authorized to show the lyrics.
+
+This behaviour is applied to **three distinct cases**:
+
+* An artist is restricted
+* A single track is restricted worldwide
+* A single track is restricted in a specific country (or countries)
+
+## Examples
+
+#### 1. Matcher.track.get for the track “Only Shallow” by My Bloody Valentine.
+
+The artist is restricted worldwide.
+
+```json theme={null}
+{
+    "message": {
+        "header": {
+            "status_code": 200,
+            "execute_time": 0.015407085418701,
+            "mode": null,
+            "cached": null
+        },
+        "body": {
+            "track": {
+                "track_id": 17285071,
+                "track_isrc": "USWB10101903",
+                "commontrack_isrcs": [
+                    [
+                        "USWB10101903",
+                        "USMTD9509802",
+                        "GBCEL2000150"
+                    ]
+                ],
+                "track_spotify_id": "52UcjsM15hjCQAUbTW2hy1",
+                "track_name": "Only Shallow",
+                "track_rating": 46,
+                "track_length": 258,
+                "commontrack_id": 1126634,
+                "instrumental": 0,
+                "explicit": 0,
+                "has_lyrics": 1,
+                "has_subtitles": 1,
+                "has_richsync": 1,
+                "num_favourite": 44,
+                "album_id": 70645357,
+                "album_name": "Loveless",
+                "artist_id": 8665,
+                "artist_name": "My Bloody Valentine",
+                "album_coverart_100x100": "http://s.mxmcdn.net/images-storage/albums/nocover.png",
+                "album_coverart_350x350": "",
+                "album_coverart_500x500": "",
+                "album_coverart_800x800": "",
+                "track_share_url": "https://www.musixmatch.com/lyrics/My-Bloody-Valentine/Only-Shallow?utm_source=application&utm_campaign=api&utm_medium=Musixmatch%3A1409625777994",
+                "track_edit_url": "https://www.musixmatch.com/lyrics/My-Bloody-Valentine/Only-Shallow/edit?utm_source=application&utm_campaign=api&utm_medium=Musixmatch%3A1409625777994",
+                "restricted": 1,
+                "updated_time": "2024-05-31T15:22:14Z",
+                "primary_genres": {
+                    "music_genre_list": [
+                        {
+                            "music_genre": {
+                                "music_genre_id": 20,
+                                "music_genre_parent_id": 34,
+                                "music_genre_name": "Alternative",
+                                "music_genre_name_extended": "Alternative",
+                                "music_genre_vanity": "Alternative"
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}
+```
+
+#### 2.  Track.lyrics.get for the track “Azzurro” by Adriano Celentano.
+
+The track is restricted only in Italy.
+
+```json theme={null}
+{
+    "message": {
+        "header": {
+            "status_code": 200,
+            "execute_time": 0.056041955947876
+        },
+        "body": {
+            "lyrics": {
+                "lyrics_id": 23793322,
+                "explicit": 0,
+                "lyrics_body": "",
+                "lyrics_language": "it",
+                "script_tracking_url": "https://tracking.musixmatch.com/t1.0/m_js/e_0/sn_0/l_23793322/su_0/rs_0/tr_.....7HEJ/",
+                "pixel_tracking_url": "https://tracking.musixmatch.com/t1.0/m_img/e_0/sn_0/l_23793322/su_0/rs_0/tr_.....DhG8/",
+                "lyrics_copyright": "Unfortunately we're not authorized to show these lyrics.",
+                "updated_time": "2024-07-17T13:48:17Z"
+            }
+        }
+    }
+}
+```
+
+
+# Authentication
+Source: https://docs.musixmatch.com/enterprises/authentication
+
+OAuth 2.0 integration guide for Musixmatch enterprise partners
+
+Musixmatch enterprise integrations use **OAuth 2.0** for authentication and authorization. Two grant types are supported depending on your use case.
+
+The authorization server base URL is:
+
+```
+https://connect.musixmatch.com
+```
+
+| Endpoint                                      | Description                |
+| --------------------------------------------- | -------------------------- |
+| `GET /oauth/authorize`                        | Authorization endpoint     |
+| `POST /oauth/token`                           | Token issuance and refresh |
+| `POST /oauth/token-metadata`                  | Token introspection        |
+| `GET /.well-known/oauth-authorization-server` | OAuth 2.0 metadata         |
+| `GET /.well-known/openid-configuration`       | OpenID Connect metadata    |
+
+## Client Registration
+
+Before integrating, Musixmatch will issue you a **Client ID** and **Client Secret** during the client registration process. You will also need to provide your `redirect_uri` (required for the Authorization Code flow).
+
+Contact [apisupport@musixmatch.com](mailto:apisupport@musixmatch.com) to begin registration.
+
+## Authorization Code Flow
+
+Use this flow to authenticate end users (artists or rights holders) within your application. The result is an `access_token` bound to that user, which can be introspected to retrieve their Musixmatch user ID.
+
+### Step 1 — Initiate the authorization request
+
+Redirect the user to the Musixmatch authorization endpoint:
+
+```
+GET https://connect.musixmatch.com/oauth/authorize
+```
+
+| Parameter               | Required    | Description                                             |
+| ----------------------- | ----------- | ------------------------------------------------------- |
+| `response_type`         | Yes         | Must be `code`                                          |
+| `client_id`             | Yes         | Your client identifier                                  |
+| `redirect_uri`          | Yes         | Your pre-registered callback URL                        |
+| `scope`                 | Yes         | Must include `profile email`                            |
+| `state`                 | Yes         | Random value to prevent CSRF — verify it on callback    |
+| `code_challenge`        | Recommended | Base64url-encoded SHA256 hash of `code_verifier` (PKCE) |
+| `code_challenge_method` | Recommended | Must be `S256` if using PKCE                            |
+
+### Step 2 — User authorizes
+
+The user logs in or registers on Musixmatch. On success, they are redirected to your `redirect_uri` with:
+
+* `code` — the authorization code
+* `state` — must match the value you sent in Step 1
+
+### Step 3 — Exchange the code for tokens
+
+```
+POST https://connect.musixmatch.com/oauth/token
+Content-Type: application/x-www-form-urlencoded
+```
+
+| Parameter       | Required     | Description                                                    |
+| --------------- | ------------ | -------------------------------------------------------------- |
+| `grant_type`    | Yes          | Must be `authorization_code`                                   |
+| `client_id`     | Yes          | Your client identifier                                         |
+| `client_secret` | Yes          | Your client secret                                             |
+| `code`          | Yes          | The authorization code from Step 2                             |
+| `redirect_uri`  | Yes          | Must exactly match the URI used in Step 1                      |
+| `code_verifier` | If PKCE used | The original unhashed secret used to generate `code_challenge` |
+
+**Response:**
+
+```json theme={null}
+{
+  "access_token": "...",
+  "token_type": "Bearer",
+  "expires_in": 3600,
+  "refresh_token": "...",
+  "scope": "profile email"
+}
+```
+
+### Step 4 — Refresh the access token
+
+When the `access_token` expires, use the `refresh_token` to get a new one without requiring the user to log in again.
+
+```
+POST https://connect.musixmatch.com/oauth/token
+Content-Type: application/x-www-form-urlencoded
+```
+
+| Parameter       | Required | Description                   |
+| --------------- | -------- | ----------------------------- |
+| `grant_type`    | Yes      | Must be `refresh_token`       |
+| `refresh_token` | Yes      | The refresh token from Step 3 |
+| `client_id`     | Yes      | Your client identifier        |
+| `client_secret` | Yes      | Your client secret            |
+
+<Warning>
+  Following the OAuth specification and security best practices, the `refresh_token` used in a successful request will be invalidated — alongside all related access tokens — and a new one will be issued in the response. Always store and use the latest `refresh_token` returned.
+</Warning>
+
+## Retrieving the Musixmatch User ID
+
+Once you have a user `access_token`, introspect it to retrieve the Musixmatch user ID (`sub`). This ID is required when making API calls on behalf of a user.
+
+```
+POST https://connect.musixmatch.com/oauth/token-metadata
+Content-Type: application/x-www-form-urlencoded
+```
+
+| Parameter     | Required | Description             |
+| ------------- | -------- | ----------------------- |
+| `accessToken` | Yes      | The user's access token |
+
+**Response (valid token):**
+
+```json theme={null}
+{
+  "active": true,
+  "sub": "<musixmatch-user-id>"
+}
+```
+
+**Response (invalid token):**
+
+```json theme={null}
+{
+  "active": false
+}
+```
+
+## Client Credentials Flow
+
+Use this flow for server-to-server API calls that do not require a user context — for example, submitting a release delivery or lyrics from your backend.
+
+```
+POST https://connect.musixmatch.com/oauth/token
+Content-Type: application/x-www-form-urlencoded
+```
+
+| Parameter       | Required | Description                                   |
+| --------------- | -------- | --------------------------------------------- |
+| `grant_type`    | Yes      | Must be `client_credentials`                  |
+| `client_id`     | Yes      | Your client identifier                        |
+| `client_secret` | Yes      | Your client secret                            |
+| `scope`         | No       | Space-separated list of requested permissions |
+
+**Response:**
+
+```json theme={null}
+{
+  "access_token": "...",
+  "token_type": "Bearer",
+  "expires_in": 3600,
+  "scope": "..."
+}
+```
+
+Pass the resulting `access_token` as a Bearer token in the `Authorization` header of API requests:
+
+```
+Authorization: Bearer <access_token>
+```
+
+
+# Catalog Feed integration
+Source: https://docs.musixmatch.com/enterprises/catalog-feed/overview
+
+Download a complete copy of the Musixmatch music database for offline access
+
+This documentation provides technical guidance for integrating Musixmatch’s music metadata into your product. The feed delivers various music-related metadata, including lyrics, writing credits, translations, mood information, and the structural breakdown of tracks.
+
+Additionally, it describes the data delivery process, which includes weekly full feeds and daily incremental updates. This document outlines how to interpret and use each section of the data to enrich your product experience.
+Note that, depending on the contractual agreement between Musixmatch and the client accessing the feed, some of the information described here might not be available to the client.
+
+## Feed Structure Overview
+
+The metadata feed contains multiple elements such as lyrics, song credits, translations, mood data, and song structure. The feed is delivered in two main ways:
+
+* **Full feed**: A complete data feed delivered once a week.
+* **Incremental updates**: Daily updates containing changes that have occurred since the last full feed.
+
+These deliveries allow your system to stay up-to-date with minimal overhead by consuming only the necessary updates daily, while having access to the full dataset on a weekly basis.
+
+Each item in the feed is delivered in a JSON format and has the following structure:
+
+```json theme={null}
+{
+  "commontrack_id": 123456, //internal Musixmatch track id
+  "lyrics_id": 456789, //internal Musixmatch lyrics id
+  "isrcs": ["USUV12345678"], //ISRC ids associated to the track,
+  "language_iso_code_1": "en",
+  "explicit": true, //boolean flag for if the track contains explicit lyrics
+  "instrumental": false, //boolean flag for if the track is instrumental or not
+  "title": "Track Title",
+  "artist": "Artist Name",
+  "lyrics": "First lyrics line\nSecond lyrics line\nEtc.",
+  "snippet": "Most relevant lyrics line of the song",
+  "syncs": [], //array of line by line time synced lyrics
+  "richsyncs": [], //array of word by word time synced lyrics
+  "writers": [], //array of songwriters information
+  "translations": [], //array of lyrics translations in multiple languages
+  "metadata": {
+    "mood_list": [], //array of song moods
+    "structure": {}, //song structure information
+  },
+  "performers": [], //array of song's performers
+  "genre": [], //array of the song's genres
+  "restrictions": {}, //regional restrictions rules for displaying lyrics
+  "restricted": {}, //boolean flag for if the display of lyrics is restricted worldwide
+}
+```
+
+## Detailed Feed Sections
+
+### Lyrics
+
+The lyrics section provides full-text lyrics of a song, including information about explicit content, language, and the structure of time-synchronized lyrics.
+
+* **Full Lyrics**: The complete text of the lyrics in the song. This is typically provided as a single string and may include markers for explicit language. Example:
+
+```json theme={null}
+“lyrics”: “First lyrics line\nSecond lyrics line\nEtc.”
+```
+
+* **Line by line Time-Synchronized Lyrics (Syncs)**: Time-coded lyrics aligned with specific moments in the song. Each entry in the synchronization list will provide the start time in milliseconds and the corresponding lyric. Example:
+
+```json theme={null}
+"syncs": [
+  {
+    "id": 123456,
+    “body”: [
+      {
+        “start_milliseconds”: 230,
+        “lyric”: “First lyrics line”
+      },
+      {
+        “start_milliseconds”: 3670,
+        “lyric”: “Second lyrics line”
+      }
+    ]
+  }
+]
+```
+
+* **Word by word Time-Synchronized Lyrics (Rich Syncs)**: In addition to the line by line synchronisation, with this format we provide also specific timing for each word in a lyrics line. Example:
+
+```json theme={null}
+"richsyncs": [
+  {
+    "id": 7852411,
+    "body": [
+      {
+        "ts": 3.2, //start time of the line in seconds
+        "te": 3.73, //end time of the line in seconds
+        "l": [
+          {
+            "c": "First", // word
+            "o": 0 // offset time from the line's start time in seconds
+          },
+          {
+            "c": " ",
+            "o": 0.105
+          },
+          {
+            "c": "lyrics",
+            "o": 0.158
+          },
+          {
+            "c": " ",
+            "o": 0.211
+          },
+          {
+            "c": "line",
+            "o": 0.264
+          },
+        ],
+        "x": "First lyrics line" // lyrics line
+      },
+      {
+        "ts": 3.73,
+        "te": 5.567,
+        "l": [
+          {
+            "c": "Second",
+            "o": 0
+          },
+          {
+            "c": " ",
+            "o": 0.01
+          },
+          {
+            "c": "lyrics",
+            "o": 0.08
+          },
+          {
+            "c": " ",
+            "o": 0.33
+          },
+          {
+            "c": "line",
+            "o": 0.38
+          }        
+        ],
+      "x": "Second lyrics line"
+     }
+    ]
+  }
+]
+```
+
+### Writers
+
+When available, Musixmatch provides song writing information for each track in the following format.
+
+```json theme={null}
+"writers": [
+  {
+    "id": 123456, //internal Musixmatch writer id
+    "name": "John Smith"
+  },
+  {
+    "id": 345678, //internal Musixmatch writer id
+    "name": "Jane Doe"
+  }
+]
+```
+
+### Translations
+
+When available, the translated lyrics, are delivered in the format bellow.
+
+```json theme={null}
+"translations": [
+  {
+    "language_iso_code_1": "fr",
+    "lyrics": "Première ligne de paroles\nDeuxième ligne de paroles\nEtc."
+  },
+  {
+    "language_iso_code_1": "de",
+    "lyrics": "Erste Liedtextzeile\nZweite Liedtextzeile\nusw."
+  }
+]
+```
+
+### Mood
+
+The mood section describes the emotional tone or atmosphere of a track. The feed outputs a selection of 5 most relevant moods for a track from a pool of 25 possible mood labels. Each of the 5 moods is given a value between 0 and 1 defining the amount of the respective mood present in the song.
+
+List of all possible labels:
+
+* peaceful
+* tender
+* sentimental
+* melancholy
+* somber
+* easygoin
+* romantic
+* sophisticated
+* cool
+* gritty
+* upbeat
+* empowering
+* sensual
+* yearning
+* serious
+* lively
+* stirring
+* fiery
+* urgent
+* brooding
+* excited
+* rowdy
+* energizing
+* defiant
+* aggressive
+
+```json theme={null}
+"mood_list": [
+  {
+    "label": "sensual",
+    "value": 0.22
+  },
+  {
+    "label": "empowering",
+    "value": 0.116
+  },
+  {
+    "label": "fiery",
+    "value": 0.115
+  },
+  {
+    "label": "stirring",
+    "value": 0.078
+  },
+  {
+    "label": "sophisticated",
+    "value": 0.059
+  }
+]
+```
+
+### Structure
+
+Musixmatch provides a breakdown of the structural elements of a track, such as verses, choruses, bridges, and more. This detailed information allows for deeper insights into the composition of the song.
+
+Sections: A breakdown of each structural element of the track (e.g., verse, chorus, bridge).
+
+* **Intro**: The Intro comes at the beginning and introduces the song. It may also introduce the performers by name, especially in rap songs‍.
+  This tag is used for labelling the lyrical introduction to a track and not to be confused with the instrumental part at the begging of a track.
+* **Hook**: The Hook is the catchiest part of a song - the bit that usually sticks with the listener. Not to be confused with the Chorus as it’s often more repetitive and a little less melodic.
+* **Verse**: The Verse is the bit of a song that is the most narrative. It tells the story and is usually a little less memorable and catchy than the Chorus or Hook.
+  When two or more sections of the song have almost identical melodies but different lyrics, you can consider each section one verse.
+* **Pre-chorus**: This is the linking section between the Verse and the Chorus.
+  Not every song has a distinct Pre-chorus, but if it’s there it’s usually distinguished from the verses by a change in the melody or the instrumentation.
+* **Chorus**: This is most likely the bit the song is famous for.
+  It is repeated throughout the song, usually without changes to the melody or lyrics.
+  It often contains the song title.
+* **Bridge**: The Bridge commonly comes about 60% of the way through the song and often introduces new melodic and lyrical ideas before a final repetition of the Chorus.
+  It does sometimes, however, ‘re-imagine’ a Verse or the Chorus - maybe presenting the same lyrics with different instrumentation to spice it up a bit.
+* **Outro**: The Outro takes a song to its conclusion - always coming at the very end of the track‍.
+  As the Intro is used just at the beginning of the track, the Outro is used only at the end.
+
+Example:
+
+```json theme={null}
+"structure": {
+  "intro": {
+    "lines": [0] //array of indexes of the lyric lines that make part of the specifc song section
+  },
+  "verse": {
+    "lines": [1, 2, 3, 4, 5, 6, 7, 8, 20, 21, 22, 23, 24, 25, 26, 27]
+  },
+  "chorus": {
+    "lines": [9, 10, 11, 12, 32, 33, 34, 35]
+  },
+  "hook": {
+    "lines": [13, 14, 15, 16, 17, 18, 19]
+  },
+  "pre-chorus": {
+    "lines": [28, 29, 30, 31]
+  },
+  "outro": {
+    "lines": [36, 37, 38]
+  }
+}
+```
+
+### Performers
+
+The **performers** section provides information on the artists performing the song, when available. The data is a breakdown of the lyrics with each part(snippet) having associated one or more performers and in some cases the performer can also be unknown. The performer object contains the type and an id to an external artist entity (such as a Spotify artist id).
+
+Example:
+
+```json theme={null}
+"performers": [
+  {
+    "snippet": "Lorem ipsum\n",
+    "performers": [
+      {
+        "type": "unknown"
+      }
+    ]
+  },
+  {
+    "snippet": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.\nPellentesque vestibulum elit id ultricies consequat.\n",
+    "performers": [
+      {
+        "type": "artist",
+        "fqid": "mxm:artist:XXXXXXX"
+      }
+    ]
+  },
+  {
+    "snippet": "Maecenas eget augue vel est egestas commodo vitae eu tortor./nDonec mollis mi eget lorem aliquet, et bibendum elit rhoncus./n",
+    "performers": [
+      {
+        "type": "artist",
+        "fqid": "mxm:artist:XXXXXXX"
+      }
+    ]
+  },
+  {
+    "snippet": "Donec gravida nibh lacinia odio tincidunt, in mattis mauris aliquet./nProin in lacus mollis, vulputate nunc vitae, ornare lorem./n",
+    "performers": [
+      {
+        "type": "artist",
+        "fqid": "mxm:artist:XXXXXXX"
+      },
+      {
+        "type": "artist",
+        "fqid": "mxm:artist:XXXXXXX"
+      }
+    ]
+  }
+]
+```
+
+### Genre
+
+The genres associated to a track are listed as an array like described here:
+
+```json theme={null}
+"genre": [
+  {
+    "id": 1076, //internal Musixmatch genre id
+    "name": "Rap"
+  },
+  {
+    "id": 18,
+    "name": "Hip Hop/Rap"
+  }
+]
+```
+
+### Restrictions
+
+Restrictions on content are applied for a number of reasons; however, it all comes down to preserving copyright owners and preventing legal queries.
+
+Within every API response that includes lyrics or subtitles we're going to provide a territory based restriction data which will allows you to identify the countries you are allowed to display that content in.
+
+It is imperative that the client applies the updates of the country-restriction data as soon as possible.
+We expect these updates to happen ideally on the day the update is made available to you as they may, for example, include a restriction included as a result of a takedown notice.
+
+This restriction block contains two sets, the allowed and the blocked countries:
+
+* Countries are identified with the **ISO 3166-1 alpha-2 standard**
+* **XW** Identifies every country
+
+There are two different types of possible configurations:
+
+1. All the world allowed with the exception of a specific set of countries (that is usually empty)
+
+```json theme={null}
+restrictions: { allowed: [XW], blocked: [] } 
+```
+
+This means you can display the lyrics in every country.
+
+```json theme={null}
+restrictions: { allowed: [XW], blocked: [US,CA] }
+```
+
+This means you can not display the lyrics in the USA and in Canada.
+2\. 1. All the world is NOT allowed, with the exclusion of zero or few countries
+
+```json theme={null}
+restrictions: { allowed: [], blocked: [XW] } 
+```
+
+This means you can not display the lyrics in any country.
+
+```json theme={null}
+restrictions: { allowed: [IT], blocked: [XW] }
+```
+
+This means you can only display the lyrics in Italy.
+
+## Data Delivery and Updates
+
+### Full Data Feed
+
+Musixmatch provides a full feed of its entire music metadata catalog once a week, typically on Tuesdays. This feed includes all available data fields for each track and serves as the base dataset for your integration.
+
+* **Delivery Time**: Once a week
+* **Use Case**: Use this feed to initialize your database or refresh the entire catalog in bulk.
+
+### Daily Incremental Updates
+
+In addition to the weekly full feed, Musixmatch offers **daily incremental updates**. These updates contain only the changes (additions, modifications, or deletions) made to the data since the last full feed. This is particularly useful for keeping your metadata synchronized without having to process the entire catalog daily.
+
+* **Delivery Time**: Daily
+* **Use Case**: Use this to keep your database updated with the latest changes in the metadata, reducing processing time and overhead.
+
+A list of the **latest Musixmatch catalogue feeds to download** can be accessed using the API called [tracks.dump.get](/enterprises/catalog-feed/tracks-dump-get).
+
+
+# track.dump.get
+Source: https://docs.musixmatch.com/enterprises/catalog-feed/track-dump-get
+
+get /ws/1.1/track.dump.get
+Retrieve the track-related metadata for a single track in the json format (e.g., lyrics, writing credits, translations, mood information, syncs, etc).
+
+<PlanIndicator />
+
+The metadata returned are the same as in the catalogue feed.
+
+
+# tracks.dump.get
+Source: https://docs.musixmatch.com/enterprises/catalog-feed/tracks-dump-get
+
+get /ws/1.1/tracks.dump.get
+Retrieve a list of the latest Musixmatch catalog feeds to download.
+
+<PlanIndicator />
+
+The data returned comprises the download URLs for the catalog feeds starting from the latest full feed and therefore depends on the date when the request is made.
+E.g., if the request is made on the day when the full feed was generated, then the response will contain only the link to the full feed. However, if it is made several days after, it will contain both the link to the full feed and the links to all the feeds with incremental updates generated since the last full feed.
+
+
+# work.post
+Source: https://docs.musixmatch.com/enterprises/catalog-feed/work-post
+
+post /ws/1.1/work.post
+Submit a musical work's details.
+
+<PlanIndicator />
+
+Use this API to submit new or updated publishing data.
+
+This API is designed for publishers to post copyright information associated to a musical work (intellectual property).
+The API supports the transmission of detailed information, including their **ownership shares** along with **collection shares** on a per-territory basis, and other essential metadata such as **ISRC codes**, **performer names**, and **alternate titles**, which are crucial for accurate work matching across various sources that partecipate in the royalties collection and our music catalog.
+If you are a **label** and you'd like to send us **lyrics in bulk**, please refer to our commercial department.
+
+Please note that you are responsible for transmitting only trustworthy and verified data.
+
+
+# work.validity.post
+Source: https://docs.musixmatch.com/enterprises/catalog-feed/work-validity-post
+
+post /ws/1.1/work.validity.post
+Submit validity dates for a musical work.
+
+<PlanIndicator />
+
+Use this api to submit validity end for a work.
+
+You have to submit a payload with your **unique work identifier** used in the work ingestion phase, together with the **validity end**.
+
+Please note that you are responsible for transmitting only trustworthy and verified data.
+
+
+# Content Restrictions
+Source: https://docs.musixmatch.com/enterprises/content-restrictions
+
+
+
+<Info>This page is written for the users of the Enterprise plan. Information on restrictions for the non-enterprise plans can be found [here](/content-restrictions).</Info>
+
+Restrictions on content are applied for a number of reasons; however, it all comes down to preserving copyright owners and preventing legal queries.
+
+Within every API response that includes lyrics or subtitles we're going to provide a territory based restriction data which will allows you to identify the countries you are allowed to display that content in.
+
+**It is imperative that you apply the updates of the country-restriction data as soon as possible.**
+
+We expect these updates to happen ideally on the day the update is made available to you as they may, for example, include a restriction included as a result of a takedown notice.
+
+This restriction block contains two sets, the allowed and the blocked countries:
+
+* Countries are identified with the ISO 3166-1 alpha-2 standard
+* XW Identifies every country
+
+There are two different types of possible configurations:
+
+#### 1. All the world allowed with the exception of a specific set of countries (that is usually empty)
+
+* `region_restriction: { allowed: [XW], blocked: [] }`\
+  This means you can display the lyrics in every country.
+* `region_restriction: { allowed: [XW], blocked: [US,CA] }`\
+  This means you can not display the lyrics in the USA and in Canada.
+
+#### 2. All the world is NOT allowed, with the exclusion of zero or few countries
+
+* `region_restriction: { allowed: [], blocked: [XW] }`\
+  This means you can not display the lyrics in any country.
+* `region_restriction: { allowed: [IT], blocked: [XW] }`\
+  This means you can only display the lyrics in Italy.
+
+## Examples
+
+### Worldwide restriction
+
+Feed for track Serpentskirt by Cocteau Twins is restricted worldwide (XW):
+
+```json theme={null}
+{
+  "message": {
+    "header": {
+      "status_code": 200,
+      "execute_time": 0.010541915893555
+    },
+    "body": {
+      "lyrics": {
+        "lyrics_id": 29476108,
+        "explicit": 0,
+        "lyrics_body": "",
+        "lyrics_language": "en",
+        "script_tracking_url": "...",
+        "pixel_tracking_url": "...",
+        "lyrics_copyright": "...",
+        "updated_time": "2024-02-08T16:59:28Z",
+        "region_restriction": {
+          "allowed": [
+            
+          ],
+          "blocked": [
+            "XW"
+          ]
+        }
+      }
+    }
+  }
+}
+```
+
+### Country based restriction
+
+Feed for track Ciao amore by Adriano Celentano is restricted in Italy (IT):
+
+```json theme={null}
+{
+  "message": {
+    "header": {
+      "status_code": 200,
+      "execute_time": 0.0080831050872803
+    },
+    "body": {
+      "lyrics": {
+        "lyrics_id": 23204457,
+        "explicit": 0,
+        "lyrics_body": "...",
+        "lyrics_language": "it",
+        "script_tracking_url": "...",
+        "pixel_tracking_url": "...",
+        "lyrics_copyright": "...",
+        "updated_time": "2023-08-29T13:48:46Z",
+        "region_restriction": {
+          "allowed": [
+            "XW"
+          ],
+          "blocked": [
+            "IT"
+          ]
+        }
+      }
+    }
+  }
+}
+```
+
+
+# Claim an artist
+Source: https://docs.musixmatch.com/enterprises/distribution/api/claims/claim-an-artist
+
+/enterprises/distribution/openapi.json post /distribution/artist/claim
+Associates a Musixmatch user with one or more artist identities from an external service. Submit at least one artist identifier. Musixmatch returns a list of `claim_id`s confirming the association. Use `GET /distribution/artist/claim/{partner_user_id}` to query the status of a claim.
+
+
+
+# Get artist claim status
+Source: https://docs.musixmatch.com/enterprises/distribution/api/claims/get-artist-claim-status
+
+/enterprises/distribution/openapi.json get /distribution/artist/claim/{partner_user_id}
+Returns the verified artist identifiers associated with a distributor user. Use this to confirm that a claim has been successfully processed.
+
+
+
+# Create a delivery
+Source: https://docs.musixmatch.com/enterprises/distribution/api/deliveries/create-a-delivery
+
+/enterprises/distribution/openapi.json post /distribution/deliveries
+Creates a delivery from an uploaded release file. Call this after uploading the ZIP to the URL returned by `POST /distribution/deliveries/files`. Returns a `delivery_id` to track ingestion progress.
+
+
+
+# Get delivery status
+Source: https://docs.musixmatch.com/enterprises/distribution/api/deliveries/get-delivery-status
+
+/enterprises/distribution/openapi.json get /distribution/deliveries/{delivery_id}
+Returns the current processing status of a delivery and the per-track import status. Poll this endpoint after calling `POST /distribution/deliveries` to track progress. `commontrack_id` is only present on tracks whose `status` is `success`.
+
+
+
+# Upload a release file
+Source: https://docs.musixmatch.com/enterprises/distribution/api/deliveries/upload-a-release-file
+
+/enterprises/distribution/openapi.json post /distribution/deliveries/files
+Creates a pre-signed upload URL for a release ZIP file (ERN metadata + audio). Upload the file via HTTP PUT to the returned `upload_url`, then call `POST /distribution/deliveries` with the `file_id` to create the delivery.
+
+
+
+# Get lyrics status
+Source: https://docs.musixmatch.com/enterprises/distribution/api/lyrics/get-lyrics-status
+
+/enterprises/distribution/openapi.json get /distribution/lyrics/{lyrics_request_id}
+Returns the current processing status of a lyrics submission. When `status` is `success`, the response includes the indexed plain-text lyrics.
+
+
+
+# Submit lyrics
+Source: https://docs.musixmatch.com/enterprises/distribution/api/lyrics/submit-lyrics
+
+/enterprises/distribution/openapi.json post /distribution/lyrics
+Submits plain-text lyrics for a track identified by ISRC. Returns a `lyrics_request_id` to track processing status. The output is plain-text lyrics indexed in the Musixmatch catalog.
+
+
+
+# Activate a subscription
+Source: https://docs.musixmatch.com/enterprises/distribution/api/subscriptions/activate-a-subscription
+
+/enterprises/distribution/openapi.json post /distribution/subscriptions
+Grants a Musixmatch premium plan to a user when they subscribe on the distributor's platform. The `plan_id` is the distributor's plan identifier; Musixmatch maps it internally to the corresponding Musixmatch plan.
+
+
+
+# Revoke a subscription
+Source: https://docs.musixmatch.com/enterprises/distribution/api/subscriptions/revoke-a-subscription
+
+/enterprises/distribution/openapi.json delete /distribution/subscriptions/{musixmatch_user_id}
+Removes the Musixmatch premium plan from a user when they unsubscribe on the distributor's platform.
+
+
+
+# Get transcription status
+Source: https://docs.musixmatch.com/enterprises/distribution/api/transcriptions/get-transcription-status
+
+/enterprises/distribution/openapi.json get /distribution/transcriptions/{transcription_request_id}
+Returns the current status of a transcription request. When `status` is `success`, the response includes the AI-generated plain-text lyrics.
+
+
+
+# Request a transcription
+Source: https://docs.musixmatch.com/enterprises/distribution/api/transcriptions/request-a-transcription
+
+/enterprises/distribution/openapi.json post /distribution/transcriptions
+Triggers AI transcription of a track from the audio file previously delivered via the delivery flow. Musixmatch will generate plain-text lyrics and time-synced lyrics from the audio. Returns a `transcription_request_id` to track progress.
+
+
+
+# Distribution integration
+Source: https://docs.musixmatch.com/enterprises/distribution/overview
+
+Submit lyrics to Musixmatch from your distribution platform
+
+When an artist releases music through your platform, getting their lyrics into Musixmatch means those lyrics appear across every product and service powered by Musixmatch data — from streaming apps to AI music experiences. The Distribution API gives you a direct, automated path to make that happen at scale.
+
+## How it works
+
+The integration is built around four resources: **artist claims**, **subscriptions**, **deliveries**, and **lyrics**.
+
+An **artist claim** associates a Musixmatch user with their artist identity, using identifiers from Spotify, iTunes, or your own catalog. This is what allows Musixmatch to attribute delivered content to the right artist.
+
+A **subscription** event notifies Musixmatch when a user subscribes to or unsubscribes from a plan on your platform. Musixmatch maps your plan identifiers to the corresponding Musixmatch plans and grants or revokes access accordingly.
+
+A **delivery** is a release package — a ZIP file containing the ERN metadata and audio files for one release. Submitting a delivery makes the release known to Musixmatch and gives us the audio we need to generate time-synced lyrics.
+
+A **lyrics submission** associates plain-text lyrics with a specific track, identified by ISRC. You can submit lyrics yourself if you have them, or leave it to Musixmatch to AI-generate them from the audio. Either way, the output is plain-text lyrics indexed in the Musixmatch catalog.
+
+The two steps are independent by design — a delivery can arrive before lyrics are ready, and lyrics can be submitted as soon as they exist, even before release date. The only requirement is that a delivery containing the audio must be processed before AI generation can run.
+
+<Steps>
+  <Step title="Register as a partner">
+    Contact [apisupport@musixmatch.com](mailto:apisupport@musixmatch.com) to receive your `client_id`, `client_secret`, and partner base URL. You will also provide your `redirect_uri` for the OAuth flow.
+  </Step>
+
+  <Step title="Authenticate">
+    Use the [Authorization Code flow](/enterprises/authentication#authorization-code-flow) to authenticate an artist in your app and retrieve their Musixmatch user ID. Use the [Client Credentials flow](/enterprises/authentication#client-credentials-flow) to obtain a service-level Bearer token for your backend API calls.
+  </Step>
+
+  <Step title="Claim the artist">
+    Call `POST /distribution/artist/claim` with the user's Musixmatch user ID and at least one artist identifier (Spotify artist ID, iTunes artist ID, or your internal artist ID). Musixmatch returns a list of `claim_id`s confirming the association. Use `GET /distribution/artist/claim/{partner_user_id}` to verify the claim was processed.
+  </Step>
+
+  <Step title="Manage subscriptions">
+    Call `POST /distribution/subscriptions` when a user subscribes to a plan on your platform to activate their Musixmatch plan. Call `DELETE /distribution/subscriptions/{musixmatch_user_id}` when they unsubscribe to revoke access.
+  </Step>
+
+  <Step title="Deliver the release">
+    Call `POST /distribution/deliveries/files` to get a pre-signed upload URL and a `file_id`. Upload the release ZIP to that URL, then call `POST /distribution/deliveries` with the `file_id` to create the delivery and receive a `delivery_id`. Poll `GET /distribution/deliveries/{delivery_id}` until the status is `completed`.
+  </Step>
+
+  <Step title="Submit lyrics">
+    Call `POST /distribution/lyrics` with the track ISRC and — optionally — the plain-text lyrics. If you omit the lyrics, Musixmatch AI-generates them from the audio in the delivery. Poll `GET /distribution/lyrics/{lyrics_request_id}` until the status is `success`, at which point the plain-text lyrics are indexed in the catalog.
+  </Step>
+</Steps>
+
+## Base URL
+
+Each distribution partner is assigned a dedicated base URL during onboarding:
+
+```
+https://varco-{partner}.musixmatch.com
+```
+
+All Distribution API endpoints are served under this URL.
+
+## Authentication
+
+All Distribution API endpoints require a Bearer token obtained via the [Client Credentials flow](/enterprises/authentication#client-credentials-flow). The `POST` endpoints additionally require the artist's Musixmatch user ID, which you retrieve by introspecting the user's access token from the [Authorization Code flow](/enterprises/authentication#retrieving-the-musixmatch-user-id).
+
+
+# Bulk Lyrics Submission
+Source: https://docs.musixmatch.com/enterprises/lyrics-bulk-submission
+
+Standardized formats and methods for submitting lyrics in bulk to Musixmatch
+
+## Documentation for Partners
+
+This document outlines the standardized formats and methods for submitting lyrics in bulk to contribute lyrical content at scale.
+
+**Last updated July 8, 2025**
+
+## Overview of Accepted Formats
+
+Musixmatch accepts lyrics submissions in several standardized formats to accommodate different partner workflows:
+
+1. **CSV Musixmatch Standard Format** - Method for bulk lyrics delivery primarily suitable for labels
+2. **JSONL Format** - Method for bulk lyrics delivery primarily suitable for labels
+3. **DDEX MEAD** - For partners using industry standard DDEX protocols
+4. **Synchronised lyrics** - Method for bulk time-synched lyrics delivery primarily suitable for labels
+5. **Pre-released lyrics** - Method for bulk lyrics delivery prior to the release date, primarily suitable for labels
+
+## Submission Process
+
+1. **Initial Setup**: Contact Musixmatch filling [this form](https://musixmatch.typeform.com/to/kkbZwjvH) to establish credentials and delivery method
+2. **Test Submission**: Send a small (100 tracks) batch for validation
+3. **Feedback Integration**: Address any formatting issues identified
+4. **Production Submission**: Begin regular delivery of properly formatted lyrics
+
+## Best Practices
+
+1. **Data Validation**: Ensure all ISRCs are valid and correctly formatted
+2. **File Size**: Lyrics delivery should not exceed a maximum of 1000 ISRCs per batch/file
+3. **Lyrics Transcription**: Ensure that the lyrics are transcribed as sung in the recording, following [Musixmatch transcription guidelines](https://community.musixmatch.com/guidelines?lng=en#transcribe)
+4. **Lyrics Formatting**: Maintain original line breaks and paragraph structure
+5. **Character Encoding**: Verify UTF-8 encoding to preserve special characters
+6. **Regular Updates**: Establish a consistent schedule for delivering new content
+7. **Communication**: Inform Musixmatch of significant changes to your delivery format
+
+Note that internal staff may periodically review lyrics to maintain the quality standards required by DSPs, with no impact on content integrity.
+
+## 1. CSV Standard Format for Lyrics Submission
+
+### File Specifications
+
+* **File naming convention**: `partnername_lyrics_YYYYMMDD.csv`
+* **Format**: CSV file (not Excel)
+* **Encoding**: UTF-8, with or without BOM
+* **Delimiter**: Comma (,)
+* **Quote character**: Double quote (")
+  * Used to escape values containing delimiters
+  * Example: `"Laser , Game", nice, 829`
+* **Escape character**: Double quote (")
+  * For escaping quoted values containing quotes
+  * Example: `"We Will Rock You (From ""We Will Rock You"")"`
+
+### Headers and Fields
+
+Headers must appear in this exact order:
+
+| Field       | Required | Description                                                                                                                                                 |
+| ----------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| isrc        | Yes      | International Standard Recording Code associated with the track                                                                                             |
+| title       | Yes      | Title of the track                                                                                                                                          |
+| artist      | Yes      | Name of the artist associated with the track                                                                                                                |
+| duration    | No       | Integer representing track duration in milliseconds (e.g., 240000 for 4 minutes); fill in '0' if not available                                              |
+| language    | No       | The expected language ([ISO 3166-1 alpha-2 code](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2)); insert only 1 language per cell                        |
+| partner\_id | No       | Your organization's unique internal identification number for a specific song, used for tracking within your catalogue (e.g., an internal catalogue number) |
+| lyrics      | Yes      | The lyrics as sung in the recording, following [Musixmatch transcription guidelines](https://community.musixmatch.com/guidelines?lng=en#transcribe)         |
+
+### Example
+
+```csv theme={null}
+isrc,title,artist,duration,language,partner_id,lyrics
+GBAAA9100070,Stars,John Doe,247000,en,A23,"Lyrics body in brackets 
+command return to line break,
+lorem ipsum"
+GBAAA9100071,Luna,Jane Something,247001,es,A24,"Lyrics body in brackets 
+command return to line break,
+lorem ipsum"
+```
+
+## 2. JSONL Format
+
+The [JSONL](https://jsonlines.org/) format, with each JSON object on a single line, is efficient for streaming and processing large datasets. Its line-by-line structure supports independent processing, simple appending, and efficient handling of bulk lyric submissions.
+
+Below is a JSONL model that reflects the CSV standard format for lyrics submission.
+
+### JSON Schema
+
+```javascript theme={null}
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["isrc", "artist", "title", "lyrics"],
+  "properties": {
+    "isrc": {
+      "type": "string",
+      "description": "International Standard Recording Code",
+      "pattern": "^[A-Z]{2}-?[A-Z\\d]{3}-?\\d{2}-?\\d{5}$"
+    },
+    "artist": {
+      "type": "string",
+      "description": "Name of the artist associated with the track"
+    },
+    "title": {
+      "type": "string",
+      "description": "Title of the track"
+    },
+    "lyrics": {
+      "type": "string",
+      "description": "The lyrics as sung in the recording, following Musixmatch transcription guidelines"
+    },
+    "duration": {
+      "type": "integer",
+      "description": "Integer representing track duration in milliseconds (e.g., 240000 for 4 minutes); fill in '0' if not available"
+    },
+    "language": {
+      "type": "string",
+      "description": "The expected language (ISO 3166-1 alpha-2 code)",
+      "pattern": "^[a-zA-Z]{2}$"
+    },
+    "partner_id": {
+      "type": "string",
+      "description": "Partner internal identification number"
+    }
+  },
+  "additionalProperties": false
+}
+```
+
+### JSONL Example with Single Lyrics
+
+```json theme={null}
+{"isrc":"ABCDE1234567","artist":"Artist Name","title":"Track Title","lyrics":"Lyrics line 1\nLyrics line 2\nLyrics line 3","duration":240000,"language":"en","partner_id":"PARTNER123"}
+```
+
+### JSONL Example with Multiple Lyrics
+
+```json theme={null}
+{"isrc":"ABCDE1234567","artist":"Artist Name","title":"Track Title","lyrics":"Lyrics line 1\nLyrics line 2\nLyrics line 3","duration":240000,"language":"en","partner_id":"PARTNER123"}
+{"isrc":"FGHIJ8901234","artist":"Another Artist","title":"Another Track","lyrics":"More lyrics line 1\nMore lyrics line 2","duration":180000,"language":"fr","partner_id":"PARTNER124"}
+{"isrc":"KLMNO5678901","artist":"Third Artist","title":"Third Track","lyrics":"Third song lyrics\nWith multiple lines\nAnd verses too","duration":320000,"language":"es","partner_id":"PARTNER125"}
+```
+
+## 3. DDEX Standard
+
+For partners already using DDEX standards, Musixmatch accepts lyrics submissions via DDEX-MEAD and DDEX-ERN. Different DDEX formats should be agreed upon separately.
+
+**The ISRC field is mandatory.**
+
+### DDEX-MEAD 1.1
+
+See [DDEX guidance on communicating lyrics](https://kb.ddex.net/implementing-each-standard/best-practices-for-all-ddex-standards/guidance-on-releaseresourcework-metadata/communicating-lyrics/).
+
+**Embedded lyrics (ASCII text)** — plain-text lyrics embedded directly in the MEAD message using `Format="ASCII"`.
+
+```xml theme={null}
+<ResourceInformation>
+  <ResourceSummary>
+    <ResourceId><ISRC>ATUV71500090</ISRC></ResourceId>
+  </ResourceSummary>
+  <Lyrics>
+    <Text Format="ASCII">Lyric line 1
+Lyric line 2
+Lyric line 3</Text>
+    <LanguageAndScriptOfLyrics>en</LanguageAndScriptOfLyrics>
+  </Lyrics>
+</ResourceInformation>
+```
+
+**Embedded lyrics (TTML)** — use `Format="TTML"` to embed TTML content inline.
+
+```xml theme={null}
+<ResourceInformation>
+  <ResourceSummary>
+    <ResourceId><ISRC>ATUV71500090</ISRC></ResourceId>
+  </ResourceSummary>
+  <Lyrics>
+    <Text Format="TTML"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<tt xml:lang="en" xmlns="http://www.w3.org/ns/ttml">
+  <body>
+    <div>
+      <p begin="00:00:12.00" end="00:00:15.00">Lyric line 1</p>
+      <p begin="00:00:17.20" end="00:00:20.50">Lyric line 2</p>
+      <p begin="00:00:21.10" end="00:00:24.00">Lyric line 3</p>
+    </div>
+  </body>
+</tt>]]></Text>
+    <LanguageAndScriptOfLyrics>en</LanguageAndScriptOfLyrics>
+  </Lyrics>
+</ResourceInformation>
+```
+
+**Embedded lyrics (LRC)** — use `Format="LRC"` to embed LRC content inline.
+
+```xml theme={null}
+<ResourceInformation>
+  <ResourceSummary>
+    <ResourceId><ISRC>ATUV71500090</ISRC></ResourceId>
+  </ResourceSummary>
+  <Lyrics>
+    <Text Format="LRC">[00:12.00]Lyric line 1
+[00:17.20]Lyric line 2
+[00:21.10]Lyric line 3</Text>
+    <LanguageAndScriptOfLyrics>en</LanguageAndScriptOfLyrics>
+  </Lyrics>
+</ResourceInformation>
+```
+
+### DDEX-ERN 3.7/3.8
+
+In ERN, lyrics are delivered as a separate `<Text>` resource of type `LyricText`, then linked to the track via `<LinkedReleaseResourceReference LinkDescription="Lyrics">` in the release.
+
+* **External `.txt` files** — plain-text lyrics referenced as an external file.
+* **External `.ttml` files** — [TTML](https://en.wikipedia.org/wiki/Timed_Text_Markup_Language) (Timed Text Markup Language), an XML-based format for timed text with support for synchronisation, styling, and positioning.
+* **External `.lrc` files** — [LRC](https://en.wikipedia.org/wiki/LRC_\(file_format\)#Core_format) (LyRiCs), a plain-text format with time tags for synchronising lyrics with audio.
+
+```xml theme={null}
+<!-- In ResourceList: declare the lyrics as a Text resource -->
+<Text>
+  <TextType>LyricText</TextType>
+  <ResourceReference>A5</ResourceReference>
+  <TextDetailsByTerritory>
+    <TerritoryCode>Worldwide</TerritoryCode>
+    <TechnicalTextDetails>
+      <TechnicalResourceDetailsReference>T5</TechnicalResourceDetailsReference>
+      <File>
+        <FileName>ISRC_lyrics.txt</FileName>
+        <FilePath>resources/</FilePath>
+        <HashSum>
+          <HashSum>9cbb47457da9e7808e05f9dec40bc77c</HashSum>
+          <HashSumAlgorithmType>MD5</HashSumAlgorithmType>
+        </HashSum>
+      </File>
+    </TechnicalTextDetails>
+  </TextDetailsByTerritory>
+</Text>
+
+<!-- In ReleaseList: link the lyrics resource to the track -->
+<ResourceGroupContentItem>
+  <ResourceType>SoundRecording</ResourceType>
+  <ReleaseResourceReference ReleaseResourceType="PrimaryResource">A1</ReleaseResourceReference>
+  <LinkedReleaseResourceReference LinkDescription="Lyrics">A5</LinkedReleaseResourceReference>
+</ResourceGroupContentItem>
+```
+
+## 4. **Synchronised lyrics**
+
+Musixmatch supports several formats for the submission of synchronised lyrics, ensuring compatibility and ease of integration for our partners.
+
+* [<u>LRC</u>](https://en.wikipedia.org/wiki/LRC_\(file_format\)#Core_format)<u> </u>**(LyRiCs)** 
+
+  The LRC format is a plain text file that contains time tags for synchronising lyrics with an audio file. It is widely used and easily editable, making it a popular choice for many contributors.
+* [<u>TTML</u>](https://en.wikipedia.org/wiki/Timed_Text_Markup_Language)<u> </u>**(Timed Text Markup Language)** 
+
+  TTML is an XML-based format designed for representing timed text information, such as captions and subtitles. It offers robust capabilities for complex synchronisation scenarios, including styling and positioning.
+
+Please refer to your account manager to set up a dedicated flow.
+
+## **5. Pre-released lyrics**
+
+For lyrics submissions prior to the release date, a separate file with specific requirements is necessary.
+
+Please refer to your account manager to set up a dedicated flow.
+
+> This documentation is subject to updates as formats evolve. Partners will be notified of any significant changes to submission requirements.
+
+
+# Enterprises
+Source: https://docs.musixmatch.com/enterprises/overview
+
+
+
+## Getting started
+
+As enterprise, you can access the Musixmatch catalog in 2 ways:
+
+<CardGroup>
+  <Card title="Distribution" icon="arrow-up-right-from-square" href="/enterprises/distribution/overview">
+    Submit lyrics and release metadata to Musixmatch from your distribution platform.
+
+    <Badge>Distributors</Badge> 
+    <Badge>Labels</Badge> 
+    <Badge>DSPs</Badge>
+  </Card>
+
+  <Card title="Catalog Feed" icon="download" href="/enterprises/catalog-feed/overview">
+    Download a complete copy of the Musixmatch music database for offline access.
+  </Card>
+</CardGroup>
+
+
+# Musixmatch Pro API
+Source: https://docs.musixmatch.com/getting-started
+
+The Musixmatch Lyrics API allows you to get access to Musixmatch metadata about song lyrics and music.
+
+## Getting started
+
+The Musixmatch API is available to both selected partners and individual developers. Here are the steps to follow to complete the initial setup:
+
+<Steps>
+  <Step title="Get in touch">
+    If you're looking to use or display lyrics in your app or website, check out our  <a href="https://www.musixmatch.com/pro/api/pricing?utm_source=docs&utm_medium=web&utm_content=introduction_link" title="Musixmatch API pricing">API pricing plans</a> or <a href="#">send us an enquiry</a> for custom solutions.
+  </Step>
+
+  <Step title="Get your API Key">
+    Once you're registered, you'll receive your **API key** — a mandatory parameter for most API calls. It's your personal identifier and should be kept secret.
+  </Step>
+
+  <Step title="Integrate with your product">
+    With your API key in hand, you can start integrating Musixmatch into your app or website. Please follow our [implementation guidelines](/implementation-guidelines).
+    Our team may contact you to review your implementation and ensure it complies with our content policy.
+  </Step>
+</Steps>
+
+### Check the API terms
+
+Once you have completed the initial setup, don't forget to take a look at the [API Terms & Conditions](https://about.musixmatch.com/apiterms) and the [Privacy Policy](https://about.musixmatch.com/privacy-policy).
+
+We’ve worked hard to make this service completely legal so that we are all protected from any foreseeable liability: take the time to read this stuff.
+
+*Not sure about something?*\
+*Write us at* [sales@musixmatch.com](mailto:sales@musixmatch.com)
+
+### Authentication
+
+To authenticate your API requests, you need to include your API key as a query parameter in every call. Add the `apikey` parameter to your requests like this:
+
+```http theme={null}
+GET /ws/1.1/track.get?apikey=YOUR_API_KEY
+```
+
+Keep your API key secure and never share it publicly. If you believe your API key has been compromised, contact us immediately at [sales@musixmatch.com](mailto:sales@musixmatch.com).
+
+<Warning>
+  Requests without a valid API key will receive a `401` error response.
+</Warning>
+
+### Start the integration on your product
+
+In the most common scenario you only need to implement two API calls:
+
+1. Match your catalog to ours using the search function as described [track.search](/api-reference/lyrics-catalog/track-search) page
+2. Get the lyrics using the [track.lyrics.get](/api-reference/lyrics-catalog/track-lyrics-get) API call. That’s it!
+
+We can also provide static samples to let you see how the data will look like.
+
+We can’t wait to see the amazing things you’re going to do with the Musixmatch API!
+ 
+
+<Info>
+  Musixmatch API Terms of Service (FOR NOT COMMERCIAL USE) PLEASE NOTE THAT THESE TERMS AND CONDITIONS APPLY TO NON-COMMERCIAL USE OF OUR SERVICES ONLY. IF YOU INTEND TO USE OUR SERVICES FOR COMMERCIAL/BUSINESS USE, PLEASE SEND AN EMAIL TO [sales@musixmatch.com](mailto:sales@musixmatch.com). IF YOU ARE UNSURE ABOUT WHICH TERMS WILL APPLY TO YOU OR HAVE ANY QUESTIONS ABOUT THE LICENSE TERMS, PLEASE CONTACT [sales@musixmatch.com](mailto:sales@musixmatch.com).
+</Info>
+
+
+# Implementation guidelines
+Source: https://docs.musixmatch.com/implementation-guidelines
+
+
+
+Before going on, we recommend to read the checklist throughout, and make sure everything is implemented.
+
+Our API has been carefully thought out to let your creativity prevail over technology. There are literally thousands of applications that can be built using the lyrics API, but first you need to have an understanding of the basic principles in order to decide what calls to use.
+
+It is important to distinguish between searching and matching:
+
+* **Searching** is straightforward enough: make a call with the parameters that you are seeking and receive the response. See details in [track.search](/api-reference/lyrics-catalog/track-search)
+* **Matching** is a different matter and is used when you already have your own music catalog and want to associate licensed lyrics with each track. The most effective match is possible using the [ISRC](https://isrc.ifpi.org/en/), if it’s not possible, we suggest to use the metadata (Artist and Title) ranking the most effective result by popularity. See details in [matcher.lyrics.get](/api-reference/lyrics-catalog/matcher-lyrics-get)
+
+## Searching or browsing music
+
+If you don’t have your own music catalog you’ll probably want to search our database to deliver results to your users.
+
+Here are some typical functions to implement:
+
+* Get most popular lyrics and artists with: [chart.tracks.get](/api-reference/lyrics-catalog/chart-tracks-get), [chart.artists.get](/api-reference/lyrics-catalog/chart-artists-get)
+* Let users search directly for their favorite lyrics with: [track.search](/api-reference/lyrics-catalog/track-search), [artist.search](/api-reference/lyrics-catalog/artist-search)
+* Simply get lyrics with: [track.lyrics.get](/api-reference/lyrics-catalog/track-lyrics-get)
+* Get info about an album with: [album.get](/api-reference/lyrics-catalog/album-get)
+
+## Matching your music catalog
+
+If you have your own music service and browsing feature, you can focus on matching our lyrics to your catalog.\
+We recommend using the ISRC ID to match the correct track, and falling back to the track title and artist name when the ISRC is not available. In some cases, due to contractual agreements, we also provide the client’s track identifier in our catalog. In such cases, the best practice is to prioritize that identifier when matching.
+
+When matching time-synced lyrics to your tracks, keep in mind that there may be multiple versions of the lyrics, each associated with a specific duration. Choose the one that most closely matches your track’s duration.\
+\
+Reccomended API methods:
+
+* Match your song against our database with: [matcher.track.get](/api-reference/lyrics-catalog/matcher-track-get)
+* Then get the lyrics with: [track.lyrics.get](/api-reference/lyrics-catalog/track-lyrics-get)
+
+## Displaying lyrics
+
+* Display lyrics making sure to add the [lyrics views tracking](/lyrics-views-tracking) and the copyright info from the `lyrics_copyright` field received from [track.lyrics.get](/api-reference/lyrics-catalog/track-get)
+* In case you’re showing time-synced lyrics use the [track.subtitle.get](/api-reference/lyrics-catalog/track-subtitle-get)
+* Apply content restrictions based on [country restrictions](/content-restrictions) rules
+* Add the "Lyrics powered by" image [provided by Musixmatch](https://about.musixmatch.com/brand-resources) and link to the lyrics page on Musixmatch website using the `backlink_url` field received from [track.lyrics.get](/api-reference/lyrics-catalog/track-lyrics-get)
+
+## Tracking API calls
+
+If you are accessing the Musixmatch Catalog via API, you can log in to your dashboard at [developer.musixmatch.com](https://developer.musixmatch.com/login) and track all the API calls you are currently using on your product.
+
+
+# ChatGPT
+Source: https://docs.musixmatch.com/integrations/chatgpt
+
+
+
+<Info>The documentation for this integration will be available soon.</Info>
+
+## Supported features
+
+<CardGroup>
+  <Card title="Search songs" icon="magnifying-glass">
+    Search the Musixmatch catalog by artist, title, or lyrics.
+  </Card>
+
+  <Card title="Display lyrics" icon="text">
+    Retrieve and display fully licensed lyrics for any track.
+  </Card>
+</CardGroup>
+
+
+# Claude
+Source: https://docs.musixmatch.com/integrations/claude
+
+
+
+<Info>The documentation for this integration will be available soon.</Info>
+
+## Supported features
+
+<CardGroup>
+  <Card title="Search songs" icon="magnifying-glass">
+    Search the Musixmatch catalog by artist, title, or lyrics.
+  </Card>
+
+  <Card title="Display lyrics" icon="text">
+    Retrieve and display fully licensed lyrics for any track.
+  </Card>
+</CardGroup>
+
+
+# n8n
+Source: https://docs.musixmatch.com/integrations/n8n
+
+
+
+Connect Musixmatch Pro API to n8n for powerful no-code workflow automation.
+
+<Card title="Musixmatch on n8n" icon="bolt" href="https://n8n.io/integrations/musixmatch/">
+  Visit the official Musixmatch integration page on n8n.
+</Card>
+
+## Getting started
+
+1. Open your n8n instance and create a new workflow
+2. Add an HTTP Request node
+3. Configure the node with the Musixmatch Pro API base URL and your API key
+4. Build your automation pipeline
+
+## Example workflow
+
+Automatically fetch lyrics for new tracks added to your music catalog and store them in a database.
+
+## Authentication
+
+Use the HTTP Request node with your Musixmatch `apikey` in the request configuration.
+
+
+# Integrations
+Source: https://docs.musixmatch.com/integrations/overview
+
+
+
+Musixmatch Pro API can be integrated with a wide range of tools, platforms, and AI agents. Whether you prefer no-code automation or building intelligent workflows with AI, we have you covered.
+
+<Tip>
+  **Looking for enterprise integrations?** Check out our [Enterprises](/enterprises/overview) section for catalog feeds and bulk submission guides.
+</Tip>
+
+## No-code tools
+
+Connect Musixmatch to your favorite automation platforms without writing a single line of code.
+
+## AI Agents
+
+Use Musixmatch data within your AI agent workflows for enriched music intelligence.
+
+
+# Zapier
+Source: https://docs.musixmatch.com/integrations/zapier
+
+
+
+Integrate Musixmatch Pro API with Zapier to automate music data workflows without code.
+
+<Card title="Musixmatch on Zapier" icon="bolt" href="https://zapier.com/apps/musixmatch/integrations">
+  Visit the official Musixmatch integration page on Zapier.
+</Card>
+
+## Getting started
+
+1. Log in to your Zapier account
+2. Create a new Zap
+3. Use the Webhooks by Zapier app to call the Musixmatch Pro API
+4. Connect the response to your desired action apps
+
+## Example Zap
+
+When a new track is added to a playlist, automatically retrieve its lyrics and send a notification with the track details.
+
+## Authentication
+
+Configure the Webhooks action with your Musixmatch `apikey` in the request configuration.
+
+
+# Lyrics views tracking
+Source: https://docs.musixmatch.com/lyrics-views-tracking
+
+
+
+Whether you access the catalog via API or feed, you are required to track the lyrics usage/views.
+
+## Views tracking for Catalog access via API
+
+### Tracking URLs implementation
+
+When displaying any type of content, you are required to include in your page/application one of the two available tracking system:
+
+#### 1. JavaScript for websites
+
+Get the URL returned into the field `script_tracking_url` from the [track.lyrics.get](/api-reference/lyrics-catalog/track-lyrics-get) api response and include it as script tag.
+
+```javascript theme={null}
+<script type="text/javascript" src="http://tracking.musixmatch.com/t1.0/AMa6hJCIEzn1v8RuOP">
+```
+
+#### 2. Image pixel
+
+Include the URL returned into the field pixel\_tracking\_url as an image src when it’s not possible to use the script.
+
+```html theme={null}
+<img src="http://tracking.musixmatch.com/t1.0/AMa6hJCIEzn1v8RuXW">
+```
+
+Furthermore, every time a lyrics is present in a page the lyrics\_copyright field must also be clearly visible.
+
+## Views tracking for Catalog Feed access
+
+In case you access the catalog via feed, you’ll need to provide back a usage report on a monthly basis.
+
+The lyrics usage report must comply to the technical specifications that will be provided to you once the service terms are agreed on.
+
+
+# Musixmatch metadata
+Source: https://docs.musixmatch.com/musixmatch-metadata
+
+
+
+The Musixmatch API is built around lyrics, but there are many other data we provide through the API that can be used to improve every existent music service:
+
+* **Track**: the main entity to which data is associated
+* **Artist**: associated with the track
+* **Album**: the album to which the track belongs
+
+Let's explore the data we provide with some suggestion on how to use them for every single API object.
+
+## Track
+
+Inside the track object you can get the following extra information:
+
+#### Track Rating
+
+The track rating is a score 0-100 identifying how popular is a song in Musixmatch.\
+You can use this information to sort search results, like the most popular songs of an artist, of a music genre, of a lyrics language.
+
+#### Instrumental and Explicit flags
+
+The instrumental flag identifies songs with music only, no lyrics.\
+The explicit flag identifies songs with explicit lyrics or explicit title. We're able to identify explicit words and set the flag for the most common languages.
+
+#### Music Genre
+
+The music genere of the song.\
+Can be used to group songs by genre, as input for similarity algorithms, artist genre identification, navigate songs by genere, etc.
+
+#### Song titles translations
+
+The track title, as translated in different languages, can be used to display the right writing for a given user, example:
+
+* LIES (Bigbang) becomes 在光化門 in Chinese
+* HALLELUJAH (Bigbang) becomes ハレルヤ in Japanese
+
+#### Understanding Track Id's
+
+Every track has two distinct IDs:
+
+* `track_id`: identifies a track within an album. The same song of the same artist may appear in a Single Album or Ep, then in the official Album, then in a "Live concert". All this tracks will have distinct Id's so you can build the Artist → Album → Tracks relation.
+* `commontrack_id`: to link a track to its lyrics, syncs and music publishing information we group many track Id's into a single commontrack\_id. Tracks with same `commontrack_id` will share the same lyrics.
+
+#### Example response from the API
+
+```json theme={null}
+{
+    "message": {
+        "header": {
+            "status_code": 200,
+            "execute_time": 0.0074818134307861
+        },
+        "body": {
+            "lyrics": {
+                "lyrics_id": 28690433,
+                "verified": 0,
+                "restricted": 0,
+                "instrumental": 0,
+                "explicit": 0,
+                "lyrics_body": "I know that we are young\nAnd I know that you may love me\nBut I just can't be with you like this anymore\nAlejandro\n\nShe's got both hands in her pocket\nAnd she won't look at you, won't look at you\nShe hides true love en su bolsillo\nShe's got a halo around her finger, around you\n\nYou know that I love you, boy\nHot like Mexico, rejoice\nAt this point, I've gotta choose\nNothing to lose\n\nDon't call my name, don't call my name, Alejandro\nI'm not your babe, I'm not your babe, Fernando\nDon't wanna kiss, don't wanna touch\nJust smoke my cigarette and hush\nDon't call my name, don't call my name, Roberto\nAlejandro, Alejandro\nAle-Alejandro, Ale-Alejandro\nAlejandro, Alejandro\nAle-Alejandro, Ale-Alejandro\n\nStop, please, just let me go\nAlejandro, just let me go\n\nShe's not broken, she's just a baby\nBut her boyfriend's like her dad, just like a dad\nAnd all those flames that burned before him\nNow he's gotta firefight, got cool the bad\n\nYou know that I love you, boy\nHot like Mexico, rejoice\nAt this point, I've gotta choose\nNothing to lose\n\nDon't call my name, don't call my name, Alejandro\nI'm not your babe, I'm not your babe, Fernando\nDon't wanna kiss, don't wanna touch\nJust smoke my cigarette and hush\nDon't call my name, don't call my name, Roberto\nAlejandro, Alejandro\nAle-Alejandro, Ale-Alejandro\nAlejandro, Alejandro\nAle-Alejandro, Ale-Alejandro\n\nDon't bother me, don't bother me, Alejandro\nDon't call my name, don't call my name, bye, Fernando\nI'm not your babe, I'm not your babe, Alejandro\nDon't wanna kiss, don't wanna touch, Fernando\n\nDon't call my name, don't call my name, Alejandro\nI'm not your babe, I'm not your babe, Fernando\nDon't wanna kiss, don't wanna touch\nJust smoke my cigarette and hush\nDon't call my name, don't call my name, Roberto\nAlejandro, Alejandro\nAle-Alejandro, Ale-Alejandro\nAlejandro, Alejandro\nAle-Alejandro, Ale-Alejandro\n\nDon't call my name (Alejandro, Alejandro), don't call my name, Alejandro\nI'm not your babe (Ale-Alejandro, Ale-Alejandro), I'm not your babe, Fernando\nDon't wanna kiss (Alejandro, Alejandro), don't wanna touch\nJust smoke my cigarette and hush\nDon't call my name (Ale-Alejandro, Ale-Alejandro), don't call my name, Roberto\nAlejandro",
+                "lyrics_language": "en",
+                "lyrics_language_description": "English",
+                "script_tracking_url": "https://tracking.musixmatch.com/t1.0/m_js/e_0/sn_0/l_28690433/su_0/rs_0/tr_3vUCAK...2SK90/",
+                "pixel_tracking_url": "https://tracking.musixmatch.com/t1.0/m_img/e_0/sn_0/l_28690433/su_0/rs_0/tr_3vUCAC...H5AMk/",
+                "html_tracking_url": "https://tracking.musixmatch.com/t1.0/m_html/e_0/sn_0/l_28690433/su_0/rs_0/tr_3vUCAN...xOhBA/",
+                "lyrics_copyright": "Lyrics powered by www.musixmatch.com",
+                "writer_list": [],
+                "publisher_list": [],
+                "backlink_url": "https://www.musixmatch.com/lyrics/Lady-Gaga/Alejandro?utm_source=application&utm_campaign=api&utm_medium=musiXmatch+-+internal+use%3A1409607281181",
+                "updated_time": "2024-06-12T14:43:08Z"
+            }
+        }
+    }
+}
+```
+
+## Artist
+
+Inside the artist object you can get the following extra information:
+
+#### Comments and country
+
+An artist comment is a short snippet of text which can be mainly used for disambiguation.
+The artist country is the born country of the artist/group.
+
+There are two perfect search result if you search by artist with the keyword "U2".
+
+Indeed there are two distinct music groups with this same name, one is the most known irish group of Bono Vox, the other is a less popular (world wide speaking) group from Japan.
+
+Here's how you can made use of the artist comment in your search result page:
+
+* U2 (Irish rock band)
+* U2 (あきやまうに)
+
+You can also show the artist country for even better disambiguation:
+
+* U2 (Irish rock band) from Ireland
+* U2 (あきやまうに) from Japan
+
+#### Artist translations
+
+When you create a world wide music related service you have to take into consideration to display the artist name in the user's local language. These translation are also used as aliases to improve the search results.
+
+Let's use PSY for this example: western people know him as PSY but Koreans want to see the original name 싸이. Using the name translations provided by our API you can show to every user the writing they expect to see. Furthermore, when you search for "psy gangnam style" or "싸이 gangnam style" with our search/match API you will still be able to find the song.
+
+#### Artist rating
+
+The artist rating is a score 0-100 identifying how popular is an artist in Musixmatch.
+You can use this information to build charts, for suggestions, to sort search results. In the example above about U2, we use the artist rating to show the irish band before the Japanese one in our serp.
+
+#### Artist music genre
+
+We provide one or more main artist genre, this information can be used to calculate similar artist, suggestions, or the filter a search by artist genre.
+
+#### Example response from the API
+
+```json theme={null}
+{
+  "message": {
+    "header": {
+      "status_code": 200,
+      "execute_time": 0.071532011032104
+    },
+    "body": {
+      "artist": {
+        "artist_id": 118,
+        "artist_name": "Queen",
+        "artist_country": "GB",
+        "artist_alias_list": [
+          {
+            "artist_alias": "\u5973\u738b"
+          }
+        ],
+        "artist_rating": 91,
+        "artist_twitter_url": "",
+        "updated_time": "2012-06-11T08:19:15Z"
+      }
+    }
+  }
+}
+```
+
+## Album
+
+Inside the album object you can get the following nice extra information:
+
+#### Album Rating
+
+The album rating is a score 0-100 identifying how popular is an album in Musixmatch.
+You can use this information to sort search results, like the most popular albums of an artist.
+
+#### Album copyright and label
+
+For most of our albums we can provide extra information like for example:
+
+* Label: Universal-Island Records Ltd.
+* * Copyright: (P) 2013 Rubyworks, under license to Columbia Records, a Division of Sony Music Entertainment.
+
+#### Album type and release date
+
+The album official **release date** can be used to sort an artist's albums view starting by the most recent one.
+Album can also be filtered or grouped by **type**: Single, Album, Compilation, Remix, Live. This can help to build an artist page with a more organized structure.
+
+#### Album music genre
+
+For most of the albums we provide two groups of music genres. Primary and secondary.\
+This information can be used to help user navigate albums by genre.
+
+An example could be:
+
+* Primary genere: POP
+* Secondary genre: K-POP or Mandopop
+
+#### Example response from the API
+
+```json theme={null}
+{
+  "message": {
+    "header": {
+      "status_code": 200,
+      "execute_time": 0.02262282371521
+    },
+    "body": {
+      "album": {
+        "album_id": 14250417,
+        "album_name": "Party Rock",
+        "album_rating": 100,
+        "album_track_count": 16,
+        "album_release_date": "2009-07-07",
+        "album_release_type": "Album",
+        "artist_id": 437407,
+        "artist_name": "LMFAO",
+        "primary_genres": {
+          "music_genre_list": [
+            {
+              "music_genre": {
+                "music_genre_id": 1132,
+                "music_genre_parent_id": 14,
+                "music_genre_name": "Britpop",
+                "music_genre_name_extended": "Pop \/ Britpop"
+              }
+            },
+            {
+              "music_genre": {
+                "music_genre_id": 7,
+                "music_genre_parent_id": 34,
+                "music_genre_name": "Electronic",
+                "music_genre_name_extended": "Electronic"
+              }
+            }
+          ]
+        },
+        "secondary_genres": {
+          "music_genre_list": [
+          ]
+        },
+        "album_pline": "2009 Interscope Records",
+        "album_copyright": "2009 Interscope Records",
+        "album_label": "Will I Am \/ A&M",
+        "updated_time": "2013-09-26T16:06:25Z",
+
+      }
+    }
+  }
+}
+```
+
+
+#  
+Source: https://docs.musixmatch.com/overview
+
+
+
+<div />
+
+<div>
+  <div>
+    <p>Developer documentation</p>
+    <h1>Build with Musixmatch Pro API</h1>
+
+    <p>
+      Discover our guides to integrate the world's largest and fully licensed music data database into your apps and products.
+    </p>
+  </div>
+
+  <h2>Explore our platform</h2>
+
+  <CardGroup>
+    <Card title="API Reference" icon="code" href="/api-reference/overview">
+      All endpoints for lyrics, catalog, fingerprint, and analysis.
+    </Card>
+
+    <Card title="Enterprises" icon="building" href="/enterprises/overview">
+      Guides for large-scale integration, feeds, and bulk lyrics submissions.
+    </Card>
+
+    <Card title="Integrations" icon="bolt" href="/integrations/overview">
+      Use Musixmatch directly in tools like n8n, Zapier, ChatGPT, Claude and more.
+    </Card>
+  </CardGroup>
+
+  ***
+
+  ## Popular resources
+
+  <CardGroup>
+    <Card title="Quickstart" href="/getting-started">
+      Start using the Musixmatch Pro API in minutes.
+    </Card>
+
+    <Card title="Lyrics & Catalog API" href="/api-reference/lyrics-catalog/lyrics-catalog-overview">
+      Get lyrics, translations, and other metadata.
+    </Card>
+
+    <Card title="Fingerprint (Sentinel)" href="/api-reference/fingerprint/fingerprint-overview">
+      Detect copyrighted lyrics at scale.
+    </Card>
+
+    <Card title="Analysis" href="/api-reference/analysis/analysis-overview">
+      Analyze lyrics to extract enriched insights.
+    </Card>
+  </CardGroup>
+
+  <div />
+</div>
+
