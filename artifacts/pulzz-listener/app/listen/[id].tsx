@@ -16,19 +16,23 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useApp } from "@/contexts/AppContext";
-import { DEMO_SONGS } from "@/data/songs";
 import { useColors } from "@/hooks/useColors";
+import { api, apiSongDetailToDemoSong } from "@/lib/api";
+import type { DemoSong } from "@/data/songs";
 
 export default function ListenScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const colors = useColors();
   const insets = useSafeAreaInsets();
-  const { markDiscovered, markSkip, addMomentMark } = useApp();
+  const { songs, markDiscovered, markSkip, addMomentMark } = useApp();
 
   const topPad = Platform.OS === "web" ? 67 : insets.top;
   const botPad = Platform.OS === "web" ? 34 : insets.bottom;
 
-  const song = DEMO_SONGS.find((s) => s.id === id);
+  // Find song from context (has basic info)
+  const baseSong = songs.find((s) => s.id === id);
+  // Detailed song (with story + lyrics) loaded from API
+  const [song, setSong] = useState<DemoSong | null>(baseSong ?? null);
 
   const soundRef = useRef<Audio.Sound | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -43,12 +47,30 @@ export default function ListenScreen() {
   const reactionScale = useRef(new Animated.Value(0)).current;
   const momentBtnScale = useRef(new Animated.Value(1)).current;
 
+  // Fetch song detail (story, lyrics) from API
   useEffect(() => {
-    loadAudio();
+    if (!id) return;
+    const numericId = parseInt(id);
+    if (!isNaN(numericId)) {
+      api
+        .fetchSongDetail(numericId)
+        .then((detail) => setSong(apiSongDetailToDemoSong(detail)))
+        .catch(() => {
+          // Keep base song from context as fallback
+        });
+    }
+  }, [id]);
+
+  useEffect(() => {
+    if (baseSong) setSong(baseSong);
+  }, [baseSong]);
+
+  useEffect(() => {
+    if (song) loadAudio();
     return () => {
       soundRef.current?.unloadAsync();
     };
-  }, []);
+  }, [song?.audioUrl]);
 
   async function loadAudio() {
     if (!song) return;
@@ -169,12 +191,7 @@ export default function ListenScreen() {
   }
 
   return (
-    <View
-      style={[
-        styles.container,
-        { backgroundColor: colors.background },
-      ]}
-    >
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <LinearGradient
         colors={[song.coverGradient[0] + "CC", colors.background]}
         start={{ x: 0.5, y: 0 }}
@@ -253,7 +270,9 @@ export default function ListenScreen() {
               Instrumental
             </Text>
           )}
-          <Text style={styles.lyricsStory}>{song.story}</Text>
+          {song.story ? (
+            <Text style={styles.lyricsStory}>{song.story}</Text>
+          ) : null}
         </ScrollView>
       )}
 
@@ -322,9 +341,7 @@ export default function ListenScreen() {
           style={[
             styles.momentBtn,
             {
-              backgroundColor: momentFlash
-                ? colors.accent
-                : colors.primary,
+              backgroundColor: momentFlash ? colors.accent : colors.primary,
               paddingBottom: botPad + 12,
             },
           ]}
@@ -351,9 +368,7 @@ export default function ListenScreen() {
           <View
             style={[styles.reactionCard, { backgroundColor: colors.card, borderColor: colors.border }]}
           >
-            <Text style={styles.reactionTitle}>
-              What did you think?
-            </Text>
+            <Text style={styles.reactionTitle}>What did you think?</Text>
             <Text style={[styles.reactionSong, { color: colors.mutedForeground }]}>
               {song.title} · {song.artist}
             </Text>
@@ -390,9 +405,7 @@ export default function ListenScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
+  container: { flex: 1 },
   topBar: {
     flexDirection: "row",
     alignItems: "center",
@@ -400,9 +413,7 @@ const styles = StyleSheet.create({
     paddingBottom: 8,
     justifyContent: "space-between",
   },
-  topBarCenter: {
-    alignItems: "center",
-  },
+  topBarCenter: { alignItems: "center" },
   preReleaseLabel: {
     color: "rgba(255,255,255,0.6)",
     fontSize: 10,
@@ -444,15 +455,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 4,
   },
-  momentCountText: {
-    color: "#FFF",
-    fontSize: 12,
-    fontWeight: "700",
-  },
-  songInfo: {
-    paddingHorizontal: 24,
-    marginBottom: 24,
-  },
+  momentCountText: { color: "#FFF", fontSize: 12, fontWeight: "700" },
+  songInfo: { paddingHorizontal: 24, marginBottom: 24 },
   songTitle: {
     color: "#FFF",
     fontSize: 24,
@@ -465,25 +469,10 @@ const styles = StyleSheet.create({
     marginTop: 4,
     marginBottom: 10,
   },
-  tagsRow: {
-    flexDirection: "row",
-    gap: 6,
-  },
-  tag: {
-    borderRadius: 6,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-  },
-  tagText: {
-    color: "rgba(255,255,255,0.8)",
-    fontSize: 11,
-    fontWeight: "500",
-  },
-  lyricsContainer: {
-    flex: 1,
-    paddingHorizontal: 24,
-    marginTop: 8,
-  },
+  tagsRow: { flexDirection: "row", gap: 6 },
+  tag: { borderRadius: 6, paddingHorizontal: 8, paddingVertical: 4 },
+  tagText: { color: "rgba(255,255,255,0.8)", fontSize: 11, fontWeight: "500" },
+  lyricsContainer: { flex: 1, paddingHorizontal: 24, marginTop: 8 },
   lyricsTitle: {
     color: "#FFF",
     fontSize: 20,
@@ -508,20 +497,14 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
     marginBottom: 40,
   },
-  progressSection: {
-    paddingHorizontal: 24,
-    marginBottom: 8,
-  },
+  progressSection: { paddingHorizontal: 24, marginBottom: 8 },
   progressTrack: {
     height: 4,
     borderRadius: 2,
     position: "relative",
     overflow: "visible",
   },
-  progressFill: {
-    height: 4,
-    borderRadius: 2,
-  },
+  progressFill: { height: 4, borderRadius: 2 },
   momentDot: {
     position: "absolute",
     top: -3,
@@ -535,10 +518,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginTop: 6,
   },
-  timeText: {
-    color: "rgba(255,255,255,0.5)",
-    fontSize: 11,
-  },
+  timeText: { color: "rgba(255,255,255,0.5)", fontSize: 11 },
   controls: {
     flexDirection: "row",
     alignItems: "center",
@@ -554,10 +534,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  momentBtnWrapper: {
-    paddingHorizontal: 20,
-    marginTop: 4,
-  },
+  momentBtnWrapper: { paddingHorizontal: 20, marginTop: 4 },
   momentBtn: {
     flexDirection: "row",
     alignItems: "center",
@@ -567,22 +544,14 @@ const styles = StyleSheet.create({
     paddingTop: 16,
     paddingHorizontal: 24,
   },
-  momentBtnText: {
-    color: "#FFF",
-    fontSize: 16,
-    fontWeight: "700",
-  },
+  momentBtnText: { color: "#FFF", fontSize: 16, fontWeight: "700" },
   momentCountPill: {
     backgroundColor: "rgba(255,255,255,0.25)",
     borderRadius: 10,
     paddingHorizontal: 8,
     paddingVertical: 2,
   },
-  momentCountPillText: {
-    color: "#FFF",
-    fontSize: 12,
-    fontWeight: "700",
-  },
+  momentCountPillText: { color: "#FFF", fontSize: 12, fontWeight: "700" },
   reactionOverlay: {
     position: "absolute",
     inset: 0,
@@ -605,20 +574,9 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     textAlign: "center",
   },
-  reactionSong: {
-    fontSize: 14,
-    textAlign: "center",
-  },
-  reactionMoments: {
-    fontSize: 13,
-    textAlign: "center",
-    marginBottom: 4,
-  },
-  reactionBtns: {
-    width: "100%",
-    gap: 10,
-    marginTop: 8,
-  },
+  reactionSong: { fontSize: 14, textAlign: "center" },
+  reactionMoments: { fontSize: 13, textAlign: "center", marginBottom: 4 },
+  reactionBtns: { width: "100%", gap: 10, marginTop: 8 },
   discoveredBtn: {
     flexDirection: "row",
     alignItems: "center",
@@ -636,9 +594,5 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     borderWidth: 1,
   },
-  reactionBtnText: {
-    color: "#FFF",
-    fontSize: 16,
-    fontWeight: "700",
-  },
+  reactionBtnText: { color: "#FFF", fontSize: 16, fontWeight: "700" },
 });

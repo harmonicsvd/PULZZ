@@ -10,24 +10,19 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { SongCard } from "@/components/SongCard";
 import { useApp } from "@/contexts/AppContext";
-import { DEMO_SONGS } from "@/data/songs";
 import { useColors } from "@/hooks/useColors";
 
 export default function DiscoverScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
-  const { profile, listenedSongIds, discoveries } = useApp();
+  const { profile, listenedSongIds, songs } = useApp();
 
   const topPad = Platform.OS === "web" ? 67 : insets.top;
   const botPad = Platform.OS === "web" ? 34 : insets.bottom;
 
   const availableSongs = useMemo(() => {
-    return DEMO_SONGS.filter((s) => !listenedSongIds.includes(s.id));
-  }, [listenedSongIds]);
-
-  const listenedSongs = useMemo(() => {
-    return DEMO_SONGS.filter((s) => listenedSongIds.includes(s.id));
-  }, [listenedSongIds]);
+    return songs.filter((s) => !listenedSongIds.includes(s.id));
+  }, [songs, listenedSongIds]);
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -82,7 +77,7 @@ export default function DiscoverScreen() {
           </View>
         }
         ListHeaderComponent={
-          listenedSongs.length > 0 && availableSongs.length > 0 ? (
+          availableSongs.length > 0 ? (
             <View
               style={[styles.sectionHeader, { borderColor: colors.border }]}
             >
@@ -90,7 +85,7 @@ export default function DiscoverScreen() {
               <Text
                 style={[styles.sectionLabel, { color: colors.mutedForeground }]}
               >
-                {availableSongs.length} songs available this week
+                {availableSongs.length} song{availableSongs.length !== 1 ? "s" : ""} available this week
               </Text>
             </View>
           ) : null

@@ -6,6 +6,9 @@ import React, {
   useEffect,
   useState,
 } from "react";
+import { DEMO_SONGS } from "@/data/songs";
+import type { DemoSong } from "@/data/songs";
+import { api, apiSongToDemoSong } from "@/lib/api";
 
 export interface ListenerProfile {
   id: string;
@@ -35,6 +38,7 @@ export interface MomentMark {
 interface AppContextValue {
   profile: ListenerProfile | null;
   isLoading: boolean;
+  songs: DemoSong[];
   discoveries: Discovery[];
   momentMarks: MomentMark[];
   listenedSongIds: string[];
@@ -52,32 +56,49 @@ const STORAGE_KEYS = {
   DISCOVERIES: "pulzz_discoveries",
   MOMENT_MARKS: "pulzz_moment_marks",
   LISTENED: "pulzz_listened",
+  LISTENER_ID: "pulzz_listener_id",
 };
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [profile, setProfile] = useState<ListenerProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [songs, setSongs] = useState<DemoSong[]>(DEMO_SONGS);
   const [discoveries, setDiscoveries] = useState<Discovery[]>([]);
   const [momentMarks, setMomentMarks] = useState<MomentMark[]>([]);
   const [listenedSongIds, setListenedSongIds] = useState<string[]>([]);
+  const [listenerId, setListenerId] = useState<number | null>(null);
 
   useEffect(() => {
     loadAllData();
+    loadSongsFromApi();
   }, []);
+
+  async function loadSongsFromApi() {
+    try {
+      const apiSongs = await api.fetchSongs();
+      if (apiSongs && apiSongs.length > 0) {
+        setSongs(apiSongs.map(apiSongToDemoSong));
+      }
+    } catch {
+      // API unavailable — keep DEMO_SONGS as fallback
+    }
+  }
 
   async function loadAllData() {
     try {
-      const [profileJson, discJson, marksJson, listenedJson] =
+      const [profileJson, discJson, marksJson, listenedJson, listenerIdStr] =
         await Promise.all([
           AsyncStorage.getItem(STORAGE_KEYS.PROFILE),
           AsyncStorage.getItem(STORAGE_KEYS.DISCOVERIES),
           AsyncStorage.getItem(STORAGE_KEYS.MOMENT_MARKS),
           AsyncStorage.getItem(STORAGE_KEYS.LISTENED),
+          AsyncStorage.getItem(STORAGE_KEYS.LISTENER_ID),
         ]);
       if (profileJson) setProfile(JSON.parse(profileJson));
       if (discJson) setDiscoveries(JSON.parse(discJson));
       if (marksJson) setMomentMarks(JSON.parse(marksJson));
       if (listenedJson) setListenedSongIds(JSON.parse(listenedJson));
+      if (listenerIdStr) setListenerId(parseInt(listenerIdStr));
     } catch {
       // ignore
     } finally {
@@ -88,6 +109,21 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const saveProfile = useCallback(async (p: ListenerProfile) => {
     await AsyncStorage.setItem(STORAGE_KEYS.PROFILE, JSON.stringify(p));
     setProfile(p);
+    // Create listener in backend
+    try {
+      const result = await api.createListener({
+        name: p.name,
+        genres: p.genres,
+        discoveryPersonality: p.discoveryPersonality,
+      });
+      await AsyncStorage.setItem(
+        STORAGE_KEYS.LISTENER_ID,
+        String(result.id)
+      );
+      setListenerId(result.id);
+    } catch {
+      // Backend unavailable — app still works locally
+    }
   }, []);
 
   const markDiscovered = useCallback(
@@ -107,8 +143,18 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         JSON.stringify(listened)
       );
       setListenedSongIds(listened);
+      // Sync to backend
+      if (listenerId) {
+        api
+          .createReaction({
+            songId: parseInt(discovery.songId),
+            listenerId,
+            type: "discovered",
+          })
+          .catch(() => {});
+      }
     },
-    [discoveries, listenedSongIds]
+    [discoveries, listenedSongIds, listenerId]
   );
 
   const markSkip = useCallback(
@@ -119,8 +165,18 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         JSON.stringify(listened)
       );
       setListenedSongIds(listened);
+      // Sync to backend
+      if (listenerId) {
+        api
+          .createReaction({
+            songId: parseInt(songId),
+            listenerId,
+            type: "skip",
+          })
+          .catch(() => {});
+      }
     },
-    [listenedSongIds]
+    [listenedSongIds, listenerId]
   );
 
   const addMomentMark = useCallback(
@@ -131,8 +187,18 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         JSON.stringify(updated)
       );
       setMomentMarks(updated);
+      // Sync to backend
+      if (listenerId) {
+        api
+          .createMomentMark({
+            songId: parseInt(mark.songId),
+            listenerId,
+            timestampMs: mark.timestampMs,
+          })
+          .catch(() => {});
+      }
     },
-    [momentMarks]
+    [momentMarks, listenerId]
   );
 
   const getDiscoveryPoints = useCallback(() => {
@@ -157,6 +223,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       value={{
         profile,
         isLoading,
+        songs,
         discoveries,
         momentMarks,
         listenedSongIds,
