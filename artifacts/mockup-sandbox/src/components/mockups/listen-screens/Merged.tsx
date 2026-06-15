@@ -1,12 +1,14 @@
 import { useState } from "react";
-import { ChevronDown, Type, Zap, Star, X, SkipBack, Pause } from "lucide-react";
+import { ChevronDown, Type, Zap, Star, X, SkipBack, Pause, Lock } from "lucide-react";
 import "./_group.css";
 
 export function Merged() {
   const [activeTab, setActiveTab] = useState<"player" | "lyrics">("player");
+  const [storyExpanded, setStoryExpanded] = useState(false);
+  const [finished, setFinished] = useState(false);
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-neutral-900 p-4 font-sans selection:bg-[#E8956B] selection:text-white">
+    <div className="flex items-center justify-center min-h-screen bg-[#E5DFD5] p-4 font-sans selection:bg-[#E8956B] selection:text-white">
       {/* Mobile Frame */}
       <div
         className="w-[390px] h-[844px] relative overflow-hidden rounded-[40px] shadow-2xl flex flex-col border-[8px] border-white/20"
@@ -94,18 +96,31 @@ export function Merged() {
                 </h1>
                 <h2 className="text-[17px] font-bold text-[#3E5C99] mb-3">Luna Voss</h2>
 
-                {/* The Story */}
-                <div className="bg-[#DCE3EE]/50 rounded-2xl px-4 py-3 mx-1">
+                {/* Behind the song — expandable */}
+                <div className="w-full text-left bg-[#DCE3EE]/50 rounded-2xl px-4 py-3 mx-1">
                   <span className="text-[9px] font-bold tracking-[0.18em] text-[#3E5C99] uppercase">
-                    The Story
+                    Behind the song
                   </span>
-                  <p className="text-[12.5px] font-medium text-[#1B2A4A]/80 leading-relaxed mt-1">
-                    Written at 3AM in a Tokyo hotel room, about the quiet seconds right before
-                    everything changes.{" "}
+                  <p
+                    className={`text-[12.5px] font-medium text-[#1B2A4A]/80 leading-relaxed mt-1 ${
+                      storyExpanded ? "max-h-[104px] overflow-y-auto no-scrollbar" : "line-clamp-2"
+                    }`}
+                  >
+                    Written at 3AM in a Tokyo hotel room, Luna wrote{" "}
+                    <span className="italic font-semibold text-[#1B2A4A]">"Midnight Bloom"</span> about
+                    the quiet seconds right before everything changes — the last calm breath before a
+                    goodbye. She recorded the demo on her phone before sunrise and kept that raw,
+                    half-whispered vocal in the final cut.{" "}
                     <span className="italic font-semibold text-[#1B2A4A]">
-                      "Just a spark in the dark."
+                      "Just a spark in the dark, now it's tearing us apart."
                     </span>
                   </p>
+                  <button
+                    onClick={() => setStoryExpanded((v) => !v)}
+                    className="text-[11px] font-bold text-[#3E5C99] mt-1.5"
+                  >
+                    {storyExpanded ? "Show less" : "Read the full story"}
+                  </button>
                 </div>
               </div>
 
@@ -113,7 +128,10 @@ export function Merged() {
 
               {/* Waveform & Scrubber */}
               <div className="mb-5">
-                <div className="h-12 w-full flex items-end justify-between gap-[2px] mb-2 relative">
+                <div
+                  onClick={() => setFinished(true)}
+                  className="h-12 w-full flex items-end justify-between gap-[2px] mb-2 relative cursor-pointer"
+                >
                   {Array.from({ length: 48 }).map((_, i) => {
                     const isActive = i < 18; // ~38%
                     const isMoment = i === 8 || i === 14 || i === 36;
@@ -166,20 +184,33 @@ export function Merged() {
                 </button>
               </div>
 
-              {/* Secondary Actions */}
-              <div className="flex items-center gap-3">
-                <button
-                  className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-[16px] font-bold text-[#3E5C99] transition-colors hover:bg-[#DCE3EE]/80"
-                  style={{ backgroundColor: "#DCE3EE" }}
+              {/* Reactions — unlock only after the full song is heard */}
+              {finished ? (
+                <div
+                  className="flex items-center gap-3"
+                  style={{ animation: "merged-fade 0.4s ease" }}
                 >
-                  <Star size={18} />
-                  <span className="text-[15px]">Discovered</span>
+                  <button
+                    className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-[16px] font-bold text-[#3E5C99] transition-colors hover:bg-[#DCE3EE]/80"
+                    style={{ backgroundColor: "#DCE3EE" }}
+                  >
+                    <Star size={18} />
+                    <span className="text-[15px]">Discovered</span>
+                  </button>
+                  <button className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-[16px] font-bold text-[#1B2A4A]/60 transition-colors border-2 border-[#DCE3EE] hover:bg-white/50">
+                    <X size={18} />
+                    <span className="text-[15px]">Skip</span>
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => setFinished(true)}
+                  className="w-full flex items-center justify-center gap-2 py-3.5 rounded-[16px] text-[#1B2A4A]/40 font-semibold bg-[#1B2A4A]/[0.04] border border-dashed border-[#1B2A4A]/15 cursor-pointer"
+                >
+                  <Lock size={14} />
+                  <span className="text-[13px]">Finish the song to react</span>
                 </button>
-                <button className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-[16px] font-bold text-[#1B2A4A]/60 transition-colors border-2 border-[#DCE3EE] hover:bg-white/50">
-                  <X size={18} />
-                  <span className="text-[15px]">Skip</span>
-                </button>
-              </div>
+              )}
             </div>
           ) : (
             /* PANEL 2: Lyrics */
