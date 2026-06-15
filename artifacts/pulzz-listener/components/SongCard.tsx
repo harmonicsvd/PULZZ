@@ -104,15 +104,20 @@ export function SongCard({ song, hasListened }: SongCardProps) {
 
 const styles = StyleSheet.create({
   card: {
-    borderRadius: 16,
+    borderRadius: 24,
     marginBottom: 16,
     borderWidth: 1,
     overflow: "hidden",
     flexDirection: "row",
+    shadowColor: "#1B2A4A",
+    shadowOpacity: 0.08,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 3,
   },
   cover: {
     width: 110,
-    height: 130,
+    height: 138,
     position: "relative",
   },
   preReleaseTag: {

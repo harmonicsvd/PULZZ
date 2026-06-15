@@ -292,10 +292,15 @@ const styles = StyleSheet.create({
   statTile: {
     flex: 1,
     minWidth: "45%",
-    borderRadius: 14,
+    borderRadius: 20,
     borderWidth: 1,
-    padding: 16,
+    padding: 18,
     alignItems: "center",
+    shadowColor: "#1B2A4A",
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 2,
   },
   statValue: {
     fontSize: 24,
@@ -331,9 +336,9 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   infoCard: {
-    borderRadius: 14,
+    borderRadius: 20,
     borderWidth: 1,
-    padding: 16,
+    padding: 18,
   },
   infoText: {
     fontSize: 13,
@@ -345,8 +350,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     gap: 8,
     borderWidth: 1,
-    borderRadius: 12,
-    paddingVertical: 14,
+    borderRadius: 16,
+    paddingVertical: 16,
   },
   resetBtnText: {
     fontSize: 14,

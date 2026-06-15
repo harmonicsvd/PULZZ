@@ -135,7 +135,7 @@ export default function OnboardingScreen() {
       <Animated.View style={[styles.content, { opacity: fadeAnim }]}>
         {step === 0 && (
           <View style={styles.stepContainer}>
-            <View style={[styles.iconCircle, { backgroundColor: colors.muted }]}>
+            <View style={[styles.iconCircle, { backgroundColor: colors.accent + "26" }]}>
               <Text style={styles.iconEmoji}>🎵</Text>
             </View>
             <Text style={[styles.heading, { color: colors.foreground }]}>
@@ -394,10 +394,10 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   input: {
-    height: 52,
-    borderRadius: 12,
+    height: 54,
+    borderRadius: 16,
     borderWidth: 1,
-    paddingHorizontal: 16,
+    paddingHorizontal: 18,
     fontSize: 16,
     fontWeight: "500",
   },
@@ -414,9 +414,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 7,
     borderWidth: 1,
-    borderRadius: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
+    borderRadius: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 11,
   },
   genreChipLabel: {
     fontSize: 14,
@@ -429,14 +429,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 14,
-    padding: 16,
-    borderRadius: 14,
+    padding: 18,
+    borderRadius: 22,
     borderWidth: 1.5,
   },
   personalityIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 10,
+    width: 44,
+    height: 44,
+    borderRadius: 14,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -458,16 +458,16 @@ const styles = StyleSheet.create({
     marginTop: 24,
   },
   backBtn: {
-    width: 48,
-    height: 48,
-    borderRadius: 12,
+    width: 54,
+    height: 54,
+    borderRadius: 16,
     borderWidth: 1,
     alignItems: "center",
     justifyContent: "center",
   },
   nextBtn: {
-    height: 52,
-    borderRadius: 14,
+    height: 54,
+    borderRadius: 18,
     alignItems: "center",
     justifyContent: "center",
   },

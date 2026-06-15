@@ -1,2 +1,3 @@
 - [Orval queryKey requirement](orval-querykey.md) — generated hooks require explicit queryKey via get*QueryKey() helpers, not just `{ enabled: true }`
 - [Lib rebuild order](lib-rebuild-order.md) — always run `pnpm run typecheck:libs` before leaf artifact typechecks or you get "no exported member" errors
+- [Listener light-only theme](listener-light-theme.md) — Expo listener app is intentionally light-only; both light/dark keys hold the same palette on purpose, don't "fix" it

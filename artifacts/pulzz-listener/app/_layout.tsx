@@ -8,6 +8,7 @@ import {
 } from "@expo-google-fonts/poppins";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { router, Stack } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -32,17 +33,20 @@ function RootLayoutNav() {
   }, [isLoading, profile]);
 
   return (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      <Stack.Screen
-        name="onboarding"
-        options={{ headerShown: false, animation: "fade" }}
-      />
-      <Stack.Screen
-        name="listen"
-        options={{ headerShown: false, animation: "slide_from_bottom" }}
-      />
-    </Stack>
+    <>
+      <StatusBar style="dark" />
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="onboarding"
+          options={{ headerShown: false, animation: "fade" }}
+        />
+        <Stack.Screen
+          name="listen"
+          options={{ headerShown: false, animation: "slide_from_bottom" }}
+        />
+      </Stack>
+    </>
   );
 }
 

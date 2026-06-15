@@ -3,9 +3,12 @@ import { Audio, AVPlaybackStatus } from "expo-av";
 import * as Haptics from "expo-haptics";
 import { LinearGradient } from "expo-linear-gradient";
 import { router, useLocalSearchParams } from "expo-router";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Animated,
+  Dimensions,
+  GestureResponderEvent,
+  PanResponder,
   Platform,
   Pressable,
   ScrollView,
@@ -20,18 +23,21 @@ import { useColors } from "@/hooks/useColors";
 import { api, apiSongDetailToDemoSong } from "@/lib/api";
 import type { DemoSong } from "@/data/songs";
 
+const { height: SCREEN_H } = Dimensions.get("window");
+const BAR_COUNT = 48;
+
+type Sheet = "none" | "lyrics" | "artist";
+
 export default function ListenScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const { songs, markDiscovered, markSkip, addMomentMark } = useApp();
 
-  const topPad = Platform.OS === "web" ? 67 : insets.top;
-  const botPad = Platform.OS === "web" ? 34 : insets.bottom;
+  const topPad = Platform.OS === "web" ? 24 : insets.top;
+  const botPad = Platform.OS === "web" ? 24 : insets.bottom;
 
-  // Find song from context (has basic info)
   const baseSong = songs.find((s) => s.id === id);
-  // Detailed song (with story + lyrics) loaded from API
   const [song, setSong] = useState<DemoSong | null>(baseSong ?? null);
 
   const soundRef = useRef<Audio.Sound | null>(null);
@@ -39,15 +45,24 @@ export default function ListenScreen() {
   const [isLoading, setIsLoading] = useState(true);
   const [position, setPosition] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [showReaction, setShowReaction] = useState(false);
   const [momentMarks, setMomentMarks] = useState<number[]>([]);
-  const [showLyrics, setShowLyrics] = useState(false);
-  const [momentFlash, setMomentFlash] = useState(false);
+  const [finished, setFinished] = useState(false);
+  const [storyExpanded, setStoryExpanded] = useState(false);
+  const [sheet, setSheet] = useState<Sheet>("none");
+  const [reacted, setReacted] = useState(false);
 
-  const reactionScale = useRef(new Animated.Value(0)).current;
   const momentBtnScale = useRef(new Animated.Value(1)).current;
+  const sheetAnim = useRef(new Animated.Value(0)).current;
+  const waveWidth = useRef(0);
 
-  // Fetch song detail (story, lyrics) from API
+  // Deterministic waveform heights per song
+  const barHeights = useMemo(() => {
+    return Array.from({ length: BAR_COUNT }).map((_, i) =>
+      Math.max(14, Math.sin(i * 0.4) * 50 + Math.cos(i * 0.7) * 30 + 50)
+    );
+  }, []);
+
+  // Fetch detailed song (story, lyrics) from API
   useEffect(() => {
     if (!id) return;
     const numericId = parseInt(id);
@@ -55,9 +70,7 @@ export default function ListenScreen() {
       api
         .fetchSongDetail(numericId)
         .then((detail) => setSong(apiSongDetailToDemoSong(detail)))
-        .catch(() => {
-          // Keep base song from context as fallback
-        });
+        .catch(() => {});
     }
   }, [id]);
 
@@ -70,6 +83,7 @@ export default function ListenScreen() {
     return () => {
       soundRef.current?.unloadAsync();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [song?.audioUrl]);
 
   async function loadAudio() {
@@ -97,29 +111,28 @@ export default function ListenScreen() {
     setPosition(status.positionMillis ?? 0);
     setDuration(status.durationMillis ?? (song?.durationSeconds ?? 0) * 1000);
     setIsPlaying(status.isPlaying);
-    if (status.didJustFinish) {
-      showReactionOverlay();
-    }
-  }
-
-  function showReactionOverlay() {
-    setShowReaction(true);
-    Animated.spring(reactionScale, {
-      toValue: 1,
-      useNativeDriver: true,
-      tension: 80,
-      friction: 7,
-    }).start();
+    if (status.didJustFinish) setFinished(true);
   }
 
   async function togglePlayPause() {
     if (!soundRef.current) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    if (isPlaying) {
-      await soundRef.current.pauseAsync();
-    } else {
-      await soundRef.current.playAsync();
-    }
+    if (isPlaying) await soundRef.current.pauseAsync();
+    else await soundRef.current.playAsync();
+  }
+
+  async function restart() {
+    if (!soundRef.current) return;
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    await soundRef.current.setPositionAsync(0);
+    await soundRef.current.playAsync();
+  }
+
+  async function seekTo(e: GestureResponderEvent) {
+    if (!soundRef.current || !duration || waveWidth.current <= 0) return;
+    const x = e.nativeEvent.locationX;
+    const fraction = Math.max(0, Math.min(1, x / waveWidth.current));
+    await soundRef.current.setPositionAsync(fraction * duration);
   }
 
   async function handleMomentMark() {
@@ -127,11 +140,9 @@ export default function ListenScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     const ts = position;
     setMomentMarks((prev) => [...prev, ts]);
-    setMomentFlash(true);
-    setTimeout(() => setMomentFlash(false), 600);
     Animated.sequence([
       Animated.spring(momentBtnScale, {
-        toValue: 0.88,
+        toValue: 0.85,
         useNativeDriver: true,
         tension: 300,
       }),
@@ -149,7 +160,8 @@ export default function ListenScreen() {
   }
 
   async function handleDiscovered() {
-    if (!song) return;
+    if (!song || reacted) return;
+    setReacted(true);
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     await soundRef.current?.stopAsync();
     await markDiscovered({
@@ -166,12 +178,59 @@ export default function ListenScreen() {
   }
 
   async function handleSkip() {
-    if (!song) return;
+    if (!song || reacted) return;
+    setReacted(true);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     await soundRef.current?.stopAsync();
     await markSkip(song.id);
     router.back();
   }
+
+  function close() {
+    soundRef.current?.stopAsync();
+    router.back();
+  }
+
+  const openSheet = useCallback(
+    (which: Sheet) => {
+      setSheet(which);
+      Animated.timing(sheetAnim, {
+        toValue: 1,
+        duration: 320,
+        useNativeDriver: true,
+      }).start();
+    },
+    [sheetAnim]
+  );
+
+  const closeSheet = useCallback(() => {
+    Animated.timing(sheetAnim, {
+      toValue: 0,
+      duration: 260,
+      useNativeDriver: true,
+    }).start(() => setSheet("none"));
+  }, [sheetAnim]);
+
+  // Swipe up on the player → open lyrics sheet
+  const playerPan = useRef(
+    PanResponder.create({
+      onMoveShouldSetPanResponder: (_, g) =>
+        g.dy < -18 && Math.abs(g.dy) > Math.abs(g.dx),
+      onPanResponderRelease: (_, g) => {
+        if (g.dy < -40) openSheet("lyrics");
+      },
+    })
+  ).current;
+
+  // Swipe down on the sheet handle → close
+  const sheetPan = useRef(
+    PanResponder.create({
+      onMoveShouldSetPanResponder: (_, g) => g.dy > 12,
+      onPanResponderRelease: (_, g) => {
+        if (g.dy > 50) closeSheet();
+      },
+    })
+  ).current;
 
   function formatTime(ms: number) {
     const secs = Math.floor(ms / 1000);
@@ -181,418 +240,674 @@ export default function ListenScreen() {
   }
 
   const progress = duration > 0 ? position / duration : 0;
+  const activeBars = Math.round(progress * BAR_COUNT);
 
   if (!song) {
     return (
-      <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <View
+        style={[
+          styles.container,
+          { backgroundColor: colors.background, justifyContent: "center", alignItems: "center" },
+        ]}
+      >
         <Text style={{ color: colors.foreground }}>Song not found</Text>
       </View>
     );
   }
 
+  const lyricLines = song.lyrics
+    ? song.lyrics.split(/\n+/).map((l) => l.trim()).filter(Boolean)
+    : [];
+
+  const sheetTranslate = sheetAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [SCREEN_H, 0],
+  });
+
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <LinearGradient
-        colors={[song.coverGradient[0] + "CC", colors.background]}
-        start={{ x: 0.5, y: 0 }}
-        end={{ x: 0.5, y: 0.5 }}
-        style={StyleSheet.absoluteFill}
-      />
-
-      <View style={[styles.topBar, { paddingTop: topPad + 8 }]}>
-        <TouchableOpacity
-          style={[styles.iconBtn, { backgroundColor: "rgba(0,0,0,0.4)" }]}
-          onPress={() => {
-            soundRef.current?.stopAsync();
-            router.back();
-          }}
-        >
-          <Feather name="chevron-down" size={22} color="#FFF" />
+      {/* Header */}
+      <View style={[styles.header, { paddingTop: topPad + 8 }]}>
+        <TouchableOpacity style={styles.headerBtn} onPress={close} hitSlop={8}>
+          <Feather name="chevron-down" size={26} color={colors.navy} />
         </TouchableOpacity>
-        <View style={styles.topBarCenter}>
-          <Text style={styles.preReleaseLabel}>PRE-RELEASE</Text>
-          <Text style={styles.daysLeft}>
+        <View style={styles.headerCenter}>
+          <Text style={[styles.preReleaseLabel, { color: colors.midBlue }]}>
+            PRE-RELEASE
+          </Text>
+          <Text style={[styles.daysLeft, { color: colors.mutedForeground }]}>
             {song.daysUntilRelease} days until release
           </Text>
         </View>
-        <TouchableOpacity
-          style={[styles.iconBtn, { backgroundColor: "rgba(0,0,0,0.4)" }]}
-          onPress={() => setShowLyrics(!showLyrics)}
-        >
-          <Feather name="type" size={18} color="#FFF" />
-        </TouchableOpacity>
+        <View style={styles.headerBtn} />
       </View>
 
-      {!showLyrics ? (
-        <>
-          <View style={styles.coverArea}>
-            <LinearGradient
-              colors={song.coverGradient}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.coverArt}
-            >
-              {momentMarks.length > 0 && (
-                <View style={styles.momentCountBadge}>
-                  <Feather name="zap" size={12} color="#FFF" />
-                  <Text style={styles.momentCountText}>{momentMarks.length}</Text>
-                </View>
-              )}
-            </LinearGradient>
-          </View>
-
-          <View style={styles.songInfo}>
-            <Text style={styles.songTitle} numberOfLines={1}>{song.title}</Text>
-            <Text style={styles.songArtist}>{song.artist}</Text>
-            <View style={styles.tagsRow}>
-              <View style={[styles.tag, { backgroundColor: "rgba(255,255,255,0.12)" }]}>
-                <Text style={styles.tagText}>{song.genre}</Text>
-              </View>
-              {song.tags.slice(0, 2).map((t) => (
-                <View key={t} style={[styles.tag, { backgroundColor: "rgba(255,255,255,0.08)" }]}>
-                  <Text style={styles.tagText}>{t}</Text>
-                </View>
-              ))}
-            </View>
-          </View>
-        </>
-      ) : (
-        <ScrollView
-          style={styles.lyricsContainer}
-          showsVerticalScrollIndicator={false}
-        >
-          <Text style={styles.lyricsTitle}>{song.title}</Text>
-          <Text style={styles.lyricsArtist}>{song.artist}</Text>
-          {song.lyrics ? (
-            <Text style={styles.lyricsText}>{song.lyrics}</Text>
-          ) : (
-            <Text style={[styles.lyricsText, { opacity: 0.5 }]}>
-              Instrumental
-            </Text>
-          )}
-          {song.story ? (
-            <Text style={styles.lyricsStory}>{song.story}</Text>
-          ) : null}
-        </ScrollView>
-      )}
-
-      <View style={styles.progressSection}>
-        <View style={[styles.progressTrack, { backgroundColor: "rgba(255,255,255,0.15)" }]}>
-          <View
-            style={[
-              styles.progressFill,
-              { width: `${progress * 100}%`, backgroundColor: colors.primary },
-            ]}
-          />
-          {momentMarks.map((ts, i) => (
-            <View
-              key={i}
-              style={[
-                styles.momentDot,
-                {
-                  left: `${(ts / duration) * 100}%`,
-                  backgroundColor: colors.accent,
-                },
-              ]}
-            />
-          ))}
-        </View>
-        <View style={styles.timeRow}>
-          <Text style={styles.timeText}>{formatTime(position)}</Text>
-          <Text style={styles.timeText}>{formatTime(duration)}</Text>
-        </View>
-      </View>
-
-      <View style={styles.controls}>
-        <TouchableOpacity
-          style={[styles.iconBtn, { backgroundColor: "rgba(255,255,255,0.1)" }]}
-          onPress={() => {
-            soundRef.current?.stopAsync();
-            router.back();
-          }}
-        >
-          <Feather name="skip-back" size={20} color="rgba(255,255,255,0.5)" />
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.playBtn, { backgroundColor: colors.primary }]}
-          onPress={togglePlayPause}
-          activeOpacity={0.85}
-        >
-          {isLoading ? (
-            <Feather name="loader" size={26} color="#FFF" />
-          ) : (
-            <Feather name={isPlaying ? "pause" : "play"} size={26} color="#FFF" />
-          )}
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.iconBtn, { backgroundColor: "rgba(255,255,255,0.1)" }]}
-          onPress={showReactionOverlay}
-        >
-          <Feather name="flag" size={18} color="rgba(255,255,255,0.5)" />
-        </TouchableOpacity>
-      </View>
-
-      <Animated.View
-        style={[styles.momentBtnWrapper, { transform: [{ scale: momentBtnScale }] }]}
-      >
-        <TouchableOpacity
-          style={[
-            styles.momentBtn,
-            {
-              backgroundColor: momentFlash ? colors.accent : colors.primary,
-              paddingBottom: botPad + 12,
-            },
-          ]}
-          onPress={handleMomentMark}
-          activeOpacity={0.85}
-        >
-          <Feather name="zap" size={18} color="#FFF" />
-          <Text style={styles.momentBtnText}>Mark this moment</Text>
-          {momentMarks.length > 0 && (
-            <View style={styles.momentCountPill}>
-              <Text style={styles.momentCountPillText}>{momentMarks.length}</Text>
-            </View>
-          )}
-        </TouchableOpacity>
-      </Animated.View>
-
-      {showReaction && (
-        <Animated.View
-          style={[
-            styles.reactionOverlay,
-            { transform: [{ scale: reactionScale }] },
-          ]}
-        >
-          <View
-            style={[styles.reactionCard, { backgroundColor: colors.card, borderColor: colors.border }]}
+      {/* Player */}
+      <View style={styles.playerBody} {...playerPan.panHandlers}>
+        {/* Cover art */}
+        <View style={styles.coverArea}>
+          <LinearGradient
+            colors={song.coverGradient}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.coverArt}
           >
-            <Text style={styles.reactionTitle}>What did you think?</Text>
-            <Text style={[styles.reactionSong, { color: colors.mutedForeground }]}>
-              {song.title} · {song.artist}
-            </Text>
             {momentMarks.length > 0 && (
-              <Text style={[styles.reactionMoments, { color: colors.mutedForeground }]}>
-                You marked {momentMarks.length} moment{momentMarks.length !== 1 ? "s" : ""}
-              </Text>
+              <View style={styles.momentCountBadge}>
+                <Feather name="zap" size={13} color={colors.amber} />
+                <Text style={[styles.momentCountText, { color: colors.navy }]}>
+                  {momentMarks.length}
+                </Text>
+              </View>
             )}
-            <View style={styles.reactionBtns}>
-              <TouchableOpacity
-                style={[styles.discoveredBtn, { backgroundColor: colors.primary }]}
-                onPress={handleDiscovered}
-                activeOpacity={0.85}
+          </LinearGradient>
+        </View>
+
+        {/* Title + tappable artist */}
+        <View style={styles.titleBlock}>
+          <Text style={[styles.songTitle, { color: colors.navy }]} numberOfLines={1}>
+            {song.title}
+          </Text>
+          <TouchableOpacity
+            style={styles.artistRow}
+            onPress={() => openSheet("artist")}
+            activeOpacity={0.7}
+          >
+            <Text style={[styles.songArtist, { color: colors.midBlue }]}>
+              {song.artist}
+            </Text>
+            <Feather name="chevron-right" size={15} color={colors.midBlue} />
+          </TouchableOpacity>
+
+          {/* Behind the song */}
+          {song.story ? (
+            <View style={[styles.storyCard, { backgroundColor: colors.blueGrey + "80" }]}>
+              <Text style={[styles.storyEyebrow, { color: colors.midBlue }]}>
+                BEHIND THE SONG
+              </Text>
+              <Text
+                style={[styles.storyText, { color: colors.navy }]}
+                numberOfLines={storyExpanded ? undefined : 2}
               >
-                <Feather name="star" size={18} color="#FFF" />
-                <Text style={styles.reactionBtnText}>Discovered</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.skipBtn, { borderColor: colors.border, backgroundColor: colors.muted }]}
-                onPress={handleSkip}
-                activeOpacity={0.85}
-              >
-                <Feather name="x" size={18} color="#FFF" />
-                <Text style={[styles.reactionBtnText, { color: colors.foreground }]}>
-                  Skip
+                {song.story}
+              </Text>
+              <TouchableOpacity onPress={() => setStoryExpanded((v) => !v)}>
+                <Text style={[styles.storyToggle, { color: colors.midBlue }]}>
+                  {storyExpanded ? "Show less" : "Read the full story"}
                 </Text>
               </TouchableOpacity>
             </View>
+          ) : null}
+        </View>
+
+        <View style={{ flex: 1 }} />
+
+        {/* Waveform */}
+        <View style={styles.waveSection}>
+          <Pressable
+            style={styles.waveform}
+            onLayout={(e) => (waveWidth.current = e.nativeEvent.layout.width)}
+            onPress={seekTo}
+          >
+            {barHeights.map((h, i) => {
+              const isActive = i < activeBars;
+              const markedHere = momentMarks.some((ts) => {
+                if (!duration) return false;
+                return Math.round((ts / duration) * BAR_COUNT) === i;
+              });
+              return (
+                <View key={i} style={styles.barWrap}>
+                  {markedHere && (
+                    <View style={[styles.momentTick, { backgroundColor: colors.amber }]} />
+                  )}
+                  <View
+                    style={[
+                      styles.bar,
+                      {
+                        height: `${h}%`,
+                        backgroundColor: markedHere
+                          ? colors.amber
+                          : isActive
+                            ? colors.navy
+                            : colors.blueGrey,
+                      },
+                    ]}
+                  />
+                </View>
+              );
+            })}
+          </Pressable>
+          <View style={styles.timeRow}>
+            <Text style={[styles.timeText, { color: colors.mutedForeground }]}>
+              {formatTime(position)}
+            </Text>
+            <Text style={[styles.timeText, { color: colors.mutedForeground }]}>
+              {formatTime(duration)}
+            </Text>
           </View>
+        </View>
+
+        {/* Transport controls */}
+        <View style={styles.controls}>
+          <TouchableOpacity onPress={restart} hitSlop={10} style={styles.sideBtn}>
+            <Feather name="skip-back" size={26} color={colors.midBlue} />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.playBtn, { backgroundColor: colors.midBlue }]}
+            onPress={togglePlayPause}
+            activeOpacity={0.85}
+          >
+            {isLoading ? (
+              <Feather name="loader" size={28} color="#FFF" />
+            ) : (
+              <Feather name={isPlaying ? "pause" : "play"} size={28} color="#FFF" />
+            )}
+          </TouchableOpacity>
+
+          <Animated.View style={{ transform: [{ scale: momentBtnScale }] }}>
+            <TouchableOpacity
+              style={[styles.momentBtn, { backgroundColor: colors.amber }]}
+              onPress={handleMomentMark}
+              activeOpacity={0.85}
+            >
+              <Feather name="zap" size={20} color="#FFF" />
+              {momentMarks.length > 0 && (
+                <View style={styles.momentBtnBadge}>
+                  <Text style={[styles.momentBtnBadgeText, { color: colors.amber }]}>
+                    {momentMarks.length}
+                  </Text>
+                </View>
+              )}
+            </TouchableOpacity>
+          </Animated.View>
+        </View>
+
+        {/* Reactions — locked until the song finishes */}
+        {finished ? (
+          <View style={styles.reactionRow}>
+            <TouchableOpacity
+              style={[styles.discoveredBtn, { backgroundColor: colors.blueGrey }]}
+              onPress={handleDiscovered}
+              activeOpacity={0.85}
+            >
+              <Feather name="star" size={18} color={colors.midBlue} />
+              <Text style={[styles.discoveredText, { color: colors.midBlue }]}>
+                Discovered
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.skipBtn, { borderColor: colors.blueGrey }]}
+              onPress={handleSkip}
+              activeOpacity={0.85}
+            >
+              <Feather name="x" size={18} color={colors.mutedForeground} />
+              <Text style={[styles.skipText, { color: colors.mutedForeground }]}>
+                Skip
+              </Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <View
+            style={[
+              styles.lockedBtn,
+              { borderColor: colors.navy + "26", backgroundColor: colors.navy + "08" },
+            ]}
+          >
+            <Feather name="lock" size={14} color={colors.mutedForeground} />
+            <Text style={[styles.lockedText, { color: colors.mutedForeground }]}>
+              Finish the song to react
+            </Text>
+          </View>
+        )}
+
+        {/* Grab handle → lyrics & details (no caption) */}
+        <TouchableOpacity
+          style={styles.grabHandleArea}
+          onPress={() => openSheet("lyrics")}
+          activeOpacity={0.6}
+        >
+          <View style={[styles.grabHandle, { backgroundColor: colors.navy + "26" }]} />
+        </TouchableOpacity>
+      </View>
+
+      {/* Bottom sheet */}
+      {sheet !== "none" && (
+        <Animated.View
+          style={[
+            styles.sheet,
+            {
+              backgroundColor: colors.background,
+              transform: [{ translateY: sheetTranslate }],
+            },
+          ]}
+        >
+          <View {...sheetPan.panHandlers}>
+            <TouchableOpacity
+              style={styles.sheetHandleArea}
+              onPress={closeSheet}
+              activeOpacity={0.6}
+            >
+              <View style={[styles.grabHandle, { backgroundColor: colors.navy + "26" }]} />
+            </TouchableOpacity>
+          </View>
+
+          {sheet === "lyrics" ? (
+            <ScrollView
+              style={styles.sheetScroll}
+              contentContainerStyle={{ paddingBottom: botPad + 24 }}
+              showsVerticalScrollIndicator={false}
+            >
+              <Text style={[styles.sheetEyebrow, { color: colors.midBlue }]}>
+                LYRICS
+              </Text>
+              {lyricLines.length > 0 ? (
+                <View style={{ gap: 8, marginBottom: 8 }}>
+                  {lyricLines.map((line, i) => (
+                    <Text key={i} style={[styles.lyricLine, { color: colors.navy }]}>
+                      {line}
+                    </Text>
+                  ))}
+                </View>
+              ) : (
+                <Text style={[styles.lyricLine, { color: colors.mutedForeground }]}>
+                  Instrumental
+                </Text>
+              )}
+
+              <View style={[styles.divider, { backgroundColor: colors.navy + "12" }]} />
+
+              <Text style={[styles.sheetEyebrow, { color: colors.midBlue }]}>
+                SONG DETAILS
+              </Text>
+              <View style={styles.detailsGrid}>
+                <Detail label="Genre" value={song.genre} colors={colors} />
+                <Detail label="Length" value={formatTime(song.durationSeconds * 1000)} colors={colors} />
+                {song.bpm > 0 && (
+                  <Detail label="Tempo" value={`${song.bpm} BPM`} colors={colors} />
+                )}
+                <Detail
+                  label="Releases"
+                  value={new Date(song.releaseDate).toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
+                  })}
+                  colors={colors}
+                />
+              </View>
+
+              {song.instruments.length > 0 && (
+                <View style={[styles.creditsCard, { backgroundColor: colors.blueGrey + "80" }]}>
+                  <Text style={[styles.detailLabel, { color: colors.mutedForeground }]}>
+                    INSTRUMENTS
+                  </Text>
+                  <Text style={[styles.creditsText, { color: colors.navy }]}>
+                    {song.instruments
+                      .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
+                      .join(" · ")}
+                  </Text>
+                </View>
+              )}
+            </ScrollView>
+          ) : (
+            <ScrollView
+              style={styles.sheetScroll}
+              contentContainerStyle={{ paddingBottom: botPad + 24 }}
+              showsVerticalScrollIndicator={false}
+            >
+              <View style={styles.artistHeader}>
+                <LinearGradient
+                  colors={[colors.amber, colors.midBlue]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.artistAvatar}
+                />
+                <Text style={[styles.artistName, { color: colors.navy }]}>
+                  {song.artist}
+                </Text>
+                <View style={[styles.artistGenrePill, { backgroundColor: colors.blueGrey + "B0" }]}>
+                  <Text style={[styles.artistGenreText, { color: colors.midBlue }]}>
+                    {song.genre}
+                  </Text>
+                </View>
+                <TouchableOpacity
+                  style={[styles.followBtn, { backgroundColor: colors.navy }]}
+                  activeOpacity={0.85}
+                >
+                  <Text style={styles.followBtnText}>Follow</Text>
+                </TouchableOpacity>
+              </View>
+
+              <Text style={[styles.sheetEyebrow, { color: colors.midBlue }]}>
+                ABOUT
+              </Text>
+              <Text style={[styles.aboutText, { color: colors.navy }]}>
+                {song.artist} has {song.title} in the Pulzz discovery pool — an
+                unreleased {song.genre.toLowerCase()} track you're hearing before
+                release day. Mark the moments that move you and be among the first
+                to discover it.
+              </Text>
+
+              {song.tags.length > 0 && (
+                <>
+                  <View style={{ height: 18 }} />
+                  <Text style={[styles.sheetEyebrow, { color: colors.midBlue }]}>
+                    MOOD
+                  </Text>
+                  <View style={styles.tagWrap}>
+                    {song.tags.map((t) => (
+                      <View
+                        key={t}
+                        style={[styles.moodTag, { backgroundColor: colors.blueGrey + "80" }]}
+                      >
+                        <Text style={[styles.moodTagText, { color: colors.navy }]}>
+                          {t}
+                        </Text>
+                      </View>
+                    ))}
+                  </View>
+                </>
+              )}
+            </ScrollView>
+          )}
         </Animated.View>
       )}
     </View>
   );
 }
 
+function Detail({
+  label,
+  value,
+  colors,
+}: {
+  label: string;
+  value: string;
+  colors: ReturnType<typeof useColors>;
+}) {
+  return (
+    <View style={styles.detailItem}>
+      <Text style={[styles.detailLabel, { color: colors.mutedForeground }]}>
+        {label.toUpperCase()}
+      </Text>
+      <Text style={[styles.detailValue, { color: colors.navy }]}>{value}</Text>
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  topBar: {
+  header: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     paddingBottom: 8,
     justifyContent: "space-between",
   },
-  topBarCenter: { alignItems: "center" },
-  preReleaseLabel: {
-    color: "rgba(255,255,255,0.6)",
-    fontSize: 10,
-    fontWeight: "700",
-    letterSpacing: 1.5,
-  },
-  daysLeft: {
-    color: "rgba(255,255,255,0.9)",
-    fontSize: 12,
-    fontWeight: "600",
-    marginTop: 2,
-  },
-  iconBtn: {
+  headerBtn: {
     width: 40,
     height: 40,
-    borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
   },
+  headerCenter: { alignItems: "center" },
+  preReleaseLabel: {
+    fontSize: 10,
+    fontWeight: "800",
+    letterSpacing: 2,
+  },
+  daysLeft: {
+    fontSize: 13,
+    fontWeight: "600",
+    marginTop: 2,
+  },
+  playerBody: {
+    flex: 1,
+    paddingHorizontal: 24,
+    paddingBottom: 4,
+  },
   coverArea: {
     alignItems: "center",
-    marginTop: 16,
-    marginBottom: 24,
+    marginTop: 4,
+    marginBottom: 16,
   },
   coverArt: {
-    width: 260,
-    height: 260,
-    borderRadius: 20,
+    width: 226,
+    height: 226,
+    borderRadius: 32,
     alignItems: "flex-end",
-    justifyContent: "flex-end",
-    padding: 12,
+    padding: 14,
+    shadowColor: "#3E5C99",
+    shadowOpacity: 0.3,
+    shadowRadius: 24,
+    shadowOffset: { width: 0, height: 16 },
+    elevation: 10,
   },
   momentCountBadge: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 3,
-    backgroundColor: "rgba(0,0,0,0.55)",
-    borderRadius: 8,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+    gap: 5,
+    backgroundColor: "rgba(255,255,255,0.92)",
+    borderRadius: 16,
+    paddingHorizontal: 11,
+    paddingVertical: 6,
   },
-  momentCountText: { color: "#FFF", fontSize: 12, fontWeight: "700" },
-  songInfo: { paddingHorizontal: 24, marginBottom: 24 },
+  momentCountText: { fontSize: 14, fontWeight: "800" },
+  titleBlock: { alignItems: "center" },
   songTitle: {
-    color: "#FFF",
-    fontSize: 24,
+    fontSize: 30,
     fontWeight: "800",
-    letterSpacing: -0.5,
+    letterSpacing: -0.6,
+    textAlign: "center",
   },
-  songArtist: {
-    color: "rgba(255,255,255,0.65)",
-    fontSize: 15,
-    marginTop: 4,
-    marginBottom: 10,
+  artistRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 2,
+    marginTop: 2,
+    marginBottom: 12,
   },
-  tagsRow: { flexDirection: "row", gap: 6 },
-  tag: { borderRadius: 6, paddingHorizontal: 8, paddingVertical: 4 },
-  tagText: { color: "rgba(255,255,255,0.8)", fontSize: 11, fontWeight: "500" },
-  lyricsContainer: { flex: 1, paddingHorizontal: 24, marginTop: 8 },
-  lyricsTitle: {
-    color: "#FFF",
-    fontSize: 20,
+  songArtist: { fontSize: 16, fontWeight: "700" },
+  storyCard: {
+    width: "100%",
+    borderRadius: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  storyEyebrow: {
+    fontSize: 9,
     fontWeight: "800",
+    letterSpacing: 1.6,
     marginBottom: 4,
   },
-  lyricsArtist: {
-    color: "rgba(255,255,255,0.6)",
-    fontSize: 14,
-    marginBottom: 20,
+  storyText: { fontSize: 12.5, fontWeight: "500", lineHeight: 19 },
+  storyToggle: { fontSize: 11, fontWeight: "700", marginTop: 6 },
+  waveSection: { marginBottom: 16 },
+  waveform: {
+    height: 46,
+    flexDirection: "row",
+    alignItems: "flex-end",
+    justifyContent: "space-between",
+    gap: 2,
   },
-  lyricsText: {
-    color: "rgba(255,255,255,0.9)",
-    fontSize: 16,
-    lineHeight: 28,
-    marginBottom: 24,
+  barWrap: {
+    flex: 1,
+    height: "100%",
+    justifyContent: "flex-end",
+    alignItems: "center",
   },
-  lyricsStory: {
-    color: "rgba(255,255,255,0.5)",
-    fontSize: 13,
-    lineHeight: 20,
-    fontStyle: "italic",
-    marginBottom: 40,
-  },
-  progressSection: { paddingHorizontal: 24, marginBottom: 8 },
-  progressTrack: {
-    height: 4,
-    borderRadius: 2,
-    position: "relative",
-    overflow: "visible",
-  },
-  progressFill: { height: 4, borderRadius: 2 },
-  momentDot: {
+  momentTick: {
     position: "absolute",
-    top: -3,
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    marginLeft: -5,
+    top: 0,
+    width: 6,
+    height: 6,
+    borderRadius: 3,
   },
+  bar: { width: "100%", borderRadius: 4 },
   timeRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 6,
+    marginTop: 8,
   },
-  timeText: { color: "rgba(255,255,255,0.5)", fontSize: 11 },
+  timeText: { fontSize: 12, fontWeight: "700", letterSpacing: 1 },
   controls: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 24,
-    paddingVertical: 12,
-    paddingHorizontal: 24,
+    gap: 28,
+    marginBottom: 16,
   },
+  sideBtn: { padding: 4 },
   playBtn: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
+    width: 66,
+    height: 66,
+    borderRadius: 26,
     alignItems: "center",
     justifyContent: "center",
+    shadowColor: "#3E5C99",
+    shadowOpacity: 0.35,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 6,
   },
-  momentBtnWrapper: { paddingHorizontal: 20, marginTop: 4 },
   momentBtn: {
-    flexDirection: "row",
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     alignItems: "center",
     justifyContent: "center",
-    gap: 8,
-    borderRadius: 16,
-    paddingTop: 16,
-    paddingHorizontal: 24,
+    shadowColor: "#E8956B",
+    shadowOpacity: 0.35,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 6,
   },
-  momentBtnText: { color: "#FFF", fontSize: 16, fontWeight: "700" },
-  momentCountPill: {
-    backgroundColor: "rgba(255,255,255,0.25)",
-    borderRadius: 10,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-  },
-  momentCountPillText: { color: "#FFF", fontSize: 12, fontWeight: "700" },
-  reactionOverlay: {
+  momentBtnBadge: {
     position: "absolute",
-    inset: 0,
-    backgroundColor: "rgba(0,0,0,0.75)",
+    top: -2,
+    right: -2,
+    backgroundColor: "#FFF",
+    minWidth: 18,
+    height: 18,
+    borderRadius: 9,
+    paddingHorizontal: 4,
     alignItems: "center",
     justifyContent: "center",
-    padding: 24,
   },
-  reactionCard: {
-    width: "100%",
-    borderRadius: 24,
-    borderWidth: 1,
-    padding: 28,
-    alignItems: "center",
-    gap: 8,
-  },
-  reactionTitle: {
-    color: "#FFF",
-    fontSize: 22,
-    fontWeight: "800",
-    textAlign: "center",
-  },
-  reactionSong: { fontSize: 14, textAlign: "center" },
-  reactionMoments: { fontSize: 13, textAlign: "center", marginBottom: 4 },
-  reactionBtns: { width: "100%", gap: 10, marginTop: 8 },
+  momentBtnBadgeText: { fontSize: 10, fontWeight: "900" },
+  reactionRow: { flexDirection: "row", gap: 12 },
   discoveredBtn: {
+    flex: 1,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 10,
-    borderRadius: 14,
-    paddingVertical: 16,
+    gap: 8,
+    paddingVertical: 14,
+    borderRadius: 16,
   },
+  discoveredText: { fontSize: 15, fontWeight: "800" },
   skipBtn: {
+    flex: 1,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 10,
-    borderRadius: 14,
-    paddingVertical: 16,
-    borderWidth: 1,
+    gap: 8,
+    paddingVertical: 14,
+    borderRadius: 16,
+    borderWidth: 2,
   },
-  reactionBtnText: { color: "#FFF", fontSize: 16, fontWeight: "700" },
+  skipText: { fontSize: 15, fontWeight: "800" },
+  lockedBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    paddingVertical: 14,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderStyle: "dashed",
+  },
+  lockedText: { fontSize: 13, fontWeight: "600" },
+  grabHandleArea: {
+    alignItems: "center",
+    paddingTop: 14,
+    paddingBottom: 6,
+  },
+  grabHandle: {
+    width: 40,
+    height: 5,
+    borderRadius: 3,
+  },
+  sheet: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    zIndex: 30,
+  },
+  sheetHandleArea: {
+    alignItems: "center",
+    paddingTop: 12,
+    paddingBottom: 8,
+  },
+  sheetScroll: { flex: 1, paddingHorizontal: 24 },
+  sheetEyebrow: {
+    fontSize: 11,
+    fontWeight: "800",
+    letterSpacing: 1.8,
+    marginBottom: 12,
+  },
+  lyricLine: { fontSize: 18, fontWeight: "700", lineHeight: 24 },
+  divider: { height: 1, marginVertical: 20 },
+  detailsGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    marginBottom: 16,
+  },
+  detailItem: { width: "50%", marginBottom: 14 },
+  detailLabel: {
+    fontSize: 10,
+    fontWeight: "800",
+    letterSpacing: 1,
+    marginBottom: 3,
+  },
+  detailValue: { fontSize: 14, fontWeight: "800" },
+  creditsCard: {
+    borderRadius: 18,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  creditsText: { fontSize: 13, fontWeight: "600", lineHeight: 19, marginTop: 4 },
+  artistHeader: { alignItems: "center", marginBottom: 22 },
+  artistAvatar: {
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+    marginBottom: 12,
+  },
+  artistName: { fontSize: 24, fontWeight: "800", letterSpacing: -0.4 },
+  artistGenrePill: {
+    marginTop: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 5,
+    borderRadius: 20,
+  },
+  artistGenreText: { fontSize: 12, fontWeight: "800" },
+  followBtn: {
+    marginTop: 14,
+    paddingHorizontal: 28,
+    paddingVertical: 11,
+    borderRadius: 24,
+  },
+  followBtnText: { color: "#FFF", fontSize: 14, fontWeight: "800" },
+  aboutText: { fontSize: 14, fontWeight: "500", lineHeight: 22 },
+  tagWrap: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
+  moodTag: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 14,
+  },
+  moodTagText: { fontSize: 13, fontWeight: "700" },
 });
