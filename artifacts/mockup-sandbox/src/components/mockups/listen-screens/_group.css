@@ -60,8 +60,3 @@
 .merged-anim-2 { animation-name: merged-pulse-2; animation-duration: 1.3s; }
 .merged-anim-3 { animation-name: merged-pulse-3; animation-duration: 0.9s; }
 .merged-anim-4 { animation-name: merged-pulse-4; animation-duration: 1.4s; }
-
-@keyframes merged-fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-
-.no-scrollbar::-webkit-scrollbar { display: none; }
-.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
