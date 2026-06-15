@@ -3,20 +3,32 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Pulzz — pre-release music discovery platform API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: songs
+    description: Song discovery pool
+  - name: reactions
+    description: Listener reactions to songs
+  - name: moments
+    description: Moment mark timestamps during playback
+  - name: artists
+    description: Artist operations
+  - name: listeners
+    description: Listener profiles
+  - name: wall
+    description: Discovery Wall leaderboard
+
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +36,279 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /songs:
+    get:
+      operationId: listSongs
+      tags: [songs]
+      summary: List songs in discovery pool
+      parameters:
+        - name: genre
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [active, released]
+      responses:
+        "200":
+          description: List of songs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Song"
+    post:
+      operationId: submitSong
+      tags: [songs]
+      summary: Artist submits a song to the discovery pool
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SongInput"
+      responses:
+        "201":
+          description: Song submitted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Song"
+
+  /songs/{id}:
+    get:
+      operationId: getSong
+      tags: [songs]
+      summary: Get a single song with full details
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Song detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SongDetail"
+        "404":
+          description: Not found
+
+  /songs/{id}/reactions:
+    get:
+      operationId: getSongReactions
+      tags: [songs]
+      summary: Get aggregated reaction stats for a song
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Reaction stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SongReactions"
+
+  /songs/{id}/moments:
+    get:
+      operationId: getSongMoments
+      tags: [songs]
+      summary: Get moment mark heatmap for a song
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Moment marks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MomentMark"
+
+  /reactions:
+    post:
+      operationId: createReaction
+      tags: [reactions]
+      summary: Submit a Discovered or Skip reaction after listening
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReactionInput"
+      responses:
+        "201":
+          description: Reaction recorded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Reaction"
+
+  /moment-marks:
+    post:
+      operationId: createMomentMark
+      tags: [moments]
+      summary: Record a moment mark timestamp during playback
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MomentMarkInput"
+      responses:
+        "201":
+          description: Moment mark recorded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MomentMark"
+
+  /wall:
+    get:
+      operationId: getWall
+      tags: [wall]
+      summary: Get Discovery Wall leaderboard
+      responses:
+        "200":
+          description: Leaderboard entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/WallEntry"
+
+  /artists:
+    post:
+      operationId: createArtist
+      tags: [artists]
+      summary: Register an artist account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ArtistInput"
+      responses:
+        "201":
+          description: Artist created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Artist"
+
+  /artists/{id}:
+    get:
+      operationId: getArtist
+      tags: [artists]
+      summary: Get artist profile
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Artist profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Artist"
+
+  /artists/{id}/songs:
+    get:
+      operationId: getArtistSongs
+      tags: [artists]
+      summary: Get all songs submitted by an artist
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Artist songs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Song"
+
+  /artists/{id}/dashboard:
+    get:
+      operationId: getArtistDashboard
+      tags: [artists]
+      summary: Get dashboard summary stats for an artist
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Dashboard stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ArtistDashboard"
+
+  /listeners:
+    post:
+      operationId: createListener
+      tags: [listeners]
+      summary: Register or update listener profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ListenerInput"
+      responses:
+        "201":
+          description: Listener profile saved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Listener"
+
+  /listeners/{id}:
+    get:
+      operationId: getListener
+      tags: [listeners]
+      summary: Get listener profile
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Listener profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Listener"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +319,296 @@ components:
       required:
         - status
 
+    Song:
+      type: object
+      required: [id, title, artistName, genre, releaseDate, daysUntilRelease, status, coverColor, tags]
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        artistName:
+          type: string
+        genre:
+          type: string
+        releaseDate:
+          type: string
+        daysUntilRelease:
+          type: integer
+        status:
+          type: string
+          enum: [active, released]
+        coverColor:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        audioUrl:
+          type: ["string", "null"]
+        durationSeconds:
+          type: ["integer", "null"]
+        discoveredCount:
+          type: ["integer", "null"]
+        skipCount:
+          type: ["integer", "null"]
+
+    SongInput:
+      type: object
+      required: [title, artistId, genre, releaseDate, isrc, audioUrl, story]
+      properties:
+        title:
+          type: string
+        artistId:
+          type: integer
+        genre:
+          type: string
+        language:
+          type: string
+        releaseDate:
+          type: string
+        isrc:
+          type: string
+        audioUrl:
+          type: string
+        story:
+          type: string
+        lyrics:
+          type: ["string", "null"]
+        instruments:
+          type: array
+          items:
+            type: string
+        durationSeconds:
+          type: integer
+
+    SongDetail:
+      type: object
+      required: [id, title, artistName, genre, releaseDate, daysUntilRelease, status, coverColor, tags, story]
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        artistName:
+          type: string
+        genre:
+          type: string
+        releaseDate:
+          type: string
+        daysUntilRelease:
+          type: integer
+        status:
+          type: string
+          enum: [active, released]
+        coverColor:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        story:
+          type: string
+        lyrics:
+          type: ["string", "null"]
+        audioUrl:
+          type: ["string", "null"]
+        durationSeconds:
+          type: ["integer", "null"]
+        instruments:
+          type: array
+          items:
+            type: string
+        isrc:
+          type: ["string", "null"]
+        discoveredCount:
+          type: ["integer", "null"]
+        skipCount:
+          type: ["integer", "null"]
+        momentCount:
+          type: ["integer", "null"]
+
+    SongReactions:
+      type: object
+      required: [songId, discoveredCount, skipCount, totalListeners, topMoments]
+      properties:
+        songId:
+          type: integer
+        discoveredCount:
+          type: integer
+        skipCount:
+          type: integer
+        totalListeners:
+          type: integer
+        topMoments:
+          type: array
+          items:
+            type: object
+            required: [timestampMs, count]
+            properties:
+              timestampMs:
+                type: integer
+              count:
+                type: integer
+
+    Reaction:
+      type: object
+      required: [id, songId, listenerId, type, createdAt]
+      properties:
+        id:
+          type: integer
+        songId:
+          type: integer
+        listenerId:
+          type: integer
+        type:
+          type: string
+          enum: [discovered, skip]
+        createdAt:
+          type: string
+
+    ReactionInput:
+      type: object
+      required: [songId, listenerId, type]
+      properties:
+        songId:
+          type: integer
+        listenerId:
+          type: integer
+        type:
+          type: string
+          enum: [discovered, skip]
+
+    MomentMark:
+      type: object
+      required: [id, songId, listenerId, timestampMs, createdAt]
+      properties:
+        id:
+          type: integer
+        songId:
+          type: integer
+        listenerId:
+          type: integer
+        timestampMs:
+          type: integer
+        createdAt:
+          type: string
+
+    MomentMarkInput:
+      type: object
+      required: [songId, listenerId, timestampMs]
+      properties:
+        songId:
+          type: integer
+        listenerId:
+          type: integer
+        timestampMs:
+          type: integer
+
+    WallEntry:
+      type: object
+      required: [rank, listenerId, listenerName, discoveryCount, points]
+      properties:
+        rank:
+          type: integer
+        listenerId:
+          type: integer
+        listenerName:
+          type: string
+        discoveryCount:
+          type: integer
+        points:
+          type: integer
+        badges:
+          type: array
+          items:
+            type: string
+
+    Artist:
+      type: object
+      required: [id, name, email, createdAt]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+        bio:
+          type: ["string", "null"]
+        genre:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+
+    ArtistInput:
+      type: object
+      required: [name, email]
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        bio:
+          type: string
+        genre:
+          type: string
+
+    ArtistDashboard:
+      type: object
+      required: [artistId, totalSongs, activeSongs, totalListeners, totalDiscovered, totalSkipped, totalMomentMarks]
+      properties:
+        artistId:
+          type: integer
+        totalSongs:
+          type: integer
+        activeSongs:
+          type: integer
+        totalListeners:
+          type: integer
+        totalDiscovered:
+          type: integer
+        totalSkipped:
+          type: integer
+        totalMomentMarks:
+          type: integer
+        recentSongs:
+          type: array
+          items:
+            $ref: "#/components/schemas/Song"
+
+    Listener:
+      type: object
+      required: [id, name, genres, discoveryPersonality, createdAt]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        genres:
+          type: array
+          items:
+            type: string
+        discoveryPersonality:
+          type: string
+          enum: [explorer, balanced, familiar]
+        discoveryCount:
+          type: integer
+        points:
+          type: integer
+        createdAt:
+          type: string
+
+    ListenerInput:
+      type: object
+      required: [name, genres, discoveryPersonality]
+      properties:
+        name:
+          type: string
+        genres:
+          type: array
+          items:
+            type: string
+        discoveryPersonality:
+          type: string
+          enum: [explorer, balanced, familiar]

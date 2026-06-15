@@ -1,0 +1,238 @@
+import { Router, type IRouter } from "express";
+import { and, count, desc, eq, sql } from "drizzle-orm";
+import { db, momentMarksTable, reactionsTable, songsTable, artistsTable } from "@workspace/db";
+import {
+  GetSongMomentsResponse,
+  GetSongParams,
+  GetSongReactionsParams,
+  GetSongReactionsResponse,
+  GetSongResponse,
+  ListSongsQueryParams,
+  ListSongsResponse,
+  SubmitSongBody,
+} from "@workspace/api-zod";
+
+const router: IRouter = Router();
+
+router.get("/songs", async (req, res): Promise<void> => {
+  const query = ListSongsQueryParams.safeParse(req.query);
+  if (!query.success) {
+    res.status(400).json({ error: query.error.message });
+    return;
+  }
+
+  const conditions = [];
+  if (query.data.status) conditions.push(eq(songsTable.status, query.data.status));
+  if (query.data.genre) conditions.push(eq(songsTable.genre, query.data.genre));
+
+  const songs = await db
+    .select({
+      id: songsTable.id,
+      title: songsTable.title,
+      artistName: artistsTable.name,
+      genre: songsTable.genre,
+      releaseDate: songsTable.releaseDate,
+      status: songsTable.status,
+      coverColor: songsTable.coverColor,
+      tags: songsTable.tags,
+      audioUrl: songsTable.audioUrl,
+      durationSeconds: songsTable.durationSeconds,
+    })
+    .from(songsTable)
+    .innerJoin(artistsTable, eq(songsTable.artistId, artistsTable.id))
+    .where(conditions.length ? and(...conditions) : undefined)
+    .orderBy(desc(songsTable.createdAt));
+
+  const today = new Date();
+  const result = songs.map((s) => ({
+    ...s,
+    daysUntilRelease: Math.max(
+      0,
+      Math.ceil(
+        (new Date(s.releaseDate).getTime() - today.getTime()) /
+          (1000 * 60 * 60 * 24)
+      )
+    ),
+    discoveredCount: null,
+    skipCount: null,
+  }));
+
+  res.json(ListSongsResponse.parse(result));
+});
+
+router.post("/songs", async (req, res): Promise<void> => {
+  const parsed = SubmitSongBody.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.message });
+    return;
+  }
+
+  const { artistId, releaseDate, ...rest } = parsed.data;
+  const [song] = await db
+    .insert(songsTable)
+    .values({
+      artistId,
+      releaseDate,
+      ...rest,
+    })
+    .returning();
+
+  const artist = await db
+    .select({ name: artistsTable.name })
+    .from(artistsTable)
+    .where(eq(artistsTable.id, artistId))
+    .then((r) => r[0]);
+
+  const today = new Date();
+  res.status(201).json(
+    ListSongsResponse.element.parse({
+      ...song,
+      artistName: artist?.name ?? "",
+      daysUntilRelease: Math.max(
+        0,
+        Math.ceil(
+          (new Date(song.releaseDate).getTime() - today.getTime()) /
+            (1000 * 60 * 60 * 24)
+        )
+      ),
+      discoveredCount: null,
+      skipCount: null,
+    })
+  );
+});
+
+router.get("/songs/:id", async (req, res): Promise<void> => {
+  const params = GetSongParams.safeParse(req.params);
+  if (!params.success) {
+    res.status(400).json({ error: params.error.message });
+    return;
+  }
+
+  const [song] = await db
+    .select({
+      id: songsTable.id,
+      title: songsTable.title,
+      artistName: artistsTable.name,
+      genre: songsTable.genre,
+      releaseDate: songsTable.releaseDate,
+      status: songsTable.status,
+      coverColor: songsTable.coverColor,
+      tags: songsTable.tags,
+      audioUrl: songsTable.audioUrl,
+      durationSeconds: songsTable.durationSeconds,
+      story: songsTable.story,
+      lyrics: songsTable.lyrics,
+      instruments: songsTable.instruments,
+      isrc: songsTable.isrc,
+    })
+    .from(songsTable)
+    .innerJoin(artistsTable, eq(songsTable.artistId, artistsTable.id))
+    .where(eq(songsTable.id, params.data.id));
+
+  if (!song) {
+    res.status(404).json({ error: "Song not found" });
+    return;
+  }
+
+  const reactionCounts = await db
+    .select({ type: reactionsTable.type, cnt: count() })
+    .from(reactionsTable)
+    .where(eq(reactionsTable.songId, params.data.id))
+    .groupBy(reactionsTable.type);
+
+  const momentCount = await db
+    .select({ cnt: count() })
+    .from(momentMarksTable)
+    .where(eq(momentMarksTable.songId, params.data.id))
+    .then((r) => r[0]?.cnt ?? 0);
+
+  const discovered = reactionCounts.find((r) => r.type === "discovered")?.cnt ?? 0;
+  const skip = reactionCounts.find((r) => r.type === "skip")?.cnt ?? 0;
+
+  const today = new Date();
+  res.json(
+    GetSongResponse.parse({
+      ...song,
+      daysUntilRelease: Math.max(
+        0,
+        Math.ceil(
+          (new Date(song.releaseDate).getTime() - today.getTime()) /
+            (1000 * 60 * 60 * 24)
+        )
+      ),
+      discoveredCount: discovered,
+      skipCount: skip,
+      momentCount,
+    })
+  );
+});
+
+router.get("/songs/:id/reactions", async (req, res): Promise<void> => {
+  const params = GetSongReactionsParams.safeParse(req.params);
+  if (!params.success) {
+    res.status(400).json({ error: params.error.message });
+    return;
+  }
+
+  const reactionCounts = await db
+    .select({ type: reactionsTable.type, cnt: count() })
+    .from(reactionsTable)
+    .where(eq(reactionsTable.songId, params.data.id))
+    .groupBy(reactionsTable.type);
+
+  const discovered = reactionCounts.find((r) => r.type === "discovered")?.cnt ?? 0;
+  const skip = reactionCounts.find((r) => r.type === "skip")?.cnt ?? 0;
+  const total = discovered + skip;
+
+  const topMoments = await db
+    .select({
+      timestampMs: sql<number>`(${momentMarksTable.timestampMs} / 5000) * 5000`,
+      count: count(),
+    })
+    .from(momentMarksTable)
+    .where(eq(momentMarksTable.songId, params.data.id))
+    .groupBy(sql`(${momentMarksTable.timestampMs} / 5000) * 5000`)
+    .orderBy(desc(count()))
+    .limit(10);
+
+  res.json(
+    GetSongReactionsResponse.parse({
+      songId: params.data.id,
+      discoveredCount: discovered,
+      skipCount: skip,
+      totalListeners: total,
+      topMoments: topMoments.map((m) => ({
+        timestampMs: m.timestampMs,
+        count: m.count,
+      })),
+    })
+  );
+});
+
+router.get("/songs/:id/moments", async (req, res): Promise<void> => {
+  const params = GetSongReactionsParams.safeParse(req.params);
+  if (!params.success) {
+    res.status(400).json({ error: params.error.message });
+    return;
+  }
+
+  const marks = await db
+    .select()
+    .from(momentMarksTable)
+    .where(eq(momentMarksTable.songId, params.data.id))
+    .orderBy(momentMarksTable.timestampMs);
+
+  res.json(
+    GetSongMomentsResponse.parse(
+      marks.map((m) => ({
+        id: m.id,
+        songId: m.songId,
+        listenerId: m.listenerId,
+        timestampMs: m.timestampMs,
+        createdAt: m.createdAt.toISOString(),
+      }))
+    )
+  );
+});
+
+export default router;

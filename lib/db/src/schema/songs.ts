@@ -1,0 +1,40 @@
+import {
+  date,
+  integer,
+  pgTable,
+  serial,
+  text,
+  timestamp,
+} from "drizzle-orm/pg-core";
+import { createInsertSchema } from "drizzle-zod";
+import { z } from "zod/v4";
+import { artistsTable } from "./artists";
+
+export const songsTable = pgTable("songs", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  artistId: integer("artist_id")
+    .notNull()
+    .references(() => artistsTable.id),
+  genre: text("genre").notNull(),
+  language: text("language").default("en"),
+  releaseDate: date("release_date", { mode: "string" }).notNull(),
+  isrc: text("isrc"),
+  audioUrl: text("audio_url").notNull(),
+  story: text("story").notNull().default(""),
+  lyrics: text("lyrics"),
+  instruments: text("instruments").array().default([]),
+  durationSeconds: integer("duration_seconds"),
+  coverColor: text("cover_color").notNull().default("#7B61FF"),
+  tags: text("tags").array().default([]),
+  status: text("status").notNull().default("active"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const insertSongSchema = createInsertSchema(songsTable).omit({
+  id: true,
+  createdAt: true,
+  status: true,
+});
+export type InsertSong = z.infer<typeof insertSongSchema>;
+export type Song = typeof songsTable.$inferSelect;

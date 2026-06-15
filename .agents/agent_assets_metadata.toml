@@ -1,0 +1,20 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "F1dQ5ZrDDHG5z_sblk55-"
+uri = "file://artifacts/pulzz-listener/assets/images/icon.png"
+type = "image"
+title = "pulzz app icon"
+
+[[generated]]
+id = "yv3IhOu4IPFsXekET8t1L"
+uri = "file://artifacts/pulzz-listener/assets/images/splash.png"
+type = "image"
+title = "pulzz splash screen"
+
+[[generated]]
+id = "HUiE0f7mrZERuxkBJdVk1"
+uri = "file://artifacts/pulzz-listener/assets/images/song-placeholder.png"
+type = "image"
+title = "song placeholder art"

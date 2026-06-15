@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "Pulzz — Artist Dashboard"
+version = "1.0.0"
+id = "artifacts/pulzz-artist"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 19974
+
+[services.development]
+run = "pnpm --filter @workspace/pulzz-artist run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/pulzz-artist", "run", "build" ]
+publicDir = "artifacts/pulzz-artist/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "19974"
+BASE_PATH = "/"
