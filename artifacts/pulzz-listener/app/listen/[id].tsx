@@ -92,22 +92,40 @@ export default function ListenScreen() {
   // nearest the viewport center is highlighted — no dependency on audio timing.
   const [centeredLyric, setCenteredLyric] = useState(0);
 
+  // Re-measure lyrics from scratch whenever the song changes so stale line
+  // positions from a previous track can't drive the highlight.
+  useEffect(() => {
+    lyricYs.current = {};
+    lyricHeights.current = {};
+    setCenteredLyric(0);
+  }, [song?.id]);
+
   function onLyricsScroll(e: NativeSyntheticEvent<NativeScrollEvent>) {
     const scrollY = e.nativeEvent.contentOffset.y;
     const viewport = lyricViewportH.current || 360;
     const center = scrollY + viewport / 2;
+    const keys = Object.keys(lyricYs.current);
+    if (keys.length === 0) return;
+    let firstTop = Infinity;
+    let lastBottom = -Infinity;
     let best = 0;
     let bestDist = Infinity;
-    for (const key of Object.keys(lyricYs.current)) {
+    for (const key of keys) {
       const i = Number(key);
-      const lineCenter =
-        lyricYs.current[i] + (lyricHeights.current[i] ?? 0) / 2;
+      const top = lyricYs.current[i];
+      const h = lyricHeights.current[i] ?? 0;
+      firstTop = Math.min(firstTop, top);
+      lastBottom = Math.max(lastBottom, top + h);
+      const lineCenter = top + h / 2;
       const d = Math.abs(lineCenter - center);
       if (d < bestDist) {
         bestDist = d;
         best = i;
       }
     }
+    // Only follow while the lyrics block sits under the viewport center; once
+    // the user scrolls down into SONG DETAILS, stop moving the highlight.
+    if (center < firstTop || center > lastBottom) return;
     setCenteredLyric((prev) => (prev === best ? prev : best));
   }
 
@@ -1119,7 +1137,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   syncedPillText: { fontSize: 9, fontWeight: "900", fontFamily: fontFor("900"), letterSpacing: 1 },
-  syncedLine: { fontSize: 20, fontFamily: fontFor("400"), lineHeight: 27, letterSpacing: -0.3 },
   followLine: {
     fontSize: 22,
     lineHeight: 31,
