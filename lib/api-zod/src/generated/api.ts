@@ -137,6 +137,29 @@ export const UpdateSongLyricsResponse = zod.object({
 
 
 /**
+ * @summary Update a song's lyrics analysis (mood, themes, language)
+ */
+export const UpdateSongAnalysisParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const UpdateSongAnalysisBody = zod.object({
+  "mood": zod.array(zod.string()),
+  "themes": zod.array(zod.string()),
+  "language": zod.string().nullish()
+})
+
+export const UpdateSongAnalysisResponse = zod.object({
+  "ok": zod.boolean(),
+  "analysis": zod.object({
+  "mood": zod.array(zod.string()).optional(),
+  "themes": zod.array(zod.string()).optional(),
+  "language": zod.string().nullish()
+})
+})
+
+
+/**
  * @summary Get aggregated reaction stats for a song
  */
 export const GetSongReactionsParams = zod.object({

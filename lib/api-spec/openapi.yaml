@@ -129,6 +129,33 @@ paths:
         "404":
           description: Not found
 
+  /songs/{id}/analysis:
+    put:
+      operationId: updateSongAnalysis
+      tags: [songs]
+      summary: Update a song's lyrics analysis (mood, themes, language)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateSongAnalysis"
+      responses:
+        "200":
+          description: Saved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdateSongAnalysisResult"
+        "404":
+          description: Not found
+
   /songs/{id}/reactions:
     get:
       operationId: getSongReactions
@@ -620,6 +647,30 @@ components:
           type: boolean
         lrc:
           type: string
+
+    UpdateSongAnalysis:
+      type: object
+      required: [mood, themes]
+      properties:
+        mood:
+          type: array
+          items:
+            type: string
+        themes:
+          type: array
+          items:
+            type: string
+        language:
+          type: ["string", "null"]
+
+    UpdateSongAnalysisResult:
+      type: object
+      required: [ok, analysis]
+      properties:
+        ok:
+          type: boolean
+        analysis:
+          $ref: "#/components/schemas/SongAnalysis"
 
     SongReactions:
       type: object

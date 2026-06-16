@@ -10,6 +10,9 @@ import {
   ListSongsQueryParams,
   ListSongsResponse,
   SubmitSongBody,
+  UpdateSongAnalysisBody,
+  UpdateSongAnalysisParams,
+  UpdateSongAnalysisResponse,
   UpdateSongLyricsBody,
   UpdateSongLyricsParams,
   UpdateSongLyricsResponse,
@@ -224,6 +227,44 @@ router.put("/songs/:id/lyrics", async (req, res): Promise<void> => {
 
   res.json(
     UpdateSongLyricsResponse.parse({ ok: true, lrc: updated[0].lrc ?? "" })
+  );
+});
+
+router.put("/songs/:id/analysis", async (req, res): Promise<void> => {
+  const params = UpdateSongAnalysisParams.safeParse(req.params);
+  if (!params.success) {
+    res.status(400).json({ error: params.error.message });
+    return;
+  }
+  const body = UpdateSongAnalysisBody.safeParse(req.body);
+  if (!body.success) {
+    res.status(400).json({ error: body.error.message });
+    return;
+  }
+
+  const language = body.data.language?.trim();
+  const analysis: SongAnalysis = {
+    mood: body.data.mood,
+    themes: body.data.themes,
+    ...(language ? { language } : {}),
+  };
+
+  const updated = await db
+    .update(songsTable)
+    .set({ analysis })
+    .where(eq(songsTable.id, params.data.id))
+    .returning({ id: songsTable.id, analysis: songsTable.analysis });
+
+  if (updated.length === 0) {
+    res.status(404).json({ error: "Song not found" });
+    return;
+  }
+
+  res.json(
+    UpdateSongAnalysisResponse.parse({
+      ok: true,
+      analysis: updated[0].analysis ?? { mood: [], themes: [] },
+    })
   );
 });
 

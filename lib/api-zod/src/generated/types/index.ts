@@ -39,6 +39,8 @@ export * from './songLicense';
 export * from './songReactions';
 export * from './songReactionsTopMomentsItem';
 export * from './songStatus';
+export * from './updateSongAnalysis';
+export * from './updateSongAnalysisResult';
 export * from './updateSongLyrics';
 export * from './updateSongLyricsResult';
 export * from './wallEntry';

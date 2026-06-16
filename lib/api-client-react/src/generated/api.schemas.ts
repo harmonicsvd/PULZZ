@@ -136,6 +136,18 @@ export interface UpdateSongLyricsResult {
   lrc: string;
 }
 
+export interface UpdateSongAnalysis {
+  mood: string[];
+  themes: string[];
+  /** @nullable */
+  language?: string | null;
+}
+
+export interface UpdateSongAnalysisResult {
+  ok: boolean;
+  analysis: SongAnalysis;
+}
+
 export type SongReactionsTopMomentsItem = {
   timestampMs: number;
   count: number;

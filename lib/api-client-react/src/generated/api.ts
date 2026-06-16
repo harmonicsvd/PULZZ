@@ -42,6 +42,8 @@ import type {
   SongDetail,
   SongInput,
   SongReactions,
+  UpdateSongAnalysis,
+  UpdateSongAnalysisResult,
   UpdateSongLyrics,
   UpdateSongLyricsResult,
   WallEntry
@@ -438,6 +440,78 @@ export const useUpdateSongLyrics = <TError = ErrorType<void>,
         TContext
       > => {
       return useMutation(getUpdateSongLyricsMutationOptions(options));
+    }
+
+export const getUpdateSongAnalysisUrl = (id: number,) => {
+
+
+
+
+  return `/api/songs/${id}/analysis`
+}
+
+/**
+ * @summary Update a song's lyrics analysis (mood, themes, language)
+ */
+export const updateSongAnalysis = async (id: number,
+    updateSongAnalysis: UpdateSongAnalysis, options?: RequestInit): Promise<UpdateSongAnalysisResult> => {
+
+  return customFetch<UpdateSongAnalysisResult>(getUpdateSongAnalysisUrl(id),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateSongAnalysis,)
+  }
+);}
+
+
+
+
+export const getUpdateSongAnalysisMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateSongAnalysis>>, TError,{id: number;data: BodyType<UpdateSongAnalysis>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateSongAnalysis>>, TError,{id: number;data: BodyType<UpdateSongAnalysis>}, TContext> => {
+
+const mutationKey = ['updateSongAnalysis'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateSongAnalysis>>, {id: number;data: BodyType<UpdateSongAnalysis>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateSongAnalysis(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateSongAnalysisMutationResult = NonNullable<Awaited<ReturnType<typeof updateSongAnalysis>>>
+    export type UpdateSongAnalysisMutationBody = BodyType<UpdateSongAnalysis>
+    export type UpdateSongAnalysisMutationError = ErrorType<void>
+
+    /**
+ * @summary Update a song's lyrics analysis (mood, themes, language)
+ */
+export const useUpdateSongAnalysis = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateSongAnalysis>>, TError,{id: number;data: BodyType<UpdateSongAnalysis>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateSongAnalysis>>,
+        TError,
+        {id: number;data: BodyType<UpdateSongAnalysis>},
+        TContext
+      > => {
+      return useMutation(getUpdateSongAnalysisMutationOptions(options));
     }
 
 export const getGetSongReactionsUrl = (id: number,) => {
