@@ -32,14 +32,14 @@ export default function WallPage() {
                   }`}
                 >
                   <div
-                    className="absolute inset-0 opacity-5"
+                    className="absolute inset-0 opacity-10"
                     style={{
                       background:
                         entry.rank === 1
-                          ? "linear-gradient(135deg, #7B61FF, transparent)"
+                          ? "linear-gradient(135deg, #FF5C49, transparent)"
                           : entry.rank === 2
-                          ? "linear-gradient(135deg, #A0A0B0, transparent)"
-                          : "linear-gradient(135deg, #CD7F32, transparent)",
+                          ? "linear-gradient(135deg, #3E5C99, transparent)"
+                          : "linear-gradient(135deg, #E8956B, transparent)",
                     }}
                   />
                   <CardHeader className="pb-2">

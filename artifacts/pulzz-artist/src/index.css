@@ -58,6 +58,7 @@
 
   --font-sans: var(--app-font-sans);
   --font-serif: var(--app-font-serif);
+  --font-display: var(--app-font-serif);
   --font-mono: var(--app-font-mono);
 
   --text-xs: 0.75rem;
@@ -93,79 +94,75 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
-/* Pulzz Brand — Dark mode first */
+/* Pulzz Brand — "Pulse Coral" light, modern, minimal */
 :root {
-  --button-outline: rgba(255,255,255, .10);
-  --badge-outline: rgba(255,255,255, .05);
-  --opaque-button-border-intensity: 9;
-  --elevate-1: rgba(255,255,255, .04);
-  --elevate-2: rgba(255,255,255, .09);
+  --button-outline: rgba(27,42,74, .10);
+  --badge-outline: rgba(27,42,74, .06);
+  --opaque-button-border-intensity: -7;
+  --elevate-1: rgba(27,42,74, .035);
+  --elevate-2: rgba(27,42,74, .07);
 
-  /* Dark background — #0A0A0F */
-  --background: 240 33% 4%;
-  /* #EEEEFF */
-  --foreground: 240 100% 97%;
-  /* #1E1E2A */
-  --border: 240 18% 14%;
-  /* #13131A */
-  --card: 240 20% 9%;
-  --card-foreground: 240 100% 97%;
-  --card-border: 240 18% 14%;
-  /* #0A0A0F */
-  --sidebar: 240 33% 4%;
-  --sidebar-foreground: 240 100% 97%;
-  --sidebar-border: 240 18% 14%;
-  /* #7B61FF - electric purple */
-  --sidebar-primary: 252 100% 68%;
+  /* Cream background — #FBF8F2 */
+  --background: 36 44% 97%;
+  /* Deep navy text — #1B2A4A */
+  --foreground: 221 45% 20%;
+  /* Warm border — #E9E1D4 */
+  --border: 36 30% 87%;
+  /* Warm near-white card — #FFFDFA */
+  --card: 40 60% 99%;
+  --card-foreground: 221 45% 20%;
+  --card-border: 36 30% 89%;
+  /* Deeper cream sidebar — #F2EBDF */
+  --sidebar: 36 38% 91%;
+  --sidebar-foreground: 221 45% 20%;
+  --sidebar-border: 36 30% 86%;
+  /* Pulse Coral — #FF5C49 */
+  --sidebar-primary: 6 100% 64%;
   --sidebar-primary-foreground: 0 0% 100%;
-  /* #1E1E2A */
-  --sidebar-accent: 240 18% 14%;
-  --sidebar-accent-foreground: 240 100% 97%;
-  --sidebar-ring: 252 100% 68%;
-  /* #0A0A0F */
-  --popover: 240 33% 4%;
-  --popover-foreground: 240 100% 97%;
-  --popover-border: 240 18% 14%;
-  /* #7B61FF */
-  --primary: 252 100% 68%;
+  --sidebar-accent: 36 32% 88%;
+  --sidebar-accent-foreground: 221 45% 20%;
+  --sidebar-ring: 6 100% 64%;
+  --popover: 40 60% 99%;
+  --popover-foreground: 221 45% 20%;
+  --popover-border: 36 30% 89%;
+  /* Pulse Coral — #FF5C49 */
+  --primary: 6 100% 64%;
   --primary-foreground: 0 0% 100%;
-  /* #1E1E2A */
-  --secondary: 240 18% 14%;
-  --secondary-foreground: 240 100% 97%;
-  /* #1E1E2A */
-  --muted: 240 18% 14%;
-  /* #6B6B8E */
-  --muted-foreground: 240 14% 49%;
-  /* #FF3C6E - hot pink */
-  --accent: 344 100% 61%;
-  --accent-foreground: 0 0% 100%;
-  /* #FF3C6E */
-  --destructive: 344 100% 61%;
+  /* Warm light surface */
+  --secondary: 36 32% 91%;
+  --secondary-foreground: 221 45% 24%;
+  --muted: 36 32% 92%;
+  /* Calm slate text — darker for AA contrast on cream */
+  --muted-foreground: 220 22% 40%;
+  /* Warm amber secondary accent — #E8956B */
+  --accent: 36 32% 90%;
+  --accent-foreground: 221 45% 20%;
+  /* Red destructive */
+  --destructive: 0 72% 51%;
   --destructive-foreground: 0 0% 100%;
-  /* #1E1E2A */
-  --input: 240 18% 14%;
-  --ring: 252 100% 68%;
+  --input: 36 30% 87%;
+  --ring: 6 100% 64%;
 
-  /* Chart colors */
-  --chart-1: 252 100% 68%;
-  --chart-2: 344 100% 61%;
-  --chart-3: 174 72% 50%;
-  --chart-4: 43 96% 56%;
-  --chart-5: 280 65% 60%;
+  /* Chart colors — coral, amber, green, blue, violet */
+  --chart-1: 6 100% 64%;
+  --chart-2: 26 85% 62%;
+  --chart-3: 152 48% 42%;
+  --chart-4: 221 60% 55%;
+  --chart-5: 262 52% 62%;
 
-  --app-font-sans: 'Poppins', 'Inter', sans-serif;
-  --app-font-serif: Georgia, serif;
-  --app-font-mono: Menlo, monospace;
-  --radius: 0.75rem;
+  --app-font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --app-font-serif: 'Clash Display', 'Inter', system-ui, sans-serif;
+  --app-font-mono: 'JetBrains Mono', Menlo, monospace;
+  --radius: 0.875rem;
 
-  --shadow-2xs: 0px 2px 8px 0px rgba(0,0,0,0.4);
-  --shadow-xs: 0px 2px 8px 0px rgba(0,0,0,0.4);
-  --shadow-sm: 0px 4px 12px 0px rgba(0,0,0,0.4);
-  --shadow: 0px 4px 16px 0px rgba(0,0,0,0.5);
-  --shadow-md: 0px 8px 24px 0px rgba(0,0,0,0.5);
-  --shadow-lg: 0px 12px 32px 0px rgba(0,0,0,0.6);
-  --shadow-xl: 0px 20px 48px 0px rgba(0,0,0,0.6);
-  --shadow-2xl: 0px 32px 64px 0px rgba(0,0,0,0.7);
+  --shadow-2xs: 0px 1px 2px 0px rgba(27,42,74,0.04);
+  --shadow-xs: 0px 1px 3px 0px rgba(27,42,74,0.05);
+  --shadow-sm: 0px 2px 6px 0px rgba(27,42,74,0.06);
+  --shadow: 0px 4px 12px 0px rgba(27,42,74,0.07);
+  --shadow-md: 0px 6px 18px 0px rgba(27,42,74,0.08);
+  --shadow-lg: 0px 12px 28px 0px rgba(27,42,74,0.10);
+  --shadow-xl: 0px 20px 40px 0px rgba(27,42,74,0.12);
+  --shadow-2xl: 0px 28px 56px 0px rgba(27,42,74,0.16);
   --tracking-normal: 0em;
   --spacing: 0.25rem;
 
@@ -185,57 +182,57 @@
   --destructive-border: hsl(from hsl(var(--destructive)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
 }
 
-/* Keep dark class same as root — Pulzz is always dark */
+/* Pulzz is light-only — keep .dark identical to :root so nothing renders dark */
 .dark {
-  --button-outline: rgba(255,255,255, .10);
-  --badge-outline: rgba(255,255,255, .05);
-  --opaque-button-border-intensity: 9;
-  --elevate-1: rgba(255,255,255, .04);
-  --elevate-2: rgba(255,255,255, .09);
+  --button-outline: rgba(27,42,74, .10);
+  --badge-outline: rgba(27,42,74, .06);
+  --opaque-button-border-intensity: -7;
+  --elevate-1: rgba(27,42,74, .035);
+  --elevate-2: rgba(27,42,74, .07);
 
-  --background: 240 33% 4%;
-  --foreground: 240 100% 97%;
-  --border: 240 18% 14%;
-  --card: 240 20% 9%;
-  --card-foreground: 240 100% 97%;
-  --card-border: 240 18% 14%;
-  --sidebar: 240 33% 4%;
-  --sidebar-foreground: 240 100% 97%;
-  --sidebar-border: 240 18% 14%;
-  --sidebar-primary: 252 100% 68%;
+  --background: 36 44% 97%;
+  --foreground: 221 45% 20%;
+  --border: 36 30% 87%;
+  --card: 40 60% 99%;
+  --card-foreground: 221 45% 20%;
+  --card-border: 36 30% 89%;
+  --sidebar: 36 38% 91%;
+  --sidebar-foreground: 221 45% 20%;
+  --sidebar-border: 36 30% 86%;
+  --sidebar-primary: 6 100% 64%;
   --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 240 18% 14%;
-  --sidebar-accent-foreground: 240 100% 97%;
-  --sidebar-ring: 252 100% 68%;
-  --popover: 240 33% 4%;
-  --popover-foreground: 240 100% 97%;
-  --popover-border: 240 18% 14%;
-  --primary: 252 100% 68%;
+  --sidebar-accent: 36 32% 88%;
+  --sidebar-accent-foreground: 221 45% 20%;
+  --sidebar-ring: 6 100% 64%;
+  --popover: 40 60% 99%;
+  --popover-foreground: 221 45% 20%;
+  --popover-border: 36 30% 89%;
+  --primary: 6 100% 64%;
   --primary-foreground: 0 0% 100%;
-  --secondary: 240 18% 14%;
-  --secondary-foreground: 240 100% 97%;
-  --muted: 240 18% 14%;
-  --muted-foreground: 240 14% 49%;
-  --accent: 344 100% 61%;
-  --accent-foreground: 0 0% 100%;
-  --destructive: 344 100% 61%;
+  --secondary: 36 32% 91%;
+  --secondary-foreground: 221 45% 24%;
+  --muted: 36 32% 92%;
+  --muted-foreground: 220 22% 40%;
+  --accent: 36 32% 90%;
+  --accent-foreground: 221 45% 20%;
+  --destructive: 0 72% 51%;
   --destructive-foreground: 0 0% 100%;
-  --input: 240 18% 14%;
-  --ring: 252 100% 68%;
-  --chart-1: 252 100% 68%;
-  --chart-2: 344 100% 61%;
-  --chart-3: 174 72% 50%;
-  --chart-4: 43 96% 56%;
-  --chart-5: 280 65% 60%;
+  --input: 36 30% 87%;
+  --ring: 6 100% 64%;
+  --chart-1: 6 100% 64%;
+  --chart-2: 26 85% 62%;
+  --chart-3: 152 48% 42%;
+  --chart-4: 221 60% 55%;
+  --chart-5: 262 52% 62%;
 
-  --shadow-2xs: 0px 2px 8px 0px rgba(0,0,0,0.4);
-  --shadow-xs: 0px 2px 8px 0px rgba(0,0,0,0.4);
-  --shadow-sm: 0px 4px 12px 0px rgba(0,0,0,0.4);
-  --shadow: 0px 4px 16px 0px rgba(0,0,0,0.5);
-  --shadow-md: 0px 8px 24px 0px rgba(0,0,0,0.5);
-  --shadow-lg: 0px 12px 32px 0px rgba(0,0,0,0.6);
-  --shadow-xl: 0px 20px 48px 0px rgba(0,0,0,0.6);
-  --shadow-2xl: 0px 32px 64px 0px rgba(0,0,0,0.7);
+  --shadow-2xs: 0px 1px 2px 0px rgba(27,42,74,0.04);
+  --shadow-xs: 0px 1px 3px 0px rgba(27,42,74,0.05);
+  --shadow-sm: 0px 2px 6px 0px rgba(27,42,74,0.06);
+  --shadow: 0px 4px 12px 0px rgba(27,42,74,0.07);
+  --shadow-md: 0px 6px 18px 0px rgba(27,42,74,0.08);
+  --shadow-lg: 0px 12px 28px 0px rgba(27,42,74,0.10);
+  --shadow-xl: 0px 20px 40px 0px rgba(27,42,74,0.12);
+  --shadow-2xl: 0px 28px 56px 0px rgba(27,42,74,0.16);
 }
 
 @layer base {
@@ -245,6 +242,11 @@
 
   body {
     @apply font-sans antialiased bg-background text-foreground;
+  }
+
+  h1, h2, h3 {
+    font-family: var(--app-font-serif);
+    letter-spacing: -0.02em;
   }
 }
 

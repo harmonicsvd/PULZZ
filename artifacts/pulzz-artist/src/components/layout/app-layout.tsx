@@ -18,11 +18,12 @@ export function AppLayout({ children }: { children: ReactNode }) {
       <aside className="w-64 border-r border-border bg-card flex flex-col hidden md:flex fixed inset-y-0 z-10">
         <div className="p-6">
           <Link href="/">
-            <div className="flex items-center gap-2 font-bold text-xl tracking-tight cursor-pointer">
-              <div className="w-6 h-6 bg-primary rounded-sm flex items-center justify-center">
-                <div className="w-2 h-2 bg-background rounded-full" />
+            <div className="flex items-center gap-2.5 cursor-pointer">
+              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center shadow-sm">
+                <div className="w-2.5 h-2.5 bg-background rounded-full" />
               </div>
-              PULZZ <span className="text-muted-foreground font-normal">ARTIST</span>
+              <span className="font-display font-bold text-2xl tracking-tight leading-none">PULZZ</span>
+              <span className="text-muted-foreground font-medium text-xs tracking-[0.18em] uppercase mt-0.5">Artist</span>
             </div>
           </Link>
         </div>
