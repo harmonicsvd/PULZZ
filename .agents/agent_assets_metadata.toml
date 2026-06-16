@@ -24,3 +24,9 @@ id = "HbObjUwwt8C9BSZeHimwA"
 uri = "file://artifacts/api-server/public/media/art-1.png"
 type = "image"
 title = "generated_image"
+
+[[generated]]
+id = "MXrdpBaRRQj8DZzoaA7Wz"
+uri = "file://artifacts/api-server/public/media/art-3.png"
+type = "image"
+title = "generated_image"
