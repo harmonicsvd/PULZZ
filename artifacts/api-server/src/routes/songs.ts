@@ -39,6 +39,7 @@ router.get("/songs", async (req, res): Promise<void> => {
       coverColor: songsTable.coverColor,
       tags: songsTable.tags,
       audioUrl: songsTable.audioUrl,
+      artworkUrl: songsTable.artworkUrl,
       durationSeconds: songsTable.durationSeconds,
     })
     .from(songsTable)
@@ -122,6 +123,7 @@ router.get("/songs/:id", async (req, res): Promise<void> => {
       coverColor: songsTable.coverColor,
       tags: songsTable.tags,
       audioUrl: songsTable.audioUrl,
+      artworkUrl: songsTable.artworkUrl,
       durationSeconds: songsTable.durationSeconds,
       story: songsTable.story,
       lyrics: songsTable.lyrics,

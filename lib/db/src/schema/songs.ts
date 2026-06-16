@@ -30,6 +30,7 @@ export const songsTable = pgTable("songs", {
   releaseDate: date("release_date", { mode: "string" }).notNull(),
   isrc: text("isrc"),
   audioUrl: text("audio_url").notNull(),
+  artworkUrl: text("artwork_url"),
   story: text("story").notNull().default(""),
   lyrics: text("lyrics"),
   lrc: text("lrc"),

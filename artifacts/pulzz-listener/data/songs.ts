@@ -20,6 +20,7 @@ export interface DemoSong {
   daysUntilRelease: number;
   durationSeconds: number;
   audioUrl: string;
+  artworkUrl?: string;
   coverGradient: [string, string];
   matchReason: string;
   bpm: number;

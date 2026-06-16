@@ -26,6 +26,7 @@ export interface ApiSong {
   coverColor: string;
   tags: string[];
   audioUrl: string;
+  artworkUrl: string | null;
   durationSeconds: number;
   discoveredCount: number | null;
   skipCount: number | null;
@@ -62,6 +63,7 @@ export function apiSongToDemoSong(s: ApiSong): DemoSong {
     daysUntilRelease: s.daysUntilRelease,
     durationSeconds: s.durationSeconds ?? 0,
     audioUrl: s.audioUrl,
+    artworkUrl: s.artworkUrl ?? undefined,
     coverGradient: colorToGradient(s.coverColor ?? "#333333"),
     matchReason: "In the discovery pool",
     bpm: 0,
