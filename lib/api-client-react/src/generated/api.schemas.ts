@@ -30,6 +30,8 @@ export interface Song {
   /** @nullable */
   audioUrl?: string | null;
   /** @nullable */
+  artworkUrl?: string | null;
+  /** @nullable */
   durationSeconds?: number | null;
   /** @nullable */
   discoveredCount?: number | null;
@@ -89,6 +91,8 @@ export interface SongDetail {
   credits?: SongCredits | null;
   /** @nullable */
   audioUrl?: string | null;
+  /** @nullable */
+  artworkUrl?: string | null;
   /** @nullable */
   durationSeconds?: number | null;
   instruments?: string[];

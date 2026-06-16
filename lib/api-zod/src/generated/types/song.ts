@@ -20,6 +20,8 @@ export interface Song {
   /** @nullable */
   audioUrl?: string | null;
   /** @nullable */
+  artworkUrl?: string | null;
+  /** @nullable */
   durationSeconds?: number | null;
   /** @nullable */
   discoveredCount?: number | null;

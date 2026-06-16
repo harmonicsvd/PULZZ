@@ -30,6 +30,8 @@ export interface SongDetail {
   /** @nullable */
   audioUrl?: string | null;
   /** @nullable */
+  artworkUrl?: string | null;
+  /** @nullable */
   durationSeconds?: number | null;
   instruments?: string[];
   /** @nullable */

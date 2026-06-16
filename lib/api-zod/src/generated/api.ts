@@ -35,6 +35,7 @@ export const ListSongsResponseItem = zod.object({
   "coverColor": zod.string(),
   "tags": zod.array(zod.string()),
   "audioUrl": zod.string().nullish(),
+  "artworkUrl": zod.string().nullish(),
   "durationSeconds": zod.number().nullish(),
   "discoveredCount": zod.number().nullish(),
   "skipCount": zod.number().nullish()
@@ -88,6 +89,7 @@ export const GetSongResponse = zod.object({
   "producer": zod.string().optional()
 }),zod.null()]).optional(),
   "audioUrl": zod.string().nullish(),
+  "artworkUrl": zod.string().nullish(),
   "durationSeconds": zod.number().nullish(),
   "instruments": zod.array(zod.string()).optional(),
   "isrc": zod.string().nullish(),
@@ -230,6 +232,7 @@ export const GetArtistSongsResponseItem = zod.object({
   "coverColor": zod.string(),
   "tags": zod.array(zod.string()),
   "audioUrl": zod.string().nullish(),
+  "artworkUrl": zod.string().nullish(),
   "durationSeconds": zod.number().nullish(),
   "discoveredCount": zod.number().nullish(),
   "skipCount": zod.number().nullish()
@@ -263,6 +266,7 @@ export const GetArtistDashboardResponse = zod.object({
   "coverColor": zod.string(),
   "tags": zod.array(zod.string()),
   "audioUrl": zod.string().nullish(),
+  "artworkUrl": zod.string().nullish(),
   "durationSeconds": zod.number().nullish(),
   "discoveredCount": zod.number().nullish(),
   "skipCount": zod.number().nullish()
