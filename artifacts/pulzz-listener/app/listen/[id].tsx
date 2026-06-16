@@ -9,6 +9,8 @@ import {
   Dimensions,
   GestureResponderEvent,
   Modal,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
   PanResponder,
   Platform,
   Pressable,
@@ -86,28 +88,28 @@ export default function ListenScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [song?.audioUrl]);
 
-  // Auto-scroll synced lyrics to keep the active line smoothly centered
-  const lastScrolledLrc = useRef(-1);
-  useEffect(() => {
-    if (sheet !== "lyrics") return;
-    const lines = parseLrc(song?.lrc);
-    if (lines.length === 0) return;
-    let idx = -1;
-    for (let i = 0; i < lines.length; i++) {
-      if (position >= lines[i].timeMs) idx = i;
-      else break;
-    }
-    if (idx >= 0 && idx !== lastScrolledLrc.current) {
-      lastScrolledLrc.current = idx;
-      const y = lyricYs.current[idx];
-      const lineH = lyricHeights.current[idx] ?? 0;
-      if (y != null) {
-        const viewport = lyricViewportH.current || 360;
-        const target = Math.max(0, y - viewport / 2 + lineH / 2);
-        lyricScrollRef.current?.scrollTo({ y: target, animated: true });
+  // Listener-controlled lyrics: as the user swipes the lyric list, the line
+  // nearest the viewport center is highlighted — no dependency on audio timing.
+  const [centeredLyric, setCenteredLyric] = useState(0);
+
+  function onLyricsScroll(e: NativeSyntheticEvent<NativeScrollEvent>) {
+    const scrollY = e.nativeEvent.contentOffset.y;
+    const viewport = lyricViewportH.current || 360;
+    const center = scrollY + viewport / 2;
+    let best = 0;
+    let bestDist = Infinity;
+    for (const key of Object.keys(lyricYs.current)) {
+      const i = Number(key);
+      const lineCenter =
+        lyricYs.current[i] + (lyricHeights.current[i] ?? 0) / 2;
+      const d = Math.abs(lineCenter - center);
+      if (d < bestDist) {
+        bestDist = d;
+        best = i;
       }
     }
-  }, [position, sheet, song?.lrc]);
+    setCenteredLyric((prev) => (prev === best ? prev : best));
+  }
 
   async function loadAudio() {
     if (!song) return;
@@ -295,17 +297,15 @@ export default function ListenScreen() {
     );
   }
 
-  const lyricLines = song.lyrics
-    ? song.lyrics.split(/\n+/).map((l) => l.trim()).filter(Boolean)
-    : [];
-
-  const lrcLines = parseLrc(song.lrc);
-  const hasSynced = lrcLines.length > 0;
-  let activeLrc = -1;
-  for (let i = 0; i < lrcLines.length; i++) {
-    if (position >= lrcLines[i].timeMs) activeLrc = i;
-    else break;
-  }
+  const lrcParsed = parseLrc(song.lrc);
+  const lyricLines =
+    lrcParsed.length > 0
+      ? lrcParsed.map((l) => l.text)
+      : song.lyrics
+        ? song.lyrics.includes("\n")
+          ? song.lyrics.split(/\n+/).map((l) => l.trim()).filter(Boolean)
+          : song.lyrics.split(" / ").map((l) => l.trim()).filter(Boolean)
+        : [];
 
   const sheetTranslate = sheetAnim.interpolate({
     inputRange: [0, 1],
@@ -316,11 +316,6 @@ export default function ListenScreen() {
     inputRange: [0, 1],
     outputRange: [0.92, 1],
   });
-
-  async function seekToMs(ms: number) {
-    if (!soundRef.current || !duration) return;
-    await soundRef.current.setPositionAsync(Math.max(0, Math.min(ms, duration)));
-  }
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -573,6 +568,8 @@ export default function ListenScreen() {
               style={styles.sheetScroll}
               contentContainerStyle={{ paddingBottom: botPad + 24 }}
               showsVerticalScrollIndicator={false}
+              scrollEventThrottle={16}
+              onScroll={onLyricsScroll}
               onLayout={(e) => {
                 lyricViewportH.current = e.nativeEvent.layout.height;
               }}
@@ -581,61 +578,45 @@ export default function ListenScreen() {
                 <Text style={[styles.sheetEyebrow, { color: colors.midBlue, marginBottom: 0 }]}>
                   LYRICS
                 </Text>
-                {hasSynced && (
+                {lyricLines.length > 0 && (
                   <View style={[styles.syncedPill, { backgroundColor: colors.brightBlue + "1A" }]}>
-                    <Feather name="zap" size={10} color={colors.brightBlue} />
+                    <Feather name="chevrons-up" size={10} color={colors.brightBlue} />
                     <Text style={[styles.syncedPillText, { color: colors.brightBlue }]}>
-                      SYNCED
+                      SWIPE TO FOLLOW
                     </Text>
                   </View>
                 )}
               </View>
               <View style={{ height: 12 }} />
 
-              {hasSynced ? (
-                <View style={{ gap: 12, marginBottom: 8 }}>
-                  {lrcLines.map((ln, i) => {
-                    const isActive = i === activeLrc;
-                    const isPast = i < activeLrc;
+              {lyricLines.length > 0 ? (
+                <>
+                  <View style={{ height: 120 }} />
+                  {lyricLines.map((line, i) => {
+                    const isActive = i === centeredLyric;
                     return (
-                      <TouchableOpacity
+                      <Text
                         key={i}
-                        activeOpacity={0.6}
-                        onPress={() => seekToMs(ln.timeMs)}
                         onLayout={(e) => {
                           lyricYs.current[i] = e.nativeEvent.layout.y;
                           lyricHeights.current[i] = e.nativeEvent.layout.height;
                         }}
+                        style={[
+                          styles.followLine,
+                          {
+                            color: isActive ? colors.brightBlue : colors.navy,
+                            opacity: isActive ? 1 : 0.3,
+                            fontWeight: isActive ? "900" : "700",
+                            fontFamily: fontFor(isActive ? "900" : "700"),
+                          },
+                        ]}
                       >
-                        <Text
-                          style={[
-                            styles.syncedLine,
-                            {
-                              color: isActive
-                                ? colors.brightBlue
-                                : isPast
-                                  ? colors.mutedForeground
-                                  : colors.navy,
-                              opacity: isActive ? 1 : isPast ? 0.55 : 0.8,
-                              fontWeight: isActive ? "900" : "700",
-                              fontFamily: fontFor(isActive ? "900" : "700"),
-                            },
-                          ]}
-                        >
-                          {ln.text}
-                        </Text>
-                      </TouchableOpacity>
+                        {line}
+                      </Text>
                     );
                   })}
-                </View>
-              ) : lyricLines.length > 0 ? (
-                <View style={{ gap: 8, marginBottom: 8 }}>
-                  {lyricLines.map((line, i) => (
-                    <Text key={i} style={[styles.lyricLine, { color: colors.navy }]}>
-                      {line}
-                    </Text>
-                  ))}
-                </View>
+                  <View style={{ height: 200 }} />
+                </>
               ) : (
                 <Text style={[styles.lyricLine, { color: colors.mutedForeground }]}>
                   Instrumental
@@ -1139,6 +1120,12 @@ const styles = StyleSheet.create({
   },
   syncedPillText: { fontSize: 9, fontWeight: "900", fontFamily: fontFor("900"), letterSpacing: 1 },
   syncedLine: { fontSize: 20, fontFamily: fontFor("400"), lineHeight: 27, letterSpacing: -0.3 },
+  followLine: {
+    fontSize: 22,
+    lineHeight: 31,
+    letterSpacing: -0.3,
+    paddingVertical: 7,
+  },
   creditRow: {
     flexDirection: "row",
     justifyContent: "space-between",
