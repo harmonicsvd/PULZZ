@@ -19,7 +19,7 @@ import { useColors } from "@/hooks/useColors";
 export default function ProfileScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
-  const { profile, discoveries, momentMarks, listenedSongIds, getDiscoveryPoints } =
+  const { profile, discoveries, listenedSongIds, getDiscoveryPoints } =
     useApp();
   const topPad = Platform.OS === "web" ? 67 : insets.top;
   const botPad = Platform.OS === "web" ? 34 : insets.bottom;
@@ -71,6 +71,9 @@ export default function ProfileScreen() {
   const info = personalityInfo[profile.discoveryPersonality];
   const points = getDiscoveryPoints();
   const skipCount = listenedSongIds.length - discoveries.length;
+  const discoveredArtists = Array.from(
+    new Set(discoveries.map((d) => d.artist).filter(Boolean))
+  );
 
   return (
     <ScrollView
@@ -131,19 +134,6 @@ export default function ProfileScreen() {
             { backgroundColor: colors.card, borderColor: colors.border },
           ]}
         >
-          <Text style={[styles.statValue, { color: colors.accent }]}>
-            {momentMarks.length}
-          </Text>
-          <Text style={[styles.statName, { color: colors.mutedForeground }]}>
-            Moments
-          </Text>
-        </View>
-        <View
-          style={[
-            styles.statTile,
-            { backgroundColor: colors.card, borderColor: colors.border },
-          ]}
-        >
           <Text style={[styles.statValue, { color: colors.foreground }]}>
             {points.toLocaleString()}
           </Text>
@@ -165,6 +155,42 @@ export default function ProfileScreen() {
           </Text>
         </View>
       </View>
+
+      {discoveredArtists.length > 0 && (
+        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, { color: colors.mutedForeground }]}>
+            ARTISTS DISCOVERED
+          </Text>
+          <View style={styles.genresList}>
+            {discoveredArtists.map((artist) => (
+              <View
+                key={artist}
+                style={[
+                  styles.artistPill,
+                  { backgroundColor: colors.card, borderColor: colors.border },
+                ]}
+              >
+                <View
+                  style={[
+                    styles.artistAvatar,
+                    { backgroundColor: colors.primary + "26" },
+                  ]}
+                >
+                  <Text style={[styles.artistInitial, { color: colors.primary }]}>
+                    {artist.charAt(0).toUpperCase()}
+                  </Text>
+                </View>
+                <Text
+                  style={[styles.artistName, { color: colors.foreground }]}
+                  numberOfLines={1}
+                >
+                  {artist}
+                </Text>
+              </View>
+            ))}
+          </View>
+        </View>
+      )}
 
       {profile.genres.length > 0 && (
         <View style={styles.section}>
@@ -334,6 +360,33 @@ const styles = StyleSheet.create({
   genrePillText: {
     fontSize: 13,
     fontWeight: "600",
+  },
+  artistPill: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    borderWidth: 1,
+    borderRadius: 24,
+    paddingLeft: 6,
+    paddingRight: 14,
+    paddingVertical: 5,
+    maxWidth: "100%",
+  },
+  artistAvatar: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  artistInitial: {
+    fontSize: 13,
+    fontWeight: "800",
+  },
+  artistName: {
+    fontSize: 13,
+    fontWeight: "600",
+    flexShrink: 1,
   },
   infoCard: {
     borderRadius: 20,

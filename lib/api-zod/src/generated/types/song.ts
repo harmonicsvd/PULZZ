@@ -5,6 +5,7 @@
  * Pulzz — pre-release music discovery platform API
  * OpenAPI spec version: 0.1.0
  */
+import type { SongAnalysis } from './songAnalysis';
 import type { SongStatus } from './songStatus';
 
 export interface Song {
@@ -27,4 +28,5 @@ export interface Song {
   discoveredCount?: number | null;
   /** @nullable */
   skipCount?: number | null;
+  analysis?: SongAnalysis | null;
 }

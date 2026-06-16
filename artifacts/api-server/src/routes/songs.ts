@@ -14,6 +14,8 @@ import {
   UpdateSongLyricsParams,
   UpdateSongLyricsResponse,
 } from "@workspace/api-zod";
+import type { SongAnalysis } from "@workspace/db";
+import { analyzeLyrics } from "../lib/musixmatch";
 
 const router: IRouter = Router();
 
@@ -72,12 +74,32 @@ router.post("/songs", async (req, res): Promise<void> => {
   }
 
   const { artistId, releaseDate, ...rest } = parsed.data;
+
+  let analysis: SongAnalysis | null = null;
+  if (rest.lyrics && rest.lyrics.trim().length > 0) {
+    try {
+      const query = [rest.title, rest.lyrics.split("\n")[0]?.trim()]
+        .filter(Boolean)
+        .join(" ");
+      const derived = await analyzeLyrics(query, rest.lyrics);
+      analysis = {
+        mood: derived.mood,
+        themes: derived.themes,
+        ...(derived.language ? { language: derived.language } : {}),
+      };
+    } catch (err) {
+      req.log.error({ err }, "Lyrics analysis failed during song submission");
+      analysis = null;
+    }
+  }
+
   const [song] = await db
     .insert(songsTable)
     .values({
       artistId,
       releaseDate,
       ...rest,
+      analysis,
     })
     .returning();
 
@@ -129,6 +151,7 @@ router.get("/songs/:id", async (req, res): Promise<void> => {
       lyrics: songsTable.lyrics,
       lrc: songsTable.lrc,
       credits: songsTable.credits,
+      analysis: songsTable.analysis,
       instruments: songsTable.instruments,
       isrc: songsTable.isrc,
     })

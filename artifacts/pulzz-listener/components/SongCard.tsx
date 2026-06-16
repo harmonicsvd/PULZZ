@@ -1,5 +1,4 @@
 import { Feather } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import React from "react";
 import {
@@ -9,6 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { CoverArt } from "@/components/CoverArt";
 import { useColors } from "@/hooks/useColors";
 import type { DemoSong } from "@/data/songs";
 
@@ -32,10 +32,9 @@ export function SongCard({ song, hasListened }: SongCardProps) {
       onPress={() => router.push(`/listen/${song.id}`)}
       android_ripple={{ color: colors.border }}
     >
-      <LinearGradient
-        colors={song.coverGradient}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
+      <CoverArt
+        artworkUrl={song.artworkUrl}
+        gradient={song.coverGradient}
         style={styles.cover}
       >
         <View style={styles.preReleaseTag}>
@@ -46,7 +45,7 @@ export function SongCard({ song, hasListened }: SongCardProps) {
             <Feather name="check" size={10} color="#FFF" />
           </View>
         )}
-      </LinearGradient>
+      </CoverArt>
 
       <View style={styles.info}>
         <View style={styles.topRow}>

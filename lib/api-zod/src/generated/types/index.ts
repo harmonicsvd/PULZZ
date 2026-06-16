@@ -30,6 +30,7 @@ export * from './reactionInputType';
 export * from './reactionType';
 export * from './searchMusixmatchTracksParams';
 export * from './song';
+export * from './songAnalysis';
 export * from './songCredits';
 export * from './songDetail';
 export * from './songDetailStatus';

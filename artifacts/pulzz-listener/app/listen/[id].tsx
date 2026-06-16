@@ -19,6 +19,7 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { CoverArt } from "@/components/CoverArt";
 import { useApp } from "@/contexts/AppContext";
 import { useColors } from "@/hooks/useColors";
 import { api, apiSongDetailToDemoSong } from "@/lib/api";
@@ -58,11 +59,8 @@ export default function ListenScreen() {
   const waveWidth = useRef(0);
   const lyricScrollRef = useRef<ScrollView | null>(null);
   const lyricYs = useRef<Record<number, number>>({});
-
-  // Four staggered animated values drive the "dancing" equalizer bars
-  const danceRefs = useRef(
-    [0, 1, 2, 3].map(() => new Animated.Value(1))
-  ).current;
+  const lyricHeights = useRef<Record<number, number>>({});
+  const lyricViewportH = useRef(0);
 
   // Deterministic waveform heights per song
   const barHeights = useMemo(() => {
@@ -95,33 +93,7 @@ export default function ListenScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [song?.audioUrl]);
 
-  // Dancing equalizer bars — loop while playing, freeze when paused
-  useEffect(() => {
-    if (!isPlaying) {
-      danceRefs.forEach((v) => v.stopAnimation());
-      return;
-    }
-    const loops = danceRefs.map((v, idx) =>
-      Animated.loop(
-        Animated.sequence([
-          Animated.timing(v, {
-            toValue: 0.4,
-            duration: 300 + idx * 80,
-            useNativeDriver: true,
-          }),
-          Animated.timing(v, {
-            toValue: 1,
-            duration: 300 + idx * 80,
-            useNativeDriver: true,
-          }),
-        ])
-      )
-    );
-    loops.forEach((l) => l.start());
-    return () => loops.forEach((l) => l.stop());
-  }, [isPlaying, danceRefs]);
-
-  // Auto-scroll synced lyrics to keep the active line in view
+  // Auto-scroll synced lyrics to keep the active line smoothly centered
   const lastScrolledLrc = useRef(-1);
   useEffect(() => {
     if (sheet !== "lyrics") return;
@@ -135,8 +107,11 @@ export default function ListenScreen() {
     if (idx >= 0 && idx !== lastScrolledLrc.current) {
       lastScrolledLrc.current = idx;
       const y = lyricYs.current[idx];
+      const lineH = lyricHeights.current[idx] ?? 0;
       if (y != null) {
-        lyricScrollRef.current?.scrollTo({ y: Math.max(0, y - 90), animated: true });
+        const viewport = lyricViewportH.current || 360;
+        const target = Math.max(0, y - viewport / 2 + lineH / 2);
+        lyricScrollRef.current?.scrollTo({ y: target, animated: true });
       }
     }
   }, [position, sheet, song?.lrc]);
@@ -377,10 +352,9 @@ export default function ListenScreen() {
       <View style={styles.playerBody} {...playerPan.panHandlers}>
         {/* Cover art */}
         <View style={styles.coverArea}>
-          <LinearGradient
-            colors={song.coverGradient}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
+          <CoverArt
+            artworkUrl={song.artworkUrl}
+            gradient={song.coverGradient}
             style={styles.coverArt}
           >
             {momentMarks.length > 0 && (
@@ -391,7 +365,7 @@ export default function ListenScreen() {
                 </Text>
               </View>
             )}
-          </LinearGradient>
+          </CoverArt>
         </View>
 
         {/* Title + tappable artist */}
@@ -438,25 +412,8 @@ export default function ListenScreen() {
 
         <View style={{ flex: 1 }} />
 
-        {/* Waveform */}
+        {/* Waveform — static progress bar with tasteful moment markers */}
         <View style={styles.waveSection}>
-          {/* Glowing moment dots floating above the bar */}
-          <View style={styles.momentDotsRow} pointerEvents="none">
-            {duration > 0 &&
-              momentMarks.map((ts, i) => (
-                <View
-                  key={`${ts}-${i}`}
-                  style={[
-                    styles.momentDot,
-                    {
-                      left: `${Math.min(98, (ts / duration) * 100)}%`,
-                      backgroundColor: colors.amber,
-                      shadowColor: colors.amber,
-                    },
-                  ]}
-                />
-              ))}
-          </View>
           <Pressable
             style={styles.waveform}
             onLayout={(e) => (waveWidth.current = e.nativeEvent.layout.width)}
@@ -464,38 +421,38 @@ export default function ListenScreen() {
           >
             {barHeights.map((h, i) => {
               const isActive = i < activeBars;
-              const markedHere = momentMarks.some((ts) => {
-                if (!duration) return false;
-                return Math.round((ts / duration) * BAR_COUNT) === i;
-              });
-              const scaleY = isActive ? danceRefs[i % 4] : 1;
               return (
                 <View key={i} style={styles.barWrap}>
-                  <Animated.View
+                  <View
                     style={[
                       styles.bar,
                       {
                         height: `${h}%`,
-                        backgroundColor: markedHere
-                          ? colors.amber
-                          : isActive
-                            ? colors.brightBlue
-                            : colors.blueGrey,
-                        transform: [{ scaleY }],
-                        ...(isActive && !markedHere
-                          ? {
-                              shadowColor: colors.brightBlue,
-                              shadowOpacity: 0.7,
-                              shadowRadius: 4,
-                              shadowOffset: { width: 0, height: 0 },
-                            }
-                          : null),
+                        backgroundColor: isActive
+                          ? colors.brightBlue
+                          : colors.blueGrey,
                       },
                     ]}
                   />
                 </View>
               );
             })}
+
+            {/* Moment markers rendered tastefully along the bar */}
+            {duration > 0 &&
+              momentMarks.map((ts, i) => (
+                <View
+                  key={`${ts}-${i}`}
+                  pointerEvents="none"
+                  style={[
+                    styles.momentMarker,
+                    {
+                      left: `${Math.min(99, (ts / duration) * 100)}%`,
+                      backgroundColor: colors.amber,
+                    },
+                  ]}
+                />
+              ))}
           </Pressable>
           <View style={styles.timeRow}>
             <Text style={[styles.timeText, { color: colors.mutedForeground }]}>
@@ -619,6 +576,9 @@ export default function ListenScreen() {
               style={styles.sheetScroll}
               contentContainerStyle={{ paddingBottom: botPad + 24 }}
               showsVerticalScrollIndicator={false}
+              onLayout={(e) => {
+                lyricViewportH.current = e.nativeEvent.layout.height;
+              }}
             >
               <View style={styles.lyricsHeaderRow}>
                 <Text style={[styles.sheetEyebrow, { color: colors.midBlue, marginBottom: 0 }]}>
@@ -647,6 +607,7 @@ export default function ListenScreen() {
                         onPress={() => seekToMs(ln.timeMs)}
                         onLayout={(e) => {
                           lyricYs.current[i] = e.nativeEvent.layout.y;
+                          lyricHeights.current[i] = e.nativeEvent.layout.height;
                         }}
                       >
                         <Text
@@ -1008,22 +969,14 @@ const styles = StyleSheet.create({
   },
   storyToggle: { fontSize: 11, fontWeight: "700" },
   waveSection: { marginBottom: 16 },
-  momentDotsRow: {
-    height: 12,
-    marginBottom: 4,
-    position: "relative",
-  },
-  momentDot: {
+  momentMarker: {
     position: "absolute",
-    top: 2,
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    marginLeft: -4,
-    shadowOpacity: 0.9,
-    shadowRadius: 6,
-    shadowOffset: { width: 0, height: 0 },
-    elevation: 5,
+    top: 0,
+    bottom: 0,
+    width: 2,
+    borderRadius: 1,
+    marginLeft: -1,
+    opacity: 0.9,
   },
   waveform: {
     height: 46,
@@ -1031,6 +984,7 @@ const styles = StyleSheet.create({
     alignItems: "flex-end",
     justifyContent: "space-between",
     gap: 2,
+    position: "relative",
   },
   barWrap: {
     flex: 1,

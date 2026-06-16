@@ -52,11 +52,15 @@ Pre-release music discovery platform for Musicathon 2026 (June 15–21). Listene
 
 ## Demo Data
 
-- Artist 1: Luna Voss (Indie Pop) — Midnight Bloom
-- Artist 2: NXVUS (Electronic) — Electric Reverie  
-- Artist 3: The Veil (Alternative) — Chasing Echoes
-- Artist 4: Aisha Kaine (R&B) — Golden Hours
-- Artist 5: Valo (Synth-pop) — Neon Prayer
+Real public-domain recordings (audio + cover art hosted on archive.org; canonical lyrics + occurrence-ordered LRC). Audio URL pattern `https://archive.org/download/<id>/<file>`, artwork `https://archive.org/services/img/<id>`.
+
+- Artist 1: Ernestine Schumann-Heink (Folk) — Danny Boy (1917)
+- Artist 2: Fisk Jubilee Quartet (Gospel) — Swing Low, Sweet Chariot (1909)
+- Artist 3: Marion Harris (Jazz) — After You've Gone (1918)
+- Artist 4: Sophie Tucker (Jazz) — Some of These Days (1911)
+- Artist 5: Bessie Smith (Blues) — St. Louis Blues (1925)
+
+All five are pre-1929 US recordings in the public domain. DB rows are updated IN PLACE (never delete/reinsert — reactions reference song_id 1, 2, 4).
 
 ## User preferences
 

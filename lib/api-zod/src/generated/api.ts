@@ -38,7 +38,12 @@ export const ListSongsResponseItem = zod.object({
   "artworkUrl": zod.string().nullish(),
   "durationSeconds": zod.number().nullish(),
   "discoveredCount": zod.number().nullish(),
-  "skipCount": zod.number().nullish()
+  "skipCount": zod.number().nullish(),
+  "analysis": zod.union([zod.object({
+  "mood": zod.array(zod.string()).optional(),
+  "themes": zod.array(zod.string()).optional(),
+  "language": zod.string().nullish()
+}),zod.null()]).optional()
 })
 export const ListSongsResponse = zod.array(ListSongsResponseItem)
 
@@ -95,7 +100,12 @@ export const GetSongResponse = zod.object({
   "isrc": zod.string().nullish(),
   "discoveredCount": zod.number().nullish(),
   "skipCount": zod.number().nullish(),
-  "momentCount": zod.number().nullish()
+  "momentCount": zod.number().nullish(),
+  "analysis": zod.union([zod.object({
+  "mood": zod.array(zod.string()).optional(),
+  "themes": zod.array(zod.string()).optional(),
+  "language": zod.string().nullish()
+}),zod.null()]).optional()
 })
 
 
@@ -235,7 +245,12 @@ export const GetArtistSongsResponseItem = zod.object({
   "artworkUrl": zod.string().nullish(),
   "durationSeconds": zod.number().nullish(),
   "discoveredCount": zod.number().nullish(),
-  "skipCount": zod.number().nullish()
+  "skipCount": zod.number().nullish(),
+  "analysis": zod.union([zod.object({
+  "mood": zod.array(zod.string()).optional(),
+  "themes": zod.array(zod.string()).optional(),
+  "language": zod.string().nullish()
+}),zod.null()]).optional()
 })
 export const GetArtistSongsResponse = zod.array(GetArtistSongsResponseItem)
 
@@ -269,7 +284,12 @@ export const GetArtistDashboardResponse = zod.object({
   "artworkUrl": zod.string().nullish(),
   "durationSeconds": zod.number().nullish(),
   "discoveredCount": zod.number().nullish(),
-  "skipCount": zod.number().nullish()
+  "skipCount": zod.number().nullish(),
+  "analysis": zod.union([zod.object({
+  "mood": zod.array(zod.string()).optional(),
+  "themes": zod.array(zod.string()).optional(),
+  "language": zod.string().nullish()
+}),zod.null()]).optional()
 })).optional()
 })
 

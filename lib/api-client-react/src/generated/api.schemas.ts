@@ -17,6 +17,13 @@ export const SongStatus = {
   released: 'released',
 } as const;
 
+export interface SongAnalysis {
+  mood?: string[];
+  themes?: string[];
+  /** @nullable */
+  language?: string | null;
+}
+
 export interface Song {
   id: number;
   title: string;
@@ -37,6 +44,7 @@ export interface Song {
   discoveredCount?: number | null;
   /** @nullable */
   skipCount?: number | null;
+  analysis?: SongAnalysis | null;
 }
 
 export interface SongInput {
@@ -104,6 +112,7 @@ export interface SongDetail {
   skipCount?: number | null;
   /** @nullable */
   momentCount?: number | null;
+  analysis?: SongAnalysis | null;
 }
 
 export interface UpdateSongLyrics {

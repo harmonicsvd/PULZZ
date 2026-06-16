@@ -36,6 +36,12 @@ export interface MxmAnalysis {
   themes: string[];
 }
 
+export interface MxmLyricsAnalysis {
+  mood: string[];
+  themes: string[];
+  language: string | null;
+}
+
 interface MxmResponse<T> {
   message: {
     header: { status_code: number };
@@ -49,14 +55,22 @@ function apiKey(): string {
   return key;
 }
 
+const REQUEST_TIMEOUT_MS = 8000;
+
 async function call<T>(method: string, params: Record<string, string | number>): Promise<{ statusCode: number; body: T | null }> {
   const url = new URL(`${BASE}/${method}`);
   for (const [k, v] of Object.entries(params)) url.searchParams.set(k, String(v));
   url.searchParams.set("apikey", apiKey());
-  const res = await fetch(url.toString());
-  const json = (await res.json().catch(() => null)) as MxmResponse<T> | null;
-  const statusCode = json?.message?.header?.status_code ?? res.status;
-  return { statusCode, body: json?.message?.body ?? null };
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  try {
+    const res = await fetch(url.toString(), { signal: controller.signal });
+    const json = (await res.json().catch(() => null)) as MxmResponse<T> | null;
+    const statusCode = json?.message?.header?.status_code ?? res.status;
+    return { statusCode, body: json?.message?.body ?? null };
+  } finally {
+    clearTimeout(timeout);
+  }
 }
 
 function genreNames(primary: unknown): string[] {
@@ -191,5 +205,48 @@ export async function getAnalysis(trackId: number): Promise<MxmAnalysis> {
     trackId,
     moods: extractStrings(moodsRaw).slice(0, 12),
     themes: extractStrings(themesRaw).slice(0, 12),
+  };
+}
+
+function detectLanguage(text: string): string | null {
+  const trimmed = text.trim();
+  if (!trimmed) return null;
+  if (/[\u3040-\u30ff]/.test(trimmed)) return "ja";
+  if (/[\uac00-\ud7af]/.test(trimmed)) return "ko";
+  if (/[\u4e00-\u9fff]/.test(trimmed)) return "zh";
+  if (/[\u0600-\u06ff]/.test(trimmed)) return "ar";
+  if (/[\u0400-\u04ff]/.test(trimmed)) return "ru";
+  if (/[áéíóúñ¿¡]/i.test(trimmed)) return "es";
+  if (/[àâçéèêëîïôûùüœ]/i.test(trimmed)) return "fr";
+  if (/[äöüß]/i.test(trimmed)) return "de";
+  if (/[a-z]/i.test(trimmed)) return "en";
+  return null;
+}
+
+/**
+ * Derives mood, themes and language for a song's lyrics by reusing the
+ * Musixmatch lyrics analysis capability. The analysis endpoint is track-based,
+ * so we search for the best matching released track (using title/lyrics) and
+ * pull its mood/theme analysis. Language is taken from the matched track's
+ * subtitle, falling back to a lightweight script-based detection on the lyrics.
+ */
+export async function analyzeLyrics(
+  query: string,
+  lyrics: string
+): Promise<MxmLyricsAnalysis> {
+  const fallbackLanguage = detectLanguage(lyrics);
+  const tracks = await searchTracks(query, 1);
+  const track = tracks[0];
+  if (!track) {
+    return { mood: [], themes: [], language: fallbackLanguage };
+  }
+  const [analysis, subtitle] = await Promise.all([
+    getAnalysis(track.id),
+    getSubtitle(track.id),
+  ]);
+  return {
+    mood: analysis.moods,
+    themes: analysis.themes,
+    language: subtitle.language ?? fallbackLanguage,
   };
 }

@@ -18,6 +18,7 @@ import {
   Users,
   Zap,
   Clock,
+  Sparkles,
 } from "lucide-react";
 import { Link } from "wouter";
 
@@ -242,6 +243,89 @@ export default function SongDetailPage({ id }: Props) {
                 </Card>
               )}
             </div>
+
+            <Card className="bg-card border-border">
+              <CardHeader className="flex flex-row items-center justify-between">
+                <CardTitle className="text-base">Lyrics Analysis</CardTitle>
+                <Sparkles className="w-4 h-4 text-primary" />
+              </CardHeader>
+              <CardContent>
+                {(() => {
+                  const analysis = song.analysis;
+                  const moods = analysis?.mood ?? [];
+                  const themes = analysis?.themes ?? [];
+                  const language = analysis?.language ?? null;
+                  const hasAny =
+                    moods.length > 0 || themes.length > 0 || !!language;
+
+                  if (!hasAny) {
+                    return (
+                      <p className="text-sm text-muted-foreground">
+                        No lyrics analysis available yet. Analysis is derived
+                        automatically when a song is submitted with lyrics.
+                      </p>
+                    );
+                  }
+
+                  return (
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <dt className="text-xs uppercase tracking-wide text-muted-foreground">
+                          Mood
+                        </dt>
+                        <dd className="flex flex-wrap gap-1.5">
+                          {moods.length > 0 ? (
+                            moods.map((m) => (
+                              <Badge key={m} variant="secondary">
+                                {m}
+                              </Badge>
+                            ))
+                          ) : (
+                            <span className="text-sm text-muted-foreground">
+                              —
+                            </span>
+                          )}
+                        </dd>
+                      </div>
+                      <div className="space-y-2">
+                        <dt className="text-xs uppercase tracking-wide text-muted-foreground">
+                          Themes
+                        </dt>
+                        <dd className="flex flex-wrap gap-1.5">
+                          {themes.length > 0 ? (
+                            themes.map((t) => (
+                              <Badge key={t} variant="outline">
+                                {t}
+                              </Badge>
+                            ))
+                          ) : (
+                            <span className="text-sm text-muted-foreground">
+                              —
+                            </span>
+                          )}
+                        </dd>
+                      </div>
+                      <div className="space-y-2">
+                        <dt className="text-xs uppercase tracking-wide text-muted-foreground">
+                          Language
+                        </dt>
+                        <dd>
+                          {language ? (
+                            <Badge variant="secondary" className="uppercase">
+                              {language}
+                            </Badge>
+                          ) : (
+                            <span className="text-sm text-muted-foreground">
+                              —
+                            </span>
+                          )}
+                        </dd>
+                      </div>
+                    </div>
+                  );
+                })()}
+              </CardContent>
+            </Card>
 
             <LyricSyncTool
               songId={songId}

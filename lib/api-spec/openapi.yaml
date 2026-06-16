@@ -461,6 +461,10 @@ components:
           type: ["integer", "null"]
         skipCount:
           type: ["integer", "null"]
+        analysis:
+          oneOf:
+            - $ref: "#/components/schemas/SongAnalysis"
+            - type: "null"
 
     SongInput:
       type: object
@@ -545,6 +549,24 @@ components:
           type: ["integer", "null"]
         momentCount:
           type: ["integer", "null"]
+        analysis:
+          oneOf:
+            - $ref: "#/components/schemas/SongAnalysis"
+            - type: "null"
+
+    SongAnalysis:
+      type: object
+      properties:
+        mood:
+          type: array
+          items:
+            type: string
+        themes:
+          type: array
+          items:
+            type: string
+        language:
+          type: ["string", "null"]
 
     SongCredits:
       type: object

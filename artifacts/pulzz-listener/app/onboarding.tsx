@@ -16,10 +16,11 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { PulzzWordmark } from "@/components/PulzzWordmark";
 import { useColors } from "@/hooks/useColors";
 import { useApp } from "@/contexts/AppContext";
 import type { FavoriteTrack, TasteProfile } from "@/contexts/AppContext";
-import { api, type MxmTrack } from "@/lib/api";
+import { api, type MxmGenre, type MxmTrack } from "@/lib/api";
 
 interface GenreChip {
   name: string;
@@ -97,6 +98,8 @@ export default function OnboardingScreen() {
   const [step, setStep] = useState(0);
   const [name, setName] = useState("");
   const [genres, setGenres] = useState<GenreChip[]>(FALLBACK_GENRES);
+  const [allGenres, setAllGenres] = useState<MxmGenre[]>([]);
+  const [genreQuery, setGenreQuery] = useState("");
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const [personality, setPersonality] = useState<
     "explorer" | "balanced" | "familiar" | null
@@ -117,6 +120,7 @@ export default function OnboardingScreen() {
       .fetchMusixmatchGenres()
       .then((all) => {
         if (!active || !all || all.length === 0) return;
+        setAllGenres(all);
         const byName = new Map(all.map((g) => [g.name.toLowerCase(), g.name]));
         const picked: GenreChip[] = [];
         for (const desired of DESIRED_GENRES) {
@@ -243,6 +247,30 @@ export default function OnboardingScreen() {
     router.replace("/(tabs)/discover");
   }
 
+  const displayGenres: GenreChip[] = [
+    ...genres,
+    ...selectedGenres
+      .filter((s) => !genres.some((g) => g.name === s))
+      .map((s) => ({ name: s, icon: iconForGenre(s) })),
+  ];
+
+  const genreSearchResults: GenreChip[] = (() => {
+    const q = genreQuery.trim().toLowerCase();
+    if (q.length < 1) return [];
+    const shown = new Set(displayGenres.map((g) => g.name.toLowerCase()));
+    const seen = new Set<string>();
+    const out: GenreChip[] = [];
+    for (const g of allGenres) {
+      const lower = g.name.toLowerCase();
+      if (!lower.includes(q)) continue;
+      if (shown.has(lower) || seen.has(lower)) continue;
+      seen.add(lower);
+      out.push({ name: g.name, icon: iconForGenre(g.name) });
+      if (out.length >= 20) break;
+    }
+    return out;
+  })();
+
   const canProceed =
     (step === 0 && name.trim().length > 0) ||
     (step === 1 && selectedGenres.length > 0) ||
@@ -260,6 +288,10 @@ export default function OnboardingScreen() {
         },
       ]}
     >
+      <View style={styles.brandHeader}>
+        <PulzzWordmark size={34} />
+      </View>
+
       <View style={styles.progressBar}>
         {[0, 1, 2, 3].map((i) => (
           <View
@@ -278,9 +310,6 @@ export default function OnboardingScreen() {
       <Animated.View style={[styles.content, { opacity: fadeAnim }]}>
         {step === 0 && (
           <View style={styles.stepContainer}>
-            <View style={[styles.iconCircle, { backgroundColor: colors.accent + "26" }]}>
-              <Text style={styles.iconEmoji}>🎵</Text>
-            </View>
             <Text style={[styles.heading, { color: colors.foreground }]}>
               Welcome to Pulzz
             </Text>
@@ -320,9 +349,37 @@ export default function OnboardingScreen() {
             <Text style={[styles.subheading, { color: colors.mutedForeground }]}>
               Pick your genres. We'll match you with songs that fit your taste.
             </Text>
-            <ScrollView style={styles.genreScroll} showsVerticalScrollIndicator={false}>
+
+            <View
+              style={[
+                styles.searchBar,
+                { backgroundColor: colors.card, borderColor: colors.border },
+              ]}
+            >
+              <Feather name="search" size={18} color={colors.mutedForeground} />
+              <TextInput
+                style={[styles.searchInput, { color: colors.foreground }]}
+                placeholder="Search all genres"
+                placeholderTextColor={colors.mutedForeground}
+                value={genreQuery}
+                onChangeText={setGenreQuery}
+                autoCapitalize="none"
+                returnKeyType="search"
+              />
+              {genreQuery.length > 0 && (
+                <Pressable onPress={() => setGenreQuery("")} hitSlop={8}>
+                  <Feather name="x" size={16} color={colors.mutedForeground} />
+                </Pressable>
+              )}
+            </View>
+
+            <ScrollView
+              style={styles.genreScroll}
+              keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator={false}
+            >
               <View style={styles.genreGrid}>
-                {genres.map((g) => {
+                {displayGenres.map((g) => {
                   const selected = selectedGenres.includes(g.name);
                   return (
                     <Pressable
@@ -353,6 +410,47 @@ export default function OnboardingScreen() {
                   );
                 })}
               </View>
+
+              {genreQuery.trim().length >= 1 && (
+                <View style={styles.genreSearchSection}>
+                  <Text
+                    style={[styles.genreSearchLabel, { color: colors.mutedForeground }]}
+                  >
+                    {genreSearchResults.length > 0
+                      ? "SEARCH RESULTS"
+                      : "NO MATCHING GENRES"}
+                  </Text>
+                  <View style={styles.genreGrid}>
+                    {genreSearchResults.map((g) => (
+                      <Pressable
+                        key={g.name}
+                        style={[
+                          styles.genreChip,
+                          { backgroundColor: colors.card, borderColor: colors.border },
+                        ]}
+                        onPress={() => {
+                          toggleGenre(g.name);
+                          setGenreQuery("");
+                        }}
+                      >
+                        <Feather
+                          name="plus"
+                          size={16}
+                          color={colors.mutedForeground}
+                        />
+                        <Text
+                          style={[
+                            styles.genreChipLabel,
+                            { color: colors.foreground },
+                          ]}
+                        >
+                          {g.name}
+                        </Text>
+                      </Pressable>
+                    ))}
+                  </View>
+                </View>
+              )}
             </ScrollView>
           </View>
         )}
@@ -606,17 +704,6 @@ const styles = StyleSheet.create({
   stepContainer: {
     flex: 1,
   },
-  iconCircle: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 24,
-  },
-  iconEmoji: {
-    fontSize: 28,
-  },
   heading: {
     fontSize: 28,
     fontWeight: "800",
@@ -665,6 +752,19 @@ const styles = StyleSheet.create({
   genreChipLabel: {
     fontSize: 14,
     fontWeight: "600",
+  },
+  genreSearchSection: {
+    marginTop: 20,
+  },
+  genreSearchLabel: {
+    fontSize: 11,
+    fontWeight: "700",
+    letterSpacing: 1,
+    marginBottom: 10,
+  },
+  brandHeader: {
+    alignItems: "center",
+    marginBottom: 20,
   },
   searchBar: {
     flexDirection: "row",
