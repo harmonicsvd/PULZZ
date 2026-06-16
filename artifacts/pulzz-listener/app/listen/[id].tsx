@@ -3,7 +3,7 @@ import { Audio, AVPlaybackStatus } from "expo-av";
 import * as Haptics from "expo-haptics";
 import { LinearGradient } from "expo-linear-gradient";
 import { router, useLocalSearchParams } from "expo-router";
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Animated,
   Dimensions,
@@ -20,13 +20,13 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { CoverArt } from "@/components/CoverArt";
+import { fontFor } from "@/constants/fonts";
 import { useApp } from "@/contexts/AppContext";
 import { useColors } from "@/hooks/useColors";
 import { api, apiSongDetailToDemoSong } from "@/lib/api";
 import type { DemoSong } from "@/data/songs";
 
 const { height: SCREEN_H } = Dimensions.get("window");
-const BAR_COUNT = 48;
 
 type Sheet = "none" | "lyrics" | "artist";
 
@@ -61,13 +61,6 @@ export default function ListenScreen() {
   const lyricYs = useRef<Record<number, number>>({});
   const lyricHeights = useRef<Record<number, number>>({});
   const lyricViewportH = useRef(0);
-
-  // Deterministic waveform heights per song
-  const barHeights = useMemo(() => {
-    return Array.from({ length: BAR_COUNT }).map((_, i) =>
-      Math.max(14, Math.sin(i * 0.4) * 50 + Math.cos(i * 0.7) * 30 + 50)
-    );
-  }, []);
 
   // Fetch detailed song (story, lyrics) from API
   useEffect(() => {
@@ -288,7 +281,6 @@ export default function ListenScreen() {
   }
 
   const progress = duration > 0 ? position / duration : 0;
-  const activeBars = Math.round(progress * BAR_COUNT);
 
   if (!song) {
     return (
@@ -412,47 +404,52 @@ export default function ListenScreen() {
 
         <View style={{ flex: 1 }} />
 
-        {/* Waveform — static progress bar with tasteful moment markers */}
-        <View style={styles.waveSection}>
+        {/* Progress bar — standard track with fill, thumb, and moment markers */}
+        <View style={styles.progressSection}>
           <Pressable
-            style={styles.waveform}
+            style={styles.progressHit}
             onLayout={(e) => (waveWidth.current = e.nativeEvent.layout.width)}
             onPress={seekTo}
           >
-            {barHeights.map((h, i) => {
-              const isActive = i < activeBars;
-              return (
-                <View key={i} style={styles.barWrap}>
+            <View style={[styles.progressTrack, { backgroundColor: colors.blueGrey }]}>
+              <View
+                style={[
+                  styles.progressFill,
+                  {
+                    width: `${Math.min(100, progress * 100)}%`,
+                    backgroundColor: colors.coral,
+                  },
+                ]}
+              />
+
+              {/* Moment markers along the track */}
+              {duration > 0 &&
+                momentMarks.map((ts, i) => (
                   <View
+                    key={`${ts}-${i}`}
+                    pointerEvents="none"
                     style={[
-                      styles.bar,
+                      styles.momentMarker,
                       {
-                        height: `${h}%`,
-                        backgroundColor: isActive
-                          ? colors.brightBlue
-                          : colors.blueGrey,
+                        left: `${Math.min(99, (ts / duration) * 100)}%`,
+                        backgroundColor: colors.amber,
                       },
                     ]}
                   />
-                </View>
-              );
-            })}
+                ))}
+            </View>
 
-            {/* Moment markers rendered tastefully along the bar */}
-            {duration > 0 &&
-              momentMarks.map((ts, i) => (
-                <View
-                  key={`${ts}-${i}`}
-                  pointerEvents="none"
-                  style={[
-                    styles.momentMarker,
-                    {
-                      left: `${Math.min(99, (ts / duration) * 100)}%`,
-                      backgroundColor: colors.amber,
-                    },
-                  ]}
-                />
-              ))}
+            {/* Draggable-looking thumb at the current position */}
+            <View
+              pointerEvents="none"
+              style={[
+                styles.progressThumb,
+                {
+                  left: `${Math.min(100, progress * 100)}%`,
+                  backgroundColor: colors.coral,
+                },
+              ]}
+            />
           </Pressable>
           <View style={styles.timeRow}>
             <Text style={[styles.timeText, { color: colors.mutedForeground }]}>
@@ -621,6 +618,7 @@ export default function ListenScreen() {
                                   : colors.navy,
                               opacity: isActive ? 1 : isPast ? 0.55 : 0.8,
                               fontWeight: isActive ? "900" : "700",
+                              fontFamily: fontFor(isActive ? "900" : "700"),
                             },
                           ]}
                         >
@@ -894,11 +892,13 @@ const styles = StyleSheet.create({
   preReleaseLabel: {
     fontSize: 10,
     fontWeight: "800",
+    fontFamily: fontFor("800"),
     letterSpacing: 2,
   },
   daysLeft: {
     fontSize: 13,
     fontWeight: "600",
+    fontFamily: fontFor("600"),
     marginTop: 2,
   },
   playerBody: {
@@ -932,11 +932,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 11,
     paddingVertical: 6,
   },
-  momentCountText: { fontSize: 14, fontWeight: "800" },
+  momentCountText: { fontSize: 14, fontWeight: "800", fontFamily: fontFor("800") },
   titleBlock: { alignItems: "center" },
   songTitle: {
     fontSize: 30,
     fontWeight: "800",
+    fontFamily: fontFor("800"),
     letterSpacing: -0.6,
     textAlign: "center",
   },
@@ -947,7 +948,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
     marginBottom: 12,
   },
-  songArtist: { fontSize: 16, fontWeight: "700" },
+  songArtist: { fontSize: 16, fontWeight: "700", fontFamily: fontFor("700") },
   storyCard: {
     width: "100%",
     borderRadius: 20,
@@ -957,48 +958,62 @@ const styles = StyleSheet.create({
   storyEyebrow: {
     fontSize: 9,
     fontWeight: "800",
+    fontFamily: fontFor("800"),
     letterSpacing: 1.6,
     marginBottom: 4,
   },
-  storyText: { fontSize: 12.5, fontWeight: "500", lineHeight: 19 },
+  storyText: { fontSize: 12.5, fontWeight: "500", fontFamily: fontFor("500"), lineHeight: 19 },
   storyToggleRow: {
     flexDirection: "row",
     alignItems: "center",
     gap: 3,
     marginTop: 6,
   },
-  storyToggle: { fontSize: 11, fontWeight: "700" },
-  waveSection: { marginBottom: 16 },
-  momentMarker: {
-    position: "absolute",
-    top: 0,
-    bottom: 0,
-    width: 2,
-    borderRadius: 1,
-    marginLeft: -1,
-    opacity: 0.9,
-  },
-  waveform: {
-    height: 46,
-    flexDirection: "row",
-    alignItems: "flex-end",
-    justifyContent: "space-between",
-    gap: 2,
+  storyToggle: { fontSize: 11, fontWeight: "700", fontFamily: fontFor("700") },
+  progressSection: { marginBottom: 16 },
+  progressHit: {
+    paddingVertical: 10,
+    justifyContent: "center",
     position: "relative",
   },
-  barWrap: {
-    flex: 1,
-    height: "100%",
-    justifyContent: "flex-end",
-    alignItems: "center",
+  progressTrack: {
+    height: 6,
+    borderRadius: 3,
+    position: "relative",
   },
-  bar: { width: "100%", borderRadius: 4 },
+  progressFill: {
+    height: "100%",
+    borderRadius: 3,
+  },
+  progressThumb: {
+    position: "absolute",
+    top: "50%",
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    marginLeft: -8,
+    marginTop: -8,
+    shadowColor: "#000",
+    shadowOpacity: 0.18,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 3,
+  },
+  momentMarker: {
+    position: "absolute",
+    top: -3,
+    height: 12,
+    width: 2.5,
+    borderRadius: 1.25,
+    marginLeft: -1,
+    opacity: 0.95,
+  },
   timeRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     marginTop: 8,
   },
-  timeText: { fontSize: 12, fontWeight: "700", letterSpacing: 1 },
+  timeText: { fontSize: 12, fontWeight: "700", fontFamily: fontFor("700"), letterSpacing: 1 },
   controls: {
     flexDirection: "row",
     alignItems: "center",
@@ -1043,7 +1058,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  momentBtnBadgeText: { fontSize: 10, fontWeight: "900" },
+  momentBtnBadgeText: { fontSize: 10, fontWeight: "900", fontFamily: fontFor("900") },
   reactionRow: { flexDirection: "row", gap: 12 },
   discoveredBtn: {
     flex: 1,
@@ -1054,7 +1069,7 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 16,
   },
-  discoveredText: { fontSize: 15, fontWeight: "800" },
+  discoveredText: { fontSize: 15, fontWeight: "800", fontFamily: fontFor("800") },
   skipBtn: {
     flex: 1,
     flexDirection: "row",
@@ -1065,7 +1080,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     borderWidth: 2,
   },
-  skipText: { fontSize: 15, fontWeight: "800" },
+  skipText: { fontSize: 15, fontWeight: "800", fontFamily: fontFor("800") },
   lockedBtn: {
     flexDirection: "row",
     alignItems: "center",
@@ -1076,7 +1091,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderStyle: "dashed",
   },
-  lockedText: { fontSize: 13, fontWeight: "600" },
+  lockedText: { fontSize: 13, fontWeight: "600", fontFamily: fontFor("600") },
   grabHandleArea: {
     alignItems: "center",
     paddingTop: 14,
@@ -1104,10 +1119,11 @@ const styles = StyleSheet.create({
   sheetEyebrow: {
     fontSize: 11,
     fontWeight: "800",
+    fontFamily: fontFor("800"),
     letterSpacing: 1.8,
     marginBottom: 12,
   },
-  lyricLine: { fontSize: 18, fontWeight: "700", lineHeight: 24 },
+  lyricLine: { fontSize: 18, fontWeight: "700", fontFamily: fontFor("700"), lineHeight: 24 },
   lyricsHeaderRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -1121,15 +1137,15 @@ const styles = StyleSheet.create({
     paddingVertical: 3,
     borderRadius: 10,
   },
-  syncedPillText: { fontSize: 9, fontWeight: "900", letterSpacing: 1 },
-  syncedLine: { fontSize: 20, lineHeight: 27, letterSpacing: -0.3 },
+  syncedPillText: { fontSize: 9, fontWeight: "900", fontFamily: fontFor("900"), letterSpacing: 1 },
+  syncedLine: { fontSize: 20, fontFamily: fontFor("400"), lineHeight: 27, letterSpacing: -0.3 },
   creditRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
   },
-  creditRole: { fontSize: 12, fontWeight: "700", letterSpacing: 0.4 },
-  creditName: { fontSize: 13, fontWeight: "800" },
+  creditRole: { fontSize: 12, fontWeight: "700", fontFamily: fontFor("700"), letterSpacing: 0.4 },
+  creditName: { fontSize: 13, fontWeight: "800", fontFamily: fontFor("800") },
   divider: { height: 1, marginVertical: 20 },
   detailsGrid: {
     flexDirection: "row",
@@ -1140,16 +1156,17 @@ const styles = StyleSheet.create({
   detailLabel: {
     fontSize: 10,
     fontWeight: "800",
+    fontFamily: fontFor("800"),
     letterSpacing: 1,
     marginBottom: 3,
   },
-  detailValue: { fontSize: 14, fontWeight: "800" },
+  detailValue: { fontSize: 14, fontWeight: "800", fontFamily: fontFor("800") },
   creditsCard: {
     borderRadius: 18,
     paddingHorizontal: 16,
     paddingVertical: 12,
   },
-  creditsText: { fontSize: 13, fontWeight: "600", lineHeight: 19, marginTop: 4 },
+  creditsText: { fontSize: 13, fontWeight: "600", fontFamily: fontFor("600"), lineHeight: 19, marginTop: 4 },
   artistHeader: { alignItems: "center", marginBottom: 22 },
   artistAvatar: {
     width: 96,
@@ -1157,29 +1174,29 @@ const styles = StyleSheet.create({
     borderRadius: 48,
     marginBottom: 12,
   },
-  artistName: { fontSize: 24, fontWeight: "800", letterSpacing: -0.4 },
+  artistName: { fontSize: 24, fontWeight: "800", fontFamily: fontFor("800"), letterSpacing: -0.4 },
   artistGenrePill: {
     marginTop: 8,
     paddingHorizontal: 14,
     paddingVertical: 5,
     borderRadius: 20,
   },
-  artistGenreText: { fontSize: 12, fontWeight: "800" },
+  artistGenreText: { fontSize: 12, fontWeight: "800", fontFamily: fontFor("800") },
   followBtn: {
     marginTop: 14,
     paddingHorizontal: 28,
     paddingVertical: 11,
     borderRadius: 24,
   },
-  followBtnText: { color: "#FFF", fontSize: 14, fontWeight: "800" },
-  aboutText: { fontSize: 14, fontWeight: "500", lineHeight: 22 },
+  followBtnText: { color: "#FFF", fontSize: 14, fontWeight: "800", fontFamily: fontFor("800") },
+  aboutText: { fontSize: 14, fontWeight: "500", fontFamily: fontFor("500"), lineHeight: 22 },
   tagWrap: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   moodTag: {
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 14,
   },
-  moodTagText: { fontSize: 13, fontWeight: "700" },
+  moodTagText: { fontSize: 13, fontWeight: "700", fontFamily: fontFor("700") },
   modalBackdrop: {
     flex: 1,
     backgroundColor: "rgba(15, 18, 30, 0.55)",
@@ -1213,14 +1230,16 @@ const styles = StyleSheet.create({
   storyDialogEyebrow: {
     fontSize: 10,
     fontWeight: "800",
+    fontFamily: fontFor("800"),
     letterSpacing: 1.8,
   },
   storyDialogTitle: {
     fontSize: 24,
     fontWeight: "900",
+    fontFamily: fontFor("900"),
     letterSpacing: -0.5,
     marginTop: 4,
   },
-  storyDialogArtist: { fontSize: 14, fontWeight: "700", marginBottom: 14 },
-  storyDialogBody: { fontSize: 15, fontWeight: "500", lineHeight: 24 },
+  storyDialogArtist: { fontSize: 14, fontWeight: "700", fontFamily: fontFor("700"), marginBottom: 14 },
+  storyDialogBody: { fontSize: 15, fontWeight: "500", fontFamily: fontFor("500"), lineHeight: 24 },
 });

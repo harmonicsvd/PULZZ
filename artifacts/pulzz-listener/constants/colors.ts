@@ -36,6 +36,9 @@ const palette = {
   brightBlue: "#1E7BFF",
   brightBlueDeep: "#0A4FCC",
   brightBlueGlow: "rgba(30, 123, 255, 0.45)",
+  // Pulse Coral — brand mark + active/"live" state (logo, progress fill)
+  coral: "#FF5C49",
+  coralGlow: "rgba(255, 92, 73, 0.28)",
 };
 
 const colors = {

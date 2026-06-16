@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { SongCard } from "@/components/SongCard";
+import { fontFor } from "@/constants/fonts";
 import { useApp } from "@/contexts/AppContext";
 import { useColors } from "@/hooks/useColors";
 import { rankSongs } from "@/lib/recommend";
@@ -116,11 +117,13 @@ const styles = StyleSheet.create({
   greeting: {
     fontSize: 13,
     fontWeight: "500",
+    fontFamily: fontFor("500"),
     marginBottom: 2,
   },
   title: {
     fontSize: 26,
     fontWeight: "800",
+    fontFamily: fontFor("800"),
     letterSpacing: -0.5,
   },
   poolBadge: {
@@ -134,6 +137,7 @@ const styles = StyleSheet.create({
   poolCount: {
     fontSize: 12,
     fontWeight: "700",
+    fontFamily: fontFor("700"),
   },
   list: {
     paddingHorizontal: 16,
@@ -150,6 +154,7 @@ const styles = StyleSheet.create({
   sectionLabel: {
     fontSize: 12,
     fontWeight: "500",
+    fontFamily: fontFor("500"),
   },
   emptyState: {
     alignItems: "center",
@@ -160,9 +165,11 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 18,
     fontWeight: "700",
+    fontFamily: fontFor("700"),
   },
   emptyDesc: {
     fontSize: 14,
+    fontFamily: fontFor("400"),
     textAlign: "center",
     lineHeight: 20,
   },

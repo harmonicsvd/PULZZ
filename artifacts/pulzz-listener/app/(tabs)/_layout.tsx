@@ -3,6 +3,7 @@ import { Tabs } from "expo-router";
 import { Feather } from "@expo/vector-icons";
 import React from "react";
 import { Platform, StyleSheet, View } from "react-native";
+import { fontFor } from "@/constants/fonts";
 import { useColors } from "@/hooks/useColors";
 
 export default function TabLayout() {
@@ -19,6 +20,7 @@ export default function TabLayout() {
         tabBarLabelStyle: {
           fontWeight: "700",
           fontSize: 11,
+          fontFamily: fontFor("700"),
         },
         tabBarStyle: {
           position: "absolute",

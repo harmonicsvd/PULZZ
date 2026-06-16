@@ -17,6 +17,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { PulzzWordmark } from "@/components/PulzzWordmark";
+import { fontFor } from "@/constants/fonts";
 import { useColors } from "@/hooks/useColors";
 import { useApp } from "@/contexts/AppContext";
 import type { FavoriteTrack, TasteProfile } from "@/contexts/AppContext";
@@ -707,11 +708,13 @@ const styles = StyleSheet.create({
   heading: {
     fontSize: 28,
     fontWeight: "800",
+    fontFamily: fontFor("800"),
     marginBottom: 10,
     letterSpacing: -0.5,
   },
   subheading: {
     fontSize: 15,
+    fontFamily: fontFor("400"),
     lineHeight: 22,
     marginBottom: 32,
   },
@@ -721,6 +724,7 @@ const styles = StyleSheet.create({
   inputLabel: {
     fontSize: 13,
     fontWeight: "600",
+    fontFamily: fontFor("600"),
     textTransform: "uppercase",
     letterSpacing: 0.5,
   },
@@ -731,6 +735,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
     fontSize: 16,
     fontWeight: "500",
+    fontFamily: fontFor("500"),
   },
   genreScroll: {
     flex: 1,
@@ -752,6 +757,7 @@ const styles = StyleSheet.create({
   genreChipLabel: {
     fontSize: 14,
     fontWeight: "600",
+    fontFamily: fontFor("600"),
   },
   genreSearchSection: {
     marginTop: 20,
@@ -759,6 +765,7 @@ const styles = StyleSheet.create({
   genreSearchLabel: {
     fontSize: 11,
     fontWeight: "700",
+    fontFamily: fontFor("700"),
     letterSpacing: 1,
     marginBottom: 10,
   },
@@ -780,6 +787,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 15,
     fontWeight: "500",
+    fontFamily: fontFor("500"),
   },
   favRow: {
     flexGrow: 0,
@@ -800,6 +808,7 @@ const styles = StyleSheet.create({
   favPillText: {
     fontSize: 13,
     fontWeight: "600",
+    fontFamily: fontFor("600"),
   },
   resultsScroll: {
     flex: 1,
@@ -826,10 +835,12 @@ const styles = StyleSheet.create({
   resultTitle: {
     fontSize: 15,
     fontWeight: "700",
+    fontFamily: fontFor("700"),
     marginBottom: 2,
   },
   resultArtist: {
     fontSize: 13,
+    fontFamily: fontFor("400"),
   },
   addBtn: {
     width: 32,
@@ -841,6 +852,7 @@ const styles = StyleSheet.create({
   },
   emptyHint: {
     fontSize: 14,
+    fontFamily: fontFor("400"),
     textAlign: "center",
     paddingVertical: 28,
   },
@@ -868,10 +880,12 @@ const styles = StyleSheet.create({
   personalityLabel: {
     fontSize: 16,
     fontWeight: "700",
+    fontFamily: fontFor("700"),
     marginBottom: 3,
   },
   personalityDesc: {
     fontSize: 13,
+    fontFamily: fontFor("400"),
     lineHeight: 18,
   },
   navRow: {
@@ -897,5 +911,6 @@ const styles = StyleSheet.create({
     color: "#FFF",
     fontSize: 16,
     fontWeight: "700",
+    fontFamily: fontFor("700"),
   },
 });

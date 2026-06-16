@@ -10,6 +10,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useApp } from "@/contexts/AppContext";
 import { useColors } from "@/hooks/useColors";
+import { fontFor } from "@/constants/fonts";
 
 interface WallUser {
   rank: number;
@@ -200,10 +201,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 26,
     fontWeight: "800",
+    fontFamily: fontFor("800"),
     letterSpacing: -0.5,
   },
   subtitle: {
     fontSize: 13,
+    fontFamily: fontFor("400"),
     marginTop: 2,
   },
   myRankBanner: {
@@ -217,14 +220,17 @@ const styles = StyleSheet.create({
   myRankLabel: {
     fontSize: 12,
     fontWeight: "500",
+    fontFamily: fontFor("500"),
   },
   myRankNumber: {
     fontSize: 20,
     fontWeight: "800",
+    fontFamily: fontFor("800"),
     flex: 1,
   },
   myRankPoints: {
     fontSize: 12,
+    fontFamily: fontFor("400"),
   },
   list: {
     paddingHorizontal: 16,
@@ -253,6 +259,7 @@ const styles = StyleSheet.create({
   rankNum: {
     fontSize: 14,
     fontWeight: "700",
+    fontFamily: fontFor("700"),
   },
   avatar: {
     width: 40,
@@ -267,9 +274,11 @@ const styles = StyleSheet.create({
   userName: {
     fontSize: 14,
     fontWeight: "700",
+    fontFamily: fontFor("700"),
   },
   personalityText: {
     fontSize: 11,
+    fontFamily: fontFor("400"),
     marginTop: 2,
   },
   rightCol: {
@@ -278,9 +287,11 @@ const styles = StyleSheet.create({
   pointsNum: {
     fontSize: 15,
     fontWeight: "800",
+    fontFamily: fontFor("800"),
   },
   pointsLabel: {
     fontSize: 10,
+    fontFamily: fontFor("400"),
   },
   badges: {
     fontSize: 12,

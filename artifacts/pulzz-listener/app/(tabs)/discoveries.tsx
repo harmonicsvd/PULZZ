@@ -10,6 +10,7 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { fontFor } from "@/constants/fonts";
 import { useApp } from "@/contexts/AppContext";
 import { useColors } from "@/hooks/useColors";
 
@@ -209,6 +210,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 26,
     fontWeight: "800",
+    fontFamily: fontFor("800"),
     letterSpacing: -0.5,
   },
   pointsBadge: {
@@ -222,6 +224,7 @@ const styles = StyleSheet.create({
   pointsText: {
     fontSize: 13,
     fontWeight: "700",
+    fontFamily: fontFor("700"),
   },
   statsRow: {
     flexDirection: "row",
@@ -243,9 +246,11 @@ const styles = StyleSheet.create({
   statNumber: {
     fontSize: 22,
     fontWeight: "800",
+    fontFamily: fontFor("800"),
   },
   statLabel: {
     fontSize: 11,
+    fontFamily: fontFor("400"),
     marginTop: 2,
   },
   list: {
@@ -279,9 +284,11 @@ const styles = StyleSheet.create({
   discoveryTitle: {
     fontSize: 14,
     fontWeight: "700",
+    fontFamily: fontFor("700"),
   },
   discoveryArtist: {
     fontSize: 12,
+    fontFamily: fontFor("400"),
     marginTop: 2,
   },
   discoveryMeta: {
@@ -297,6 +304,7 @@ const styles = StyleSheet.create({
   },
   metaText: {
     fontSize: 11,
+    fontFamily: fontFor("400"),
   },
   streamBtn: {
     flexDirection: "row",
@@ -310,6 +318,7 @@ const styles = StyleSheet.create({
     color: "#FFF",
     fontSize: 11,
     fontWeight: "700",
+    fontFamily: fontFor("700"),
   },
   pendingBadge: {
     width: 36,
@@ -327,9 +336,11 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 18,
     fontWeight: "700",
+    fontFamily: fontFor("700"),
   },
   emptyDesc: {
     fontSize: 14,
+    fontFamily: fontFor("400"),
     textAlign: "center",
     lineHeight: 20,
   },

@@ -13,6 +13,7 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { fontFor } from "@/constants/fonts";
 import { useApp } from "@/contexts/AppContext";
 import { useColors } from "@/hooks/useColors";
 
@@ -267,6 +268,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 26,
     fontWeight: "800",
+    fontFamily: fontFor("800"),
     letterSpacing: -0.5,
   },
   avatarSection: {
@@ -285,10 +287,12 @@ const styles = StyleSheet.create({
   avatarInitial: {
     fontSize: 32,
     fontWeight: "800",
+    fontFamily: fontFor("800"),
   },
   profileName: {
     fontSize: 22,
     fontWeight: "800",
+    fontFamily: fontFor("800"),
     marginBottom: 8,
   },
   personalityPill: {
@@ -304,9 +308,11 @@ const styles = StyleSheet.create({
   personalityLabel: {
     fontSize: 13,
     fontWeight: "700",
+    fontFamily: fontFor("700"),
   },
   personalityDesc: {
     fontSize: 13,
+    fontFamily: fontFor("400"),
     textAlign: "center",
   },
   statsGrid: {
@@ -331,9 +337,11 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 24,
     fontWeight: "800",
+    fontFamily: fontFor("800"),
   },
   statName: {
     fontSize: 12,
+    fontFamily: fontFor("400"),
     marginTop: 2,
   },
   section: {
@@ -343,6 +351,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 11,
     fontWeight: "700",
+    fontFamily: fontFor("700"),
     letterSpacing: 1,
     marginBottom: 10,
   },
@@ -360,6 +369,7 @@ const styles = StyleSheet.create({
   genrePillText: {
     fontSize: 13,
     fontWeight: "600",
+    fontFamily: fontFor("600"),
   },
   artistPill: {
     flexDirection: "row",
@@ -382,10 +392,12 @@ const styles = StyleSheet.create({
   artistInitial: {
     fontSize: 13,
     fontWeight: "800",
+    fontFamily: fontFor("800"),
   },
   artistName: {
     fontSize: 13,
     fontWeight: "600",
+    fontFamily: fontFor("600"),
     flexShrink: 1,
   },
   infoCard: {
@@ -395,6 +407,7 @@ const styles = StyleSheet.create({
   },
   infoText: {
     fontSize: 13,
+    fontFamily: fontFor("400"),
     lineHeight: 19,
   },
   resetBtn: {
@@ -409,5 +422,6 @@ const styles = StyleSheet.create({
   resetBtnText: {
     fontSize: 14,
     fontWeight: "600",
+    fontFamily: fontFor("600"),
   },
 });

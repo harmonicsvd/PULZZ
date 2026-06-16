@@ -9,6 +9,7 @@ import {
   View,
 } from "react-native";
 import { CoverArt } from "@/components/CoverArt";
+import { fontFor } from "@/constants/fonts";
 import { useColors } from "@/hooks/useColors";
 import type { DemoSong } from "@/data/songs";
 
@@ -132,6 +133,7 @@ const styles = StyleSheet.create({
     color: "#FFF",
     fontSize: 8,
     fontWeight: "700",
+    fontFamily: fontFor("700"),
     letterSpacing: 0.5,
   },
   listenedBadge: {
@@ -158,6 +160,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 15,
     fontWeight: "700",
+    fontFamily: fontFor("700"),
     flex: 1,
   },
   daysTag: {
@@ -171,9 +174,11 @@ const styles = StyleSheet.create({
   daysText: {
     fontSize: 10,
     fontWeight: "600",
+    fontFamily: fontFor("600"),
   },
   artist: {
     fontSize: 13,
+    fontFamily: fontFor("400"),
     marginTop: 2,
   },
   tagsRow: {
@@ -190,6 +195,7 @@ const styles = StyleSheet.create({
   genreText: {
     fontSize: 10,
     fontWeight: "500",
+    fontFamily: fontFor("500"),
   },
   footer: {
     flexDirection: "row",
@@ -200,6 +206,7 @@ const styles = StyleSheet.create({
   matchReason: {
     fontSize: 11,
     fontWeight: "600",
+    fontFamily: fontFor("600"),
     flex: 1,
   },
   listenBtn: {
@@ -214,5 +221,6 @@ const styles = StyleSheet.create({
     color: "#FFF",
     fontSize: 12,
     fontWeight: "700",
+    fontFamily: fontFor("700"),
   },
 });
