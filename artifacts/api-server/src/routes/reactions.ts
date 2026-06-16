@@ -20,6 +20,8 @@ router.post("/reactions", async (req, res): Promise<void> => {
     )
     .then((r) => r[0]);
 
+  const wasDiscovered = existing?.type === "discovered";
+
   let reaction;
   if (existing) {
     [reaction] = await db
@@ -34,12 +36,23 @@ router.post("/reactions", async (req, res): Promise<void> => {
       .returning();
   }
 
-  if (parsed.data.type === "discovered") {
+  // Adjust listener score only on a state transition, so repeated/duplicate
+  // "discovered" submissions (e.g. an offline retry) never inflate metrics.
+  const nowDiscovered = parsed.data.type === "discovered";
+  if (nowDiscovered && !wasDiscovered) {
     await db
       .update(listenersTable)
       .set({
         discoveryCount: sql`${listenersTable.discoveryCount} + 1`,
         points: sql`${listenersTable.points} + 100`,
+      })
+      .where(eq(listenersTable.id, parsed.data.listenerId));
+  } else if (!nowDiscovered && wasDiscovered) {
+    await db
+      .update(listenersTable)
+      .set({
+        discoveryCount: sql`GREATEST(${listenersTable.discoveryCount} - 1, 0)`,
+        points: sql`GREATEST(${listenersTable.points} - 100, 0)`,
       })
       .where(eq(listenersTable.id, parsed.data.listenerId));
   }

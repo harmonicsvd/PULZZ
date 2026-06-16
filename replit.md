@@ -37,7 +37,7 @@ Pre-release music discovery platform for Musicathon 2026 (June 15–21). Listene
 
 ## Architecture decisions
 
-- Listener app uses AsyncStorage only (no backend for first build) — demo songs in `data/songs.ts` with SoundHelix MP3 URLs
+- Listener app is local-first (AsyncStorage) but syncs reactions + moment marks to the API via a backend `listenerId` (created at onboarding, backfilled on launch if missing). Unsent events queue in a local outbox (`pulzz_pending_reactions`/`pulzz_pending_moments`) and flush on launch — so the artist dashboard reflects real listener activity. Reaction scoring is transition-based to stay idempotent under retries.
 - Generated hooks require explicit `queryKey` via the exported `get*QueryKey()` helpers — always pass it in the `query` option
 - Artist dashboard is hardcoded to artistId=1 for MVP (Luna Voss)
 - All routes prefixed with `/api` — services must handle their full base path

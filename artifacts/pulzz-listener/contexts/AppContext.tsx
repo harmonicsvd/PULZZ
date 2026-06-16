@@ -51,6 +51,16 @@ export interface MomentMark {
   createdAt: string;
 }
 
+interface PendingReaction {
+  songId: string;
+  type: "discovered" | "skip";
+}
+
+interface PendingMoment {
+  songId: string;
+  timestampMs: number;
+}
+
 interface AppContextValue {
   profile: ListenerProfile | null;
   isLoading: boolean;
@@ -73,6 +83,8 @@ const STORAGE_KEYS = {
   MOMENT_MARKS: "pulzz_moment_marks",
   LISTENED: "pulzz_listened",
   LISTENER_ID: "pulzz_listener_id",
+  PENDING_REACTIONS: "pulzz_pending_reactions",
+  PENDING_MOMENTS: "pulzz_pending_moments",
 };
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
@@ -100,6 +112,98 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  // Append a not-yet-synced event to the local outbox.
+  const enqueuePending = useCallback(
+    async (key: string, item: PendingReaction | PendingMoment) => {
+      try {
+        const json = await AsyncStorage.getItem(key);
+        const arr = json ? JSON.parse(json) : [];
+        arr.push(item);
+        await AsyncStorage.setItem(key, JSON.stringify(arr));
+      } catch {
+        // ignore — best effort
+      }
+    },
+    []
+  );
+
+  // Replay any queued reactions/moments to the backend. Survivors of a failed
+  // send stay in the outbox for the next attempt. Reaction scoring is
+  // idempotent server-side, so replays never inflate metrics.
+  const flushPending = useCallback(async (lid: number) => {
+    try {
+      const json = await AsyncStorage.getItem(STORAGE_KEYS.PENDING_REACTIONS);
+      const pending: PendingReaction[] = json ? JSON.parse(json) : [];
+      if (pending.length > 0) {
+        const remaining: PendingReaction[] = [];
+        for (const r of pending) {
+          const songId = parseInt(r.songId);
+          if (isNaN(songId)) continue;
+          try {
+            await api.createReaction({ songId, listenerId: lid, type: r.type });
+          } catch {
+            remaining.push(r);
+          }
+        }
+        await AsyncStorage.setItem(
+          STORAGE_KEYS.PENDING_REACTIONS,
+          JSON.stringify(remaining)
+        );
+      }
+    } catch {
+      // ignore
+    }
+    try {
+      const json = await AsyncStorage.getItem(STORAGE_KEYS.PENDING_MOMENTS);
+      const pending: PendingMoment[] = json ? JSON.parse(json) : [];
+      if (pending.length > 0) {
+        const remaining: PendingMoment[] = [];
+        for (const m of pending) {
+          const songId = parseInt(m.songId);
+          if (isNaN(songId)) continue;
+          try {
+            await api.createMomentMark({
+              songId,
+              listenerId: lid,
+              timestampMs: m.timestampMs,
+            });
+          } catch {
+            remaining.push(m);
+          }
+        }
+        await AsyncStorage.setItem(
+          STORAGE_KEYS.PENDING_MOMENTS,
+          JSON.stringify(remaining)
+        );
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  // Create the backend listener identity and persist its id locally.
+  // Returns the id, or null if the backend was unavailable.
+  const createBackendListener = useCallback(
+    async (p: ListenerProfile): Promise<number | null> => {
+      try {
+        const result = await api.createListener({
+          name: p.name,
+          genres: p.genres,
+          discoveryPersonality: p.discoveryPersonality,
+        });
+        await AsyncStorage.setItem(STORAGE_KEYS.LISTENER_ID, String(result.id));
+        setListenerId(result.id);
+        // Identity established — drain any events queued while offline.
+        flushPending(result.id);
+        return result.id;
+      } catch {
+        // Backend unavailable — app still works locally, retried on next launch
+        return null;
+      }
+    },
+    [flushPending]
+  );
+
   async function loadAllData() {
     try {
       const [profileJson, discJson, marksJson, listenedJson, listenerIdStr] =
@@ -110,11 +214,24 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           AsyncStorage.getItem(STORAGE_KEYS.LISTENED),
           AsyncStorage.getItem(STORAGE_KEYS.LISTENER_ID),
         ]);
-      if (profileJson) setProfile(JSON.parse(profileJson));
+      let loadedProfile: ListenerProfile | null = null;
+      if (profileJson) {
+        loadedProfile = JSON.parse(profileJson);
+        setProfile(loadedProfile);
+      }
       if (discJson) setDiscoveries(JSON.parse(discJson));
       if (marksJson) setMomentMarks(JSON.parse(marksJson));
       if (listenedJson) setListenedSongIds(JSON.parse(listenedJson));
-      if (listenerIdStr) setListenerId(parseInt(listenerIdStr));
+      const parsedId = listenerIdStr ? parseInt(listenerIdStr) : NaN;
+      if (!isNaN(parsedId)) {
+        setListenerId(parsedId);
+        // Drain any events queued while the backend was unreachable.
+        flushPending(parsedId);
+      } else if (loadedProfile) {
+        // Profile exists but no backend identity yet (e.g. backend was down at
+        // onboarding, or an older local profile). Backfill so reactions sync.
+        createBackendListener(loadedProfile);
+      }
     } catch {
       // ignore
     } finally {
@@ -122,25 +239,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  const saveProfile = useCallback(async (p: ListenerProfile) => {
-    await AsyncStorage.setItem(STORAGE_KEYS.PROFILE, JSON.stringify(p));
-    setProfile(p);
-    // Create listener in backend
-    try {
-      const result = await api.createListener({
-        name: p.name,
-        genres: p.genres,
-        discoveryPersonality: p.discoveryPersonality,
-      });
-      await AsyncStorage.setItem(
-        STORAGE_KEYS.LISTENER_ID,
-        String(result.id)
-      );
-      setListenerId(result.id);
-    } catch {
-      // Backend unavailable — app still works locally
-    }
-  }, []);
+  const saveProfile = useCallback(
+    async (p: ListenerProfile) => {
+      await AsyncStorage.setItem(STORAGE_KEYS.PROFILE, JSON.stringify(p));
+      setProfile(p);
+      await createBackendListener(p);
+    },
+    [createBackendListener]
+  );
 
   const markDiscovered = useCallback(
     async (discovery: Discovery) => {
@@ -159,18 +265,27 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         JSON.stringify(listened)
       );
       setListenedSongIds(listened);
-      // Sync to backend
-      if (listenerId) {
-        api
-          .createReaction({
-            songId: parseInt(discovery.songId),
-            listenerId,
+      // Sync to backend; queue for later if offline or no identity yet.
+      const songId = parseInt(discovery.songId);
+      if (!isNaN(songId)) {
+        if (listenerId) {
+          api
+            .createReaction({ songId, listenerId, type: "discovered" })
+            .catch(() =>
+              enqueuePending(STORAGE_KEYS.PENDING_REACTIONS, {
+                songId: discovery.songId,
+                type: "discovered",
+              })
+            );
+        } else {
+          enqueuePending(STORAGE_KEYS.PENDING_REACTIONS, {
+            songId: discovery.songId,
             type: "discovered",
-          })
-          .catch(() => {});
+          });
+        }
       }
     },
-    [discoveries, listenedSongIds, listenerId]
+    [discoveries, listenedSongIds, listenerId, enqueuePending]
   );
 
   const markSkip = useCallback(
@@ -181,18 +296,27 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         JSON.stringify(listened)
       );
       setListenedSongIds(listened);
-      // Sync to backend
-      if (listenerId) {
-        api
-          .createReaction({
-            songId: parseInt(songId),
-            listenerId,
+      // Sync to backend; queue for later if offline or no identity yet.
+      const numericId = parseInt(songId);
+      if (!isNaN(numericId)) {
+        if (listenerId) {
+          api
+            .createReaction({ songId: numericId, listenerId, type: "skip" })
+            .catch(() =>
+              enqueuePending(STORAGE_KEYS.PENDING_REACTIONS, {
+                songId,
+                type: "skip",
+              })
+            );
+        } else {
+          enqueuePending(STORAGE_KEYS.PENDING_REACTIONS, {
+            songId,
             type: "skip",
-          })
-          .catch(() => {});
+          });
+        }
       }
     },
-    [listenedSongIds, listenerId]
+    [listenedSongIds, listenerId, enqueuePending]
   );
 
   const addMomentMark = useCallback(
@@ -203,18 +327,31 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         JSON.stringify(updated)
       );
       setMomentMarks(updated);
-      // Sync to backend
-      if (listenerId) {
-        api
-          .createMomentMark({
-            songId: parseInt(mark.songId),
-            listenerId,
+      // Sync to backend; queue for later if offline or no identity yet.
+      const songId = parseInt(mark.songId);
+      if (!isNaN(songId)) {
+        if (listenerId) {
+          api
+            .createMomentMark({
+              songId,
+              listenerId,
+              timestampMs: mark.timestampMs,
+            })
+            .catch(() =>
+              enqueuePending(STORAGE_KEYS.PENDING_MOMENTS, {
+                songId: mark.songId,
+                timestampMs: mark.timestampMs,
+              })
+            );
+        } else {
+          enqueuePending(STORAGE_KEYS.PENDING_MOMENTS, {
+            songId: mark.songId,
             timestampMs: mark.timestampMs,
-          })
-          .catch(() => {});
+          });
+        }
       }
     },
-    [momentMarks, listenerId]
+    [momentMarks, listenerId, enqueuePending]
   );
 
   const getDiscoveryPoints = useCallback(() => {
