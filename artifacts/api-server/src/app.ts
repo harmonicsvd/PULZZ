@@ -1,4 +1,3 @@
-import path from "node:path";
 import express, { type Express } from "express";
 import cors from "cors";
 import pinoHttp from "pino-http";
@@ -29,15 +28,6 @@ app.use(
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// Serve generated demo media (audio + cover art) committed under public/media.
-// Resolved relative to the bundle dir (__dirname) so it works in dev and prod.
-app.use(
-  "/api/media",
-  express.static(path.resolve(__dirname, "../public/media"), {
-    maxAge: "1h",
-  }),
-);
 
 app.use("/api", router);
 

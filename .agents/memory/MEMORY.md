@@ -2,6 +2,7 @@
 - [Lib rebuild order](lib-rebuild-order.md) — always run `pnpm run typecheck:libs` before leaf artifact typechecks or you get "no exported member" errors
 - [Listener light-only theme](listener-light-theme.md) — Expo listener app is intentionally light-only; both light/dark keys hold the same palette on purpose, don't "fix" it
 - [LRC duplicate-line seeding](lrc-duplicate-line-seeding.md) — seed per-line timestamps from existing LRC by occurrence order, never a text-keyed map (collapses repeated choruses)
+- [Demo catalog source](demo-catalog-source.md) — demo songs must stay free public-domain archive.org recordings; never re-introduce AI-generated tracks or paid generation
 - [Reaction sync idempotency](reaction-sync-idempotency.md) — listener syncs reactions/moments via an offline outbox; reaction scoring must adjust only on state transitions, never per POST
 - [Standalone TS scripts](standalone-ts-scripts.md) — a seed/CLI importing @workspace/db must be esbuild-bundled (Node can't resolve workspace pkgs at root nor drizzle's dir imports); follow the build.mjs pattern
 - [Artist app Pulse Coral theme](artist-pulse-coral-theme.md) — artist web app is light-only cream/navy/coral #FF5C49; white-on-coral primary is an intentional brand CTA (~3:1), don't "fix" it
