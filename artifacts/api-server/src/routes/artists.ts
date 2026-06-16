@@ -87,7 +87,10 @@ router.get("/artists/:id/songs", async (req, res): Promise<void> => {
       coverColor: songsTable.coverColor,
       tags: songsTable.tags,
       audioUrl: songsTable.audioUrl,
+      artworkUrl: songsTable.artworkUrl,
       durationSeconds: songsTable.durationSeconds,
+      license: songsTable.license,
+      analysis: songsTable.analysis,
     })
     .from(songsTable)
     .innerJoin(artistsTable, eq(songsTable.artistId, artistsTable.id))
@@ -172,7 +175,10 @@ router.get("/artists/:id/dashboard", async (req, res): Promise<void> => {
       coverColor: songsTable.coverColor,
       tags: songsTable.tags,
       audioUrl: songsTable.audioUrl,
+      artworkUrl: songsTable.artworkUrl,
       durationSeconds: songsTable.durationSeconds,
+      license: songsTable.license,
+      analysis: songsTable.analysis,
     })
     .from(songsTable)
     .innerJoin(artistsTable, eq(songsTable.artistId, artistsTable.id))

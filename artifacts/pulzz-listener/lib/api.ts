@@ -1,4 +1,4 @@
-import type { DemoSong, SongCredits } from "@/data/songs";
+import type { DemoSong, SongCredits, SongLicense } from "@/data/songs";
 
 const getBase = () => {
   const domain = process.env.EXPO_PUBLIC_DOMAIN;
@@ -28,6 +28,7 @@ export interface ApiSong {
   audioUrl: string;
   artworkUrl: string | null;
   durationSeconds: number;
+  license: SongLicense | null;
   discoveredCount: number | null;
   skipCount: number | null;
 }
@@ -64,6 +65,7 @@ export function apiSongToDemoSong(s: ApiSong): DemoSong {
     durationSeconds: s.durationSeconds ?? 0,
     audioUrl: s.audioUrl,
     artworkUrl: s.artworkUrl ?? undefined,
+    license: s.license ?? undefined,
     coverGradient: colorToGradient(s.coverColor ?? "#333333"),
     matchReason: "In the discovery pool",
     bpm: 0,
