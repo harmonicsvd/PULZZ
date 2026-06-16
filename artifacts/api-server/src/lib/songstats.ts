@@ -6,6 +6,7 @@ const CACHE_TTL_MS = 10 * 60 * 1000;
 
 export type SongstatsStatus =
   | "ok"
+  | "pre_release"
   | "no_identifier"
   | "not_found"
   | "unconfigured"
@@ -43,6 +44,9 @@ export interface SongstatsResult {
   playlistReachTotal: number | null;
   playlistsTotal: number | null;
   chartsTotal: number | null;
+  streamsRecent: number | null;
+  playlistsRecent: number | null;
+  chartsRecent: number | null;
   sources: SongstatsSource[];
   fetchedAt: string;
 }
@@ -148,6 +152,24 @@ function buildResult(
     return (acc ?? 0) + s.chartsTotal;
   }, null);
 
+  // "Recent" (current-period) movement, summed across platforms. Songstats
+  // reports *_current as the latest reporting window, so these surface the
+  // song's recent trend rather than its all-time totals.
+  const streamsRecent =
+    spotify?.streamsCurrent ??
+    sources.reduce<number | null>((acc, s) => {
+      if (s.streamsCurrent === null) return acc;
+      return (acc ?? 0) + s.streamsCurrent;
+    }, null);
+  const playlistsRecent = sources.reduce<number | null>((acc, s) => {
+    if (s.playlistsCurrent === null) return acc;
+    return (acc ?? 0) + s.playlistsCurrent;
+  }, null);
+  const chartsRecent = sources.reduce<number | null>((acc, s) => {
+    if (s.chartsCurrent === null) return acc;
+    return (acc ?? 0) + s.chartsCurrent;
+  }, null);
+
   return {
     status: "ok",
     available: true,
@@ -163,6 +185,9 @@ function buildResult(
     playlistReachTotal,
     playlistsTotal,
     chartsTotal,
+    streamsRecent,
+    playlistsRecent,
+    chartsRecent,
     sources,
     fetchedAt: new Date().toISOString(),
   };
@@ -183,6 +208,9 @@ function emptyResult(
     playlistReachTotal: null,
     playlistsTotal: null,
     chartsTotal: null,
+    streamsRecent: null,
+    playlistsRecent: null,
+    chartsRecent: null,
     sources: [],
     fetchedAt: new Date().toISOString(),
   };
@@ -196,8 +224,15 @@ function emptyResult(
  * are cached in memory for a short window to respect Songstats rate limits.
  */
 export async function getTrackStats(
-  rawIdentifier: string | null | undefined
+  rawIdentifier: string | null | undefined,
+  opts?: { released?: boolean }
 ): Promise<SongstatsResult> {
+  // Pre-release gating: a song that has not been released yet must never show
+  // live post-release numbers, even if an identifier was attached early.
+  if (opts && opts.released === false) {
+    return emptyResult("pre_release", null, rawIdentifier?.trim() || null);
+  }
+
   if (!rawIdentifier || rawIdentifier.trim().length === 0) {
     return emptyResult("no_identifier", null, null);
   }

@@ -11,6 +11,7 @@ export type SongstatsResultStatus = typeof SongstatsResultStatus[keyof typeof So
 
 export const SongstatsResultStatus = {
   ok: 'ok',
+  pre_release: 'pre_release',
   no_identifier: 'no_identifier',
   not_found: 'not_found',
   unconfigured: 'unconfigured',

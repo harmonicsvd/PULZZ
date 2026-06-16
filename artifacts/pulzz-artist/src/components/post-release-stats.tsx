@@ -249,6 +249,37 @@ export function PostReleaseStats({ songId, streamingId }: Props) {
               />
             </div>
 
+            {(data.streamsRecent != null ||
+              data.playlistsRecent != null ||
+              data.chartsRecent != null) && (
+              <div className="rounded-lg border border-border bg-background/40 p-3">
+                <div className="flex items-center gap-1.5 text-xs uppercase tracking-wide text-muted-foreground mb-2">
+                  <TrendingUp className="w-3.5 h-3.5 text-chart-3" />
+                  Recent Trend
+                </div>
+                <div className="flex flex-wrap items-center gap-x-5 gap-y-1 text-sm">
+                  {data.streamsRecent != null && (
+                    <TrendStat
+                      value={data.streamsRecent}
+                      label="streams this period"
+                    />
+                  )}
+                  {data.playlistsRecent != null && (
+                    <TrendStat
+                      value={data.playlistsRecent}
+                      label="active playlists"
+                    />
+                  )}
+                  {data.chartsRecent != null && (
+                    <TrendStat
+                      value={data.chartsRecent}
+                      label="current charts"
+                    />
+                  )}
+                </div>
+              </div>
+            )}
+
             <div className="space-y-2">
               <div className="text-xs uppercase tracking-wide text-muted-foreground">
                 By Platform
@@ -293,6 +324,17 @@ export function PostReleaseStats({ songId, streamingId }: Props) {
   );
 }
 
+function TrendStat({ value, label }: { value: number; label: string }) {
+  return (
+    <span className="text-muted-foreground">
+      <span className="font-semibold text-foreground">
+        {formatNumber(value)}
+      </span>{" "}
+      {label}
+    </span>
+  );
+}
+
 function StatTile({
   icon,
   label,
@@ -321,7 +363,11 @@ function PreReleaseState({
   hasIdentifier: boolean;
 }) {
   let message: string;
-  if (status === "unconfigured") {
+  if (status === "pre_release") {
+    message = hasIdentifier
+      ? "This song is still pre-release. We've saved its streaming link — real streaming, playlist, and chart numbers will appear here automatically once it's out."
+      : "This song is still pre-release. Once it's out, attach its ISRC or Spotify link and real streaming, playlist, and chart numbers will show up here.";
+  } else if (status === "unconfigured") {
     message =
       "Post-release stats are powered by Songstats. Once a Songstats API key is configured, real streaming numbers will appear here.";
   } else if (status === "not_found" && hasIdentifier) {

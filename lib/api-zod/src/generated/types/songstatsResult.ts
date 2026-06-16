@@ -25,6 +25,12 @@ export interface SongstatsResult {
   playlistsTotal?: number | null;
   /** @nullable */
   chartsTotal?: number | null;
+  /** @nullable */
+  streamsRecent?: number | null;
+  /** @nullable */
+  playlistsRecent?: number | null;
+  /** @nullable */
+  chartsRecent?: number | null;
   sources: SongstatsSource[];
   fetchedAt: string;
 }

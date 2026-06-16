@@ -207,6 +207,7 @@ export type SongstatsResultStatus = typeof SongstatsResultStatus[keyof typeof So
 
 export const SongstatsResultStatus = {
   ok: 'ok',
+  pre_release: 'pre_release',
   no_identifier: 'no_identifier',
   not_found: 'not_found',
   unconfigured: 'unconfigured',
@@ -229,6 +230,12 @@ export interface SongstatsResult {
   playlistsTotal?: number | null;
   /** @nullable */
   chartsTotal?: number | null;
+  /** @nullable */
+  streamsRecent?: number | null;
+  /** @nullable */
+  playlistsRecent?: number | null;
+  /** @nullable */
+  chartsRecent?: number | null;
   sources: SongstatsSource[];
   fetchedAt: string;
 }

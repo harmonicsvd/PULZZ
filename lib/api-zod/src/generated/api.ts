@@ -186,7 +186,7 @@ export const GetSongSongstatsParams = zod.object({
 })
 
 export const GetSongSongstatsResponse = zod.object({
-  "status": zod.enum(['ok', 'no_identifier', 'not_found', 'unconfigured', 'error']),
+  "status": zod.enum(['ok', 'pre_release', 'no_identifier', 'not_found', 'unconfigured', 'error']),
   "available": zod.boolean(),
   "message": zod.string().nullish(),
   "identifier": zod.string().nullish(),
@@ -199,6 +199,9 @@ export const GetSongSongstatsResponse = zod.object({
   "playlistReachTotal": zod.number().nullish(),
   "playlistsTotal": zod.number().nullish(),
   "chartsTotal": zod.number().nullish(),
+  "streamsRecent": zod.number().nullish(),
+  "playlistsRecent": zod.number().nullish(),
+  "chartsRecent": zod.number().nullish(),
   "sources": zod.array(zod.object({
   "source": zod.string(),
   "streamsTotal": zod.number().nullish(),

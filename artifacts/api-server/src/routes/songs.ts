@@ -317,7 +317,11 @@ router.get("/songs/:id/songstats", async (req, res): Promise<void> => {
   }
 
   const [song] = await db
-    .select({ streamingId: songsTable.streamingId })
+    .select({
+      streamingId: songsTable.streamingId,
+      releaseDate: songsTable.releaseDate,
+      status: songsTable.status,
+    })
     .from(songsTable)
     .where(eq(songsTable.id, params.data.id));
 
@@ -326,7 +330,14 @@ router.get("/songs/:id/songstats", async (req, res): Promise<void> => {
     return;
   }
 
-  const stats = await getTrackStats(song.streamingId);
+  // A song counts as released once its release date has arrived (compared at
+  // day granularity in UTC). Pre-release songs always get the fallback state,
+  // even if an artist attached a streaming identifier ahead of release.
+  const todayUtc = new Date(new Date().toISOString().slice(0, 10)).getTime();
+  const releaseUtc = new Date(`${song.releaseDate}T00:00:00Z`).getTime();
+  const released = Number.isFinite(releaseUtc) ? releaseUtc <= todayUtc : true;
+
+  const stats = await getTrackStats(song.streamingId, { released });
   res.json(GetSongSongstatsResponse.parse(stats));
 });
 

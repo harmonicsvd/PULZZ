@@ -789,7 +789,7 @@ components:
       properties:
         status:
           type: string
-          enum: [ok, no_identifier, not_found, unconfigured, error]
+          enum: [ok, pre_release, no_identifier, not_found, unconfigured, error]
         available:
           type: boolean
         message:
@@ -807,6 +807,12 @@ components:
         playlistsTotal:
           type: ["integer", "null"]
         chartsTotal:
+          type: ["integer", "null"]
+        streamsRecent:
+          type: ["integer", "null"]
+        playlistsRecent:
+          type: ["integer", "null"]
+        chartsRecent:
           type: ["integer", "null"]
         sources:
           type: array
