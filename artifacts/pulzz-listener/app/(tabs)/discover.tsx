@@ -8,6 +8,7 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { BrandHeader } from "@/components/BrandHeader";
 import { SongCard } from "@/components/SongCard";
 import { fontFor } from "@/constants/fonts";
 import { useApp } from "@/contexts/AppContext";
@@ -19,7 +20,6 @@ export default function DiscoverScreen() {
   const insets = useSafeAreaInsets();
   const { profile, listenedSongIds, songs, discoveries, momentMarks } = useApp();
 
-  const topPad = Platform.OS === "web" ? 67 : insets.top;
   const botPad = Platform.OS === "web" ? 34 : insets.bottom;
 
   const availableSongs = useMemo(() => {
@@ -34,10 +34,11 @@ export default function DiscoverScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <BrandHeader />
       <View
         style={[
           styles.header,
-          { paddingTop: topPad + 8, backgroundColor: colors.background },
+          { paddingTop: 4, backgroundColor: colors.background },
         ]}
       >
         <View>

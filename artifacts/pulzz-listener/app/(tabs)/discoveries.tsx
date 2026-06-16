@@ -10,6 +10,7 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { BrandHeader } from "@/components/BrandHeader";
 import { fontFor } from "@/constants/fonts";
 import { useApp } from "@/contexts/AppContext";
 import { useColors } from "@/hooks/useColors";
@@ -18,7 +19,6 @@ export default function DiscoveriesScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const { discoveries, momentMarks, getDiscoveryPoints } = useApp();
-  const topPad = Platform.OS === "web" ? 67 : insets.top;
   const botPad = Platform.OS === "web" ? 34 : insets.bottom;
 
   function getDaysUntilRelease(releaseDate: string) {
@@ -32,10 +32,11 @@ export default function DiscoveriesScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <BrandHeader />
       <View
         style={[
           styles.header,
-          { paddingTop: topPad + 8, backgroundColor: colors.background },
+          { paddingTop: 4, backgroundColor: colors.background },
         ]}
       >
         <Text style={[styles.title, { color: colors.foreground }]}>

@@ -22,6 +22,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { CoverArt } from "@/components/CoverArt";
+import { PulzzWordmark } from "@/components/PulzzWordmark";
 import { fontFor } from "@/constants/fonts";
 import { useApp } from "@/contexts/AppContext";
 import { useColors } from "@/hooks/useColors";
@@ -343,7 +344,13 @@ export default function ListenScreen() {
           <Feather name="chevron-down" size={26} color={colors.navy} />
         </TouchableOpacity>
         <View style={styles.headerCenter}>
-          <Text style={[styles.preReleaseLabel, { color: colors.midBlue }]}>
+          <PulzzWordmark size={16} />
+          <Text
+            style={[
+              styles.preReleaseLabel,
+              { color: colors.midBlue, marginTop: 4 },
+            ]}
+          >
             PRE-RELEASE
           </Text>
           <Text style={[styles.daysLeft, { color: colors.mutedForeground }]}>

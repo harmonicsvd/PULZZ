@@ -8,6 +8,7 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { BrandHeader } from "@/components/BrandHeader";
 import { useApp } from "@/contexts/AppContext";
 import { useColors } from "@/hooks/useColors";
 import { fontFor } from "@/constants/fonts";
@@ -36,7 +37,6 @@ export default function WallScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const { profile, discoveries, getDiscoveryPoints } = useApp();
-  const topPad = Platform.OS === "web" ? 67 : insets.top;
   const botPad = Platform.OS === "web" ? 34 : insets.bottom;
 
   const wallData = useMemo((): WallUser[] => {
@@ -69,10 +69,11 @@ export default function WallScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <BrandHeader />
       <View
         style={[
           styles.header,
-          { paddingTop: topPad + 8, backgroundColor: colors.background },
+          { paddingTop: 4, backgroundColor: colors.background },
         ]}
       >
         <Text style={[styles.title, { color: colors.foreground }]}>

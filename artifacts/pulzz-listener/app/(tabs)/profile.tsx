@@ -13,6 +13,7 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { BrandHeader } from "@/components/BrandHeader";
 import { fontFor } from "@/constants/fonts";
 import { useApp } from "@/contexts/AppContext";
 import { useColors } from "@/hooks/useColors";
@@ -22,7 +23,6 @@ export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
   const { profile, discoveries, listenedSongIds, getDiscoveryPoints } =
     useApp();
-  const topPad = Platform.OS === "web" ? 67 : insets.top;
   const botPad = Platform.OS === "web" ? 34 : insets.bottom;
 
   const personalityInfo = {
@@ -77,14 +77,16 @@ export default function ProfileScreen() {
   );
 
   return (
-    <ScrollView
-      style={[styles.container, { backgroundColor: colors.background }]}
-      contentContainerStyle={{ paddingBottom: botPad + 100 }}
-      showsVerticalScrollIndicator={false}
-    >
-      <View style={[styles.header, { paddingTop: topPad + 8 }]}>
-        <Text style={[styles.title, { color: colors.foreground }]}>Profile</Text>
-      </View>
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <BrandHeader />
+      <ScrollView
+        style={[styles.container, { backgroundColor: colors.background }]}
+        contentContainerStyle={{ paddingBottom: botPad + 100 }}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={[styles.header, { paddingTop: 4 }]}>
+          <Text style={[styles.title, { color: colors.foreground }]}>Profile</Text>
+        </View>
 
       <View style={styles.avatarSection}>
         <View
@@ -256,6 +258,7 @@ export default function ProfileScreen() {
         </TouchableOpacity>
       </View>
     </ScrollView>
+    </View>
   );
 }
 

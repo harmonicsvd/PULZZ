@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { Link, useLocation } from "wouter";
-import { LayoutDashboard, Music, Trophy, Users, Settings, LogOut, Plus } from "lucide-react";
+import { LayoutDashboard, Music, Trophy, Users, Settings, LogOut, Plus, Headphones } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function AppLayout({ children }: { children: ReactNode }) {
@@ -56,6 +56,15 @@ export function AppLayout({ children }: { children: ReactNode }) {
         </div>
         
         <div className="p-4 border-t border-border">
+          <a
+            href="/pulzz-listener/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-3 text-sm text-muted-foreground px-3 py-2 cursor-pointer hover:text-foreground transition-colors"
+          >
+            <Headphones className="w-4 h-4" />
+            Open the app
+          </a>
           <div className="flex items-center gap-3 text-sm text-muted-foreground px-3 py-2 cursor-pointer hover:text-foreground transition-colors">
             <Settings className="w-4 h-4" />
             Settings
