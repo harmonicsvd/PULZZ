@@ -18,3 +18,9 @@ id = "HUiE0f7mrZERuxkBJdVk1"
 uri = "file://artifacts/pulzz-listener/assets/images/song-placeholder.png"
 type = "image"
 title = "song placeholder art"
+
+[[generated]]
+id = "HbObjUwwt8C9BSZeHimwA"
+uri = "file://artifacts/api-server/public/media/art-1.png"
+type = "image"
+title = "generated_image"

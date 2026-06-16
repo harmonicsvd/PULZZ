@@ -1,4 +1,5 @@
 import type { DemoSong, SongCredits, SongLicense } from "@/data/songs";
+import { mediaUrl } from "@/lib/media";
 
 const getBase = () => {
   const domain = process.env.EXPO_PUBLIC_DOMAIN;
@@ -63,8 +64,8 @@ export function apiSongToDemoSong(s: ApiSong): DemoSong {
     releaseDate: s.releaseDate,
     daysUntilRelease: s.daysUntilRelease,
     durationSeconds: s.durationSeconds ?? 0,
-    audioUrl: s.audioUrl,
-    artworkUrl: s.artworkUrl ?? undefined,
+    audioUrl: mediaUrl(s.audioUrl) ?? s.audioUrl,
+    artworkUrl: mediaUrl(s.artworkUrl),
     license: s.license ?? undefined,
     coverGradient: colorToGradient(s.coverColor ?? "#333333"),
     matchReason: "In the discovery pool",
