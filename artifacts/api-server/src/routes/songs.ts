@@ -43,6 +43,7 @@ router.get("/songs", async (req, res): Promise<void> => {
       audioUrl: songsTable.audioUrl,
       artworkUrl: songsTable.artworkUrl,
       durationSeconds: songsTable.durationSeconds,
+      license: songsTable.license,
     })
     .from(songsTable)
     .innerJoin(artistsTable, eq(songsTable.artistId, artistsTable.id))
@@ -152,6 +153,7 @@ router.get("/songs/:id", async (req, res): Promise<void> => {
       lrc: songsTable.lrc,
       credits: songsTable.credits,
       analysis: songsTable.analysis,
+      license: songsTable.license,
       instruments: songsTable.instruments,
       isrc: songsTable.isrc,
     })

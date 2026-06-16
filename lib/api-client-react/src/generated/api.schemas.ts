@@ -24,6 +24,15 @@ export interface SongAnalysis {
   language?: string | null;
 }
 
+export interface SongLicense {
+  /** License classification, e.g. "Public Domain". */
+  type: string;
+  /** Human-readable license rationale or terms. */
+  detail?: string;
+  /** Attribution / source URL for the recording. */
+  source?: string;
+}
+
 export interface Song {
   id: number;
   title: string;
@@ -45,6 +54,7 @@ export interface Song {
   /** @nullable */
   skipCount?: number | null;
   analysis?: SongAnalysis | null;
+  license?: SongLicense | null;
 }
 
 export interface SongInput {
@@ -113,6 +123,7 @@ export interface SongDetail {
   /** @nullable */
   momentCount?: number | null;
   analysis?: SongAnalysis | null;
+  license?: SongLicense | null;
 }
 
 export interface UpdateSongLyrics {

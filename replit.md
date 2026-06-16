@@ -10,6 +10,7 @@ Pre-release music discovery platform for Musicathon 2026 (June 15–21). Listene
 - `pnpm run build` — typecheck + build all packages
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
 - `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
+- `pnpm --filter @workspace/api-server run seed` — reseed the 5 artists + 5 real songs (UPSERT in place by id; safe to re-run, preserves reactions/moments)
 - Required env: `DATABASE_URL` — Postgres connection string
 
 ## Stack
@@ -60,7 +61,9 @@ Real public-domain recordings (audio + cover art hosted on archive.org; canonica
 - Artist 4: Sophie Tucker (Jazz) — Some of These Days (1911)
 - Artist 5: Bessie Smith (Blues) — St. Louis Blues (1925)
 
-All five are pre-1929 US recordings in the public domain. DB rows are updated IN PLACE (never delete/reinsert — reactions reference song_id 1, 2, 4).
+All five are pre-1929 US recordings in the public domain. Each track carries a structured `license` ({type, detail, source}) field with explicit Public-Domain attribution + archive.org source URL — present in the DB schema, OpenAPI (`SongLicense`), API responses, and listener demo data.
+
+Catalog is reproducible via the seed (`artifacts/api-server/src/seed.ts`, run with `pnpm --filter @workspace/api-server run seed`). The seed UPSERTS by id IN PLACE (never delete/reinsert — reactions reference song_id 1, 2, 4) and bumps the serial sequences afterward. To recreate from a clean DB: schema push → seed → `GET /api/songs` should return 5 songs each with `license.type="Public Domain"`.
 
 ## User preferences
 

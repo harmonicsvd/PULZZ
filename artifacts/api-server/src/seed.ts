@@ -1,46 +1,77 @@
-export interface SongCredits {
-  lyricist?: string;
-  composer?: string;
-  vocalist?: string;
-  mixEngineer?: string;
-  producer?: string;
-}
+import { sql } from "drizzle-orm";
+import {
+  db,
+  songsTable,
+  artistsTable,
+  type InsertArtist,
+  type InsertSong,
+} from "@workspace/db";
 
-export interface SongLicense {
-  type: string;
-  detail?: string;
-  source?: string;
-}
+/**
+ * Reproducible seed for the Pulzz discovery pool.
+ *
+ * The same five public-domain recordings power both the listener demo data
+ * (artifacts/pulzz-listener/data/songs.ts) and the artist dashboard, so this
+ * keeps the server catalog in sync with what listeners see.
+ *
+ * Rows are upserted IN PLACE by primary key (never deleted / reinserted) so the
+ * existing reactions and moment marks that reference song_id 1..5 stay valid.
+ */
 
-export interface DemoSong {
-  id: string;
-  title: string;
-  artist: string;
-  genre: string;
-  tags: string[];
-  story: string;
-  lyrics: string;
-  lrc?: string;
-  credits?: SongCredits;
-  license?: SongLicense;
-  releaseDate: string;
-  daysUntilRelease: number;
-  durationSeconds: number;
-  audioUrl: string;
-  artworkUrl?: string;
-  coverGradient: [string, string];
-  matchReason: string;
-  bpm: number;
-  instruments: string[];
-}
+type SeedArtist = InsertArtist & { id: number };
+type SeedSong = InsertSong & { id: number };
 
-export const DEMO_SONGS: DemoSong[] = [
+const artists: SeedArtist[] = [
   {
-    id: "1",
-    title: "Danny Boy",
-    artist: "Ernestine Schumann-Heink",
+    id: 1,
+    name: "Ernestine Schumann-Heink",
+    email: "ernestine.schumann-heink@pulzz.demo",
+    bio: "Austrian-American contralto (1861–1936), celebrated for her recordings of ballads and lieder.",
     genre: "Folk",
-    tags: ["timeless", "longing", "ballad"],
+  },
+  {
+    id: 2,
+    name: "Fisk Jubilee Quartet",
+    email: "fisk.jubilee.quartet@pulzz.demo",
+    bio: "Touring a cappella ensemble from Fisk University that carried the African American spiritual tradition worldwide.",
+    genre: "Gospel",
+  },
+  {
+    id: 3,
+    name: "Marion Harris",
+    email: "marion.harris@pulzz.demo",
+    bio: "American singer (1896–1944), one of the first widely popular white performers of blues and jazz.",
+    genre: "Jazz",
+  },
+  {
+    id: 4,
+    name: "Sophie Tucker",
+    email: "sophie.tucker@pulzz.demo",
+    bio: "'The Last of the Red-Hot Mamas' (1887–1966), a defining voice of the vaudeville era.",
+    genre: "Jazz",
+  },
+  {
+    id: 5,
+    name: "Bessie Smith",
+    email: "bessie.smith@pulzz.demo",
+    bio: "The 'Empress of the Blues' (1894–1937), among the most influential blues vocalists ever recorded.",
+    genre: "Blues",
+  },
+];
+
+const songs: SeedSong[] = [
+  {
+    id: 1,
+    artistId: 1,
+    title: "Danny Boy",
+    genre: "Folk",
+    language: "en",
+    releaseDate: "2026-06-25",
+    isrc: null,
+    audioUrl:
+      "https://archive.org/download/78_danny-boy_ernestine-schumann-heink-fred-e-weatherly_gbia0523653a/Danny%20Boy%20-%20Ernestine%20Schumann-Heink%20-%20Fred%20E.%20Weatherly.mp3",
+    artworkUrl:
+      "https://archive.org/services/img/78_danny-boy_ernestine-schumann-heink-fred-e-weatherly_gbia0523653a",
     story:
       "A 1917 recording of the beloved Irish ballad, sung by contralto Ernestine Schumann-Heink. Set to the old 'Londonderry Air', the lyric is a parent's farewell to a departing son — a goodbye stretched across the seasons until the singer's own last day.",
     lyrics:
@@ -51,13 +82,6 @@ export const DEMO_SONGS: DemoSong[] = [
       composer: "Traditional (Londonderry Air)",
       vocalist: "Ernestine Schumann-Heink",
     },
-    releaseDate: "2026-06-25",
-    daysUntilRelease: 10,
-    durationSeconds: 214,
-    audioUrl:
-      "https://archive.org/download/78_danny-boy_ernestine-schumann-heink-fred-e-weatherly_gbia0523653a/Danny%20Boy%20-%20Ernestine%20Schumann-Heink%20-%20Fred%20E.%20Weatherly.mp3",
-    artworkUrl:
-      "https://archive.org/services/img/78_danny-boy_ernestine-schumann-heink-fred-e-weatherly_gbia0523653a",
     license: {
       type: "Public Domain",
       detail:
@@ -65,17 +89,23 @@ export const DEMO_SONGS: DemoSong[] = [
       source:
         "https://archive.org/details/78_danny-boy_ernestine-schumann-heink-fred-e-weatherly_gbia0523653a",
     },
-    coverGradient: ["#3E5C99", "#1B2A4A"],
-    matchReason: "A timeless ballad to start your discovery",
-    bpm: 68,
     instruments: ["vocals", "orchestra", "strings"],
+    durationSeconds: 214,
+    coverColor: "#3E5C99",
+    tags: ["timeless", "longing", "ballad"],
   },
   {
-    id: "2",
+    id: 2,
+    artistId: 2,
     title: "Swing Low, Sweet Chariot",
-    artist: "Fisk Jubilee Quartet",
     genre: "Gospel",
-    tags: ["spiritual", "harmony", "uplifting"],
+    language: "en",
+    releaseDate: "2026-06-22",
+    isrc: null,
+    audioUrl:
+      "https://archive.org/download/fisk-university-jubilee-quartet-swing-low-sweet-chariot-victor-16453-a/Fisk%20University%20Jubilee%20Quartet%20-%20Swing%20Low%2C%20Sweet%20Chariot%20-%20Victor%2016453-A.mp3",
+    artworkUrl:
+      "https://archive.org/services/img/fisk-university-jubilee-quartet-swing-low-sweet-chariot-victor-16453-a",
     story:
       "A 1909 recording by the Fisk University Jubilee Quartet, whose touring singers carried the African American spiritual tradition to the world. This song of deliverance became one of the most enduring spirituals ever recorded.",
     lyrics:
@@ -85,13 +115,6 @@ export const DEMO_SONGS: DemoSong[] = [
       composer: "Traditional (Wallis Willis)",
       vocalist: "Fisk Jubilee Quartet",
     },
-    releaseDate: "2026-06-22",
-    daysUntilRelease: 7,
-    durationSeconds: 172,
-    audioUrl:
-      "https://archive.org/download/fisk-university-jubilee-quartet-swing-low-sweet-chariot-victor-16453-a/Fisk%20University%20Jubilee%20Quartet%20-%20Swing%20Low%2C%20Sweet%20Chariot%20-%20Victor%2016453-A.mp3",
-    artworkUrl:
-      "https://archive.org/services/img/fisk-university-jubilee-quartet-swing-low-sweet-chariot-victor-16453-a",
     license: {
       type: "Public Domain",
       detail:
@@ -99,17 +122,23 @@ export const DEMO_SONGS: DemoSong[] = [
       source:
         "https://archive.org/details/fisk-university-jubilee-quartet-swing-low-sweet-chariot-victor-16453-a",
     },
-    coverGradient: ["#2A4070", "#0F1A33"],
-    matchReason: "Close-harmony gospel from 1909",
-    bpm: 72,
     instruments: ["vocals", "quartet harmony"],
+    durationSeconds: 172,
+    coverColor: "#2A4070",
+    tags: ["spiritual", "harmony", "uplifting"],
   },
   {
-    id: "3",
+    id: 3,
+    artistId: 3,
     title: "After You've Gone",
-    artist: "Marion Harris",
     genre: "Jazz",
-    tags: ["bluesy", "heartbreak", "vintage"],
+    language: "en",
+    releaseDate: "2026-06-28",
+    isrc: null,
+    audioUrl:
+      "https://archive.org/download/after-youve-gone-library-of-congress/After%20you've%20gone%20Library%20of%20Congress.mp3",
+    artworkUrl:
+      "https://archive.org/services/img/after-youve-gone-library-of-congress",
     story:
       "Marion Harris, one of the first widely popular white singers of blues and jazz, recorded this 1918 standard about the regret that comes after a lover walks away. It has since been sung by everyone from Bessie Smith to Judy Garland.",
     lyrics:
@@ -120,30 +149,29 @@ export const DEMO_SONGS: DemoSong[] = [
       composer: "Turner Layton",
       vocalist: "Marion Harris",
     },
-    releaseDate: "2026-06-28",
-    daysUntilRelease: 13,
-    durationSeconds: 202,
-    audioUrl:
-      "https://archive.org/download/after-youve-gone-library-of-congress/After%20you've%20gone%20Library%20of%20Congress.mp3",
-    artworkUrl:
-      "https://archive.org/services/img/after-youve-gone-library-of-congress",
     license: {
       type: "Public Domain",
       detail:
         "U.S. sound recording published 1918; in the public domain (published before 1929).",
-      source: "https://archive.org/details/after-youve-gone-library-of-congress",
+      source:
+        "https://archive.org/details/after-youve-gone-library-of-congress",
     },
-    coverGradient: ["#6B5B95", "#2D2150"],
-    matchReason: "Early jazz-blues heartbreak",
-    bpm: 96,
     instruments: ["vocals", "piano", "horns"],
+    durationSeconds: 202,
+    coverColor: "#6B5B95",
+    tags: ["bluesy", "heartbreak", "vintage"],
   },
   {
-    id: "4",
+    id: 4,
+    artistId: 4,
     title: "Some of These Days",
-    artist: "Sophie Tucker",
     genre: "Jazz",
-    tags: ["sassy", "vaudeville", "classic"],
+    language: "en",
+    releaseDate: "2026-06-24",
+    isrc: null,
+    audioUrl:
+      "https://archive.org/download/EDIS-SRP-0164-02/EDIS-SRP-0164-02.mp3",
+    artworkUrl: "https://archive.org/services/img/EDIS-SRP-0164-02",
     story:
       "Sophie Tucker, 'the last of the red-hot mamas', made this 1911 number her lifelong signature song. A defiant warning to a lover who's about to leave, it became one of the defining performances of the vaudeville era.",
     lyrics:
@@ -154,28 +182,28 @@ export const DEMO_SONGS: DemoSong[] = [
       composer: "Shelton Brooks",
       vocalist: "Sophie Tucker",
     },
-    releaseDate: "2026-06-24",
-    daysUntilRelease: 9,
-    durationSeconds: 216,
-    audioUrl: "https://archive.org/download/EDIS-SRP-0164-02/EDIS-SRP-0164-02.mp3",
-    artworkUrl: "https://archive.org/services/img/EDIS-SRP-0164-02",
     license: {
       type: "Public Domain",
       detail:
         "U.S. sound recording published 1911; in the public domain (published before 1929).",
       source: "https://archive.org/details/EDIS-SRP-0164-02",
     },
-    coverGradient: ["#E8956B", "#A85A3C"],
-    matchReason: "Red-hot vaudeville jazz",
-    bpm: 104,
     instruments: ["vocals", "piano", "brass band"],
+    durationSeconds: 216,
+    coverColor: "#E8956B",
+    tags: ["sassy", "vaudeville", "classic"],
   },
   {
-    id: "5",
+    id: 5,
+    artistId: 5,
     title: "St. Louis Blues",
-    artist: "Bessie Smith",
     genre: "Blues",
-    tags: ["soulful", "blues", "legendary"],
+    language: "en",
+    releaseDate: "2026-06-23",
+    isrc: null,
+    audioUrl:
+      "https://archive.org/download/the-st-louis-blues/The%20St%20Louis%20Blues.mp3",
+    artworkUrl: "https://archive.org/services/img/the-st-louis-blues",
     story:
       "Bessie Smith, the 'Empress of the Blues', recorded W.C. Handy's 'St. Louis Blues' in 1925 with Louis Armstrong on cornet. The pairing of two giants produced one of the most important recordings in the history of the blues.",
     lyrics:
@@ -186,21 +214,49 @@ export const DEMO_SONGS: DemoSong[] = [
       composer: "W.C. Handy",
       vocalist: "Bessie Smith",
     },
-    releaseDate: "2026-06-23",
-    daysUntilRelease: 8,
-    durationSeconds: 186,
-    audioUrl:
-      "https://archive.org/download/the-st-louis-blues/The%20St%20Louis%20Blues.mp3",
-    artworkUrl: "https://archive.org/services/img/the-st-louis-blues",
     license: {
       type: "Public Domain",
       detail:
         "U.S. sound recording published 1925; in the public domain (published before 1929).",
       source: "https://archive.org/details/the-st-louis-blues",
     },
-    coverGradient: ["#3E7C8C", "#1B3A4A"],
-    matchReason: "Empress of the Blues, 1925",
-    bpm: 84,
     instruments: ["vocals", "cornet", "piano"],
+    durationSeconds: 186,
+    coverColor: "#3E7C8C",
+    tags: ["soulful", "blues", "legendary"],
   },
 ];
+
+async function seed(): Promise<void> {
+  for (const { id, ...rest } of artists) {
+    await db
+      .insert(artistsTable)
+      .values({ id, ...rest })
+      .onConflictDoUpdate({ target: artistsTable.id, set: rest });
+  }
+
+  for (const { id, ...rest } of songs) {
+    await db
+      .insert(songsTable)
+      .values({ id, ...rest })
+      .onConflictDoUpdate({ target: songsTable.id, set: rest });
+  }
+
+  // Keep the serial sequences ahead of the explicitly-seeded ids so future
+  // inserts (e.g. artist song submissions) don't collide with seeded rows.
+  await db.execute(
+    sql`SELECT setval(pg_get_serial_sequence('artists', 'id'), (SELECT MAX(id) FROM artists))`
+  );
+  await db.execute(
+    sql`SELECT setval(pg_get_serial_sequence('songs', 'id'), (SELECT MAX(id) FROM songs))`
+  );
+
+  console.log(`Seeded ${artists.length} artists and ${songs.length} songs.`);
+}
+
+seed()
+  .then(() => process.exit(0))
+  .catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });

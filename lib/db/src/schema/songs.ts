@@ -25,6 +25,12 @@ export interface SongAnalysis {
   language?: string;
 }
 
+export interface SongLicense {
+  type: string;
+  detail?: string;
+  source?: string;
+}
+
 export const songsTable = pgTable("songs", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
@@ -42,6 +48,7 @@ export const songsTable = pgTable("songs", {
   lrc: text("lrc"),
   credits: jsonb("credits").$type<SongCredits>(),
   analysis: jsonb("analysis").$type<SongAnalysis>(),
+  license: jsonb("license").$type<SongLicense>(),
   instruments: text("instruments").array().default([]),
   durationSeconds: integer("duration_seconds"),
   coverColor: text("cover_color").notNull().default("#7B61FF"),

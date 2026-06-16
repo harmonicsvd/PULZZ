@@ -465,6 +465,10 @@ components:
           oneOf:
             - $ref: "#/components/schemas/SongAnalysis"
             - type: "null"
+        license:
+          oneOf:
+            - $ref: "#/components/schemas/SongLicense"
+            - type: "null"
 
     SongInput:
       type: object
@@ -553,6 +557,10 @@ components:
           oneOf:
             - $ref: "#/components/schemas/SongAnalysis"
             - type: "null"
+        license:
+          oneOf:
+            - $ref: "#/components/schemas/SongLicense"
+            - type: "null"
 
     SongAnalysis:
       type: object
@@ -581,6 +589,20 @@ components:
           type: string
         producer:
           type: string
+
+    SongLicense:
+      type: object
+      required: [type]
+      properties:
+        type:
+          type: string
+          description: License classification, e.g. "Public Domain".
+        detail:
+          type: string
+          description: Human-readable license rationale or terms.
+        source:
+          type: string
+          description: Attribution / source URL for the recording.
 
     UpdateSongLyrics:
       type: object

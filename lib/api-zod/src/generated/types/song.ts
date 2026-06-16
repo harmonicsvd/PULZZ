@@ -6,6 +6,7 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { SongAnalysis } from './songAnalysis';
+import type { SongLicense } from './songLicense';
 import type { SongStatus } from './songStatus';
 
 export interface Song {
@@ -29,4 +30,5 @@ export interface Song {
   /** @nullable */
   skipCount?: number | null;
   analysis?: SongAnalysis | null;
+  license?: SongLicense | null;
 }

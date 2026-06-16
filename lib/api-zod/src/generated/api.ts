@@ -43,6 +43,11 @@ export const ListSongsResponseItem = zod.object({
   "mood": zod.array(zod.string()).optional(),
   "themes": zod.array(zod.string()).optional(),
   "language": zod.string().nullish()
+}),zod.null()]).optional(),
+  "license": zod.union([zod.object({
+  "type": zod.string().describe('License classification, e.g. \"Public Domain\".'),
+  "detail": zod.string().optional().describe('Human-readable license rationale or terms.'),
+  "source": zod.string().optional().describe('Attribution \/ source URL for the recording.')
 }),zod.null()]).optional()
 })
 export const ListSongsResponse = zod.array(ListSongsResponseItem)
@@ -105,6 +110,11 @@ export const GetSongResponse = zod.object({
   "mood": zod.array(zod.string()).optional(),
   "themes": zod.array(zod.string()).optional(),
   "language": zod.string().nullish()
+}),zod.null()]).optional(),
+  "license": zod.union([zod.object({
+  "type": zod.string().describe('License classification, e.g. \"Public Domain\".'),
+  "detail": zod.string().optional().describe('Human-readable license rationale or terms.'),
+  "source": zod.string().optional().describe('Attribution \/ source URL for the recording.')
 }),zod.null()]).optional()
 })
 
@@ -250,6 +260,11 @@ export const GetArtistSongsResponseItem = zod.object({
   "mood": zod.array(zod.string()).optional(),
   "themes": zod.array(zod.string()).optional(),
   "language": zod.string().nullish()
+}),zod.null()]).optional(),
+  "license": zod.union([zod.object({
+  "type": zod.string().describe('License classification, e.g. \"Public Domain\".'),
+  "detail": zod.string().optional().describe('Human-readable license rationale or terms.'),
+  "source": zod.string().optional().describe('Attribution \/ source URL for the recording.')
 }),zod.null()]).optional()
 })
 export const GetArtistSongsResponse = zod.array(GetArtistSongsResponseItem)
@@ -289,6 +304,11 @@ export const GetArtistDashboardResponse = zod.object({
   "mood": zod.array(zod.string()).optional(),
   "themes": zod.array(zod.string()).optional(),
   "language": zod.string().nullish()
+}),zod.null()]).optional(),
+  "license": zod.union([zod.object({
+  "type": zod.string().describe('License classification, e.g. \"Public Domain\".'),
+  "detail": zod.string().optional().describe('Human-readable license rationale or terms.'),
+  "source": zod.string().optional().describe('Attribution \/ source URL for the recording.')
 }),zod.null()]).optional()
 })).optional()
 })

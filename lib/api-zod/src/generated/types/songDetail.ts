@@ -8,6 +8,7 @@
 import type { SongAnalysis } from './songAnalysis';
 import type { SongCredits } from './songCredits';
 import type { SongDetailStatus } from './songDetailStatus';
+import type { SongLicense } from './songLicense';
 
 export interface SongDetail {
   id: number;
@@ -44,4 +45,5 @@ export interface SongDetail {
   /** @nullable */
   momentCount?: number | null;
   analysis?: SongAnalysis | null;
+  license?: SongLicense | null;
 }

@@ -35,6 +35,7 @@ export * from './songCredits';
 export * from './songDetail';
 export * from './songDetailStatus';
 export * from './songInput';
+export * from './songLicense';
 export * from './songReactions';
 export * from './songReactionsTopMomentsItem';
 export * from './songStatus';
