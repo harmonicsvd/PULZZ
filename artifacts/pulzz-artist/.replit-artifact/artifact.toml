@@ -1,5 +1,5 @@
 kind = "web"
-previewPath = "/"
+previewPath = "/artist/"
 title = "Pulzz — Artist Dashboard"
 version = "1.0.0"
 id = "artifacts/pulzz-artist"
@@ -11,7 +11,7 @@ version = "1.0.0"
 
 [[services]]
 name = "web"
-paths = [ "/" ]
+paths = [ "/artist/" ]
 localPort = 19974
 
 [services.development]
@@ -23,9 +23,9 @@ publicDir = "artifacts/pulzz-artist/dist/public"
 serve = "static"
 
 [[services.production.rewrites]]
-from = "/*"
-to = "/index.html"
+from = "/artist/*"
+to = "/artist/index.html"
 
 [services.env]
 PORT = "19974"
-BASE_PATH = "/"
+BASE_PATH = "/artist/"
