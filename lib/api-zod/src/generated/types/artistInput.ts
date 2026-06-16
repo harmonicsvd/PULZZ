@@ -5,10 +5,13 @@
  * Pulzz — pre-release music discovery platform API
  * OpenAPI spec version: 0.1.0
  */
+import type { ArtistLinks } from './artistLinks';
 
 export interface ArtistInput {
   name: string;
   email: string;
   bio?: string;
   genre?: string;
+  roles?: string[];
+  links?: ArtistLinks;
 }

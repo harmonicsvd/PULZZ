@@ -9,6 +9,7 @@
 export * from './artist';
 export * from './artistDashboard';
 export * from './artistInput';
+export * from './artistLinks';
 export * from './getMusixmatchAnalysisParams';
 export * from './getMusixmatchSubtitleParams';
 export * from './healthStatus';

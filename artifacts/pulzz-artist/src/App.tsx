@@ -8,6 +8,7 @@ import SongsPage from "@/pages/songs";
 import SubmitSongPage from "@/pages/submit-song";
 import SongDetailPage from "@/pages/song-detail";
 import WallPage from "@/pages/wall";
+import ArtistsPage from "@/pages/artists";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -27,6 +28,7 @@ function Router() {
         {(params) => <SongDetailPage id={params.id} />}
       </Route>
       <Route path="/songs" component={SongsPage} />
+      <Route path="/artists" component={ArtistsPage} />
       <Route path="/wall" component={WallPage} />
       <Route component={NotFound} />
     </Switch>

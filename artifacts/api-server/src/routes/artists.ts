@@ -16,9 +16,26 @@ import {
   GetArtistResponse,
   GetArtistSongsParams,
   GetArtistSongsResponse,
+  ListArtistsResponse,
 } from "@workspace/api-zod";
 
 const router: IRouter = Router();
+
+router.get("/artists", async (_req, res): Promise<void> => {
+  const artists = await db
+    .select()
+    .from(artistsTable)
+    .orderBy(artistsTable.name);
+
+  res.json(
+    ListArtistsResponse.parse(
+      artists.map((a) => ({
+        ...a,
+        createdAt: a.createdAt.toISOString(),
+      }))
+    )
+  );
+});
 
 router.post("/artists", async (req, res): Promise<void> => {
   const parsed = CreateArtistBody.safeParse(req.body);
@@ -32,7 +49,13 @@ router.post("/artists", async (req, res): Promise<void> => {
     .values(parsed.data)
     .onConflictDoUpdate({
       target: artistsTable.email,
-      set: { name: parsed.data.name, bio: parsed.data.bio, genre: parsed.data.genre },
+      set: {
+        name: parsed.data.name,
+        bio: parsed.data.bio,
+        genre: parsed.data.genre,
+        roles: parsed.data.roles,
+        links: parsed.data.links,
+      },
     })
     .returning();
 

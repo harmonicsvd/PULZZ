@@ -298,6 +298,19 @@ paths:
                   $ref: "#/components/schemas/WallEntry"
 
   /artists:
+    get:
+      operationId: listArtists
+      tags: [artists]
+      summary: List all artists with their collaboration profiles
+      responses:
+        "200":
+          description: List of artists
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Artist"
     post:
       operationId: createArtist
       tags: [artists]
@@ -917,6 +930,25 @@ components:
           items:
             type: string
 
+    ArtistLinks:
+      type: object
+      properties:
+        website:
+          type: string
+          pattern: "^https?://"
+        spotify:
+          type: string
+          pattern: "^https?://"
+        instagram:
+          type: string
+          pattern: "^https?://"
+        soundcloud:
+          type: string
+          pattern: "^https?://"
+        youtube:
+          type: string
+          pattern: "^https?://"
+
     Artist:
       type: object
       required: [id, name, email, createdAt]
@@ -931,6 +963,14 @@ components:
           type: ["string", "null"]
         genre:
           type: ["string", "null"]
+        roles:
+          type: ["array", "null"]
+          items:
+            type: string
+        links:
+          oneOf:
+            - $ref: "#/components/schemas/ArtistLinks"
+            - type: "null"
         createdAt:
           type: string
 
@@ -946,6 +986,12 @@ components:
           type: string
         genre:
           type: string
+        roles:
+          type: array
+          items:
+            type: string
+        links:
+          $ref: "#/components/schemas/ArtistLinks"
 
     ArtistDashboard:
       type: object

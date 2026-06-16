@@ -5,6 +5,7 @@
  * Pulzz — pre-release music discovery platform API
  * OpenAPI spec version: 0.1.0
  */
+import type { ArtistLinks } from './artistLinks';
 
 export interface Artist {
   id: number;
@@ -14,5 +15,8 @@ export interface Artist {
   bio?: string | null;
   /** @nullable */
   genre?: string | null;
+  /** @nullable */
+  roles?: string[] | null;
+  links?: ArtistLinks | null;
   createdAt: string;
 }

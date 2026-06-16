@@ -1039,6 +1039,83 @@ export function useGetWall<TData = Awaited<ReturnType<typeof getWall>>, TError =
 
 
 
+export const getListArtistsUrl = () => {
+
+
+
+
+  return `/api/artists`
+}
+
+/**
+ * @summary List all artists with their collaboration profiles
+ */
+export const listArtists = async ( options?: RequestInit): Promise<Artist[]> => {
+
+  return customFetch<Artist[]>(getListArtistsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListArtistsQueryKey = () => {
+    return [
+    `/api/artists`
+    ] as const;
+    }
+
+
+export const getListArtistsQueryOptions = <TData = Awaited<ReturnType<typeof listArtists>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listArtists>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListArtistsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listArtists>>> = ({ signal }) => listArtists({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listArtists>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListArtistsQueryResult = NonNullable<Awaited<ReturnType<typeof listArtists>>>
+export type ListArtistsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List all artists with their collaboration profiles
+ */
+
+export function useListArtists<TData = Awaited<ReturnType<typeof listArtists>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listArtists>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListArtistsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
 export const getCreateArtistUrl = () => {
 
 

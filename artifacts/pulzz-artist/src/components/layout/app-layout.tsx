@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { Link, useLocation } from "wouter";
-import { LayoutDashboard, Music, Trophy, Settings, LogOut, Plus } from "lucide-react";
+import { LayoutDashboard, Music, Trophy, Users, Settings, LogOut, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function AppLayout({ children }: { children: ReactNode }) {
@@ -9,6 +9,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
   const navItems = [
     { href: "/", label: "Overview", icon: LayoutDashboard },
     { href: "/songs", label: "Discovery Pool", icon: Music },
+    { href: "/artists", label: "Collaborate", icon: Users },
     { href: "/wall", label: "The Wall", icon: Trophy },
   ];
 

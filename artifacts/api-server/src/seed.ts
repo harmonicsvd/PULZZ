@@ -28,6 +28,8 @@ const artists: SeedArtist[] = [
     email: "ernestine.schumann-heink@pulzz.demo",
     bio: "Austrian-American contralto (1861–1936), celebrated for her recordings of ballads and lieder.",
     genre: "Folk",
+    roles: ["singer"],
+    links: { website: "https://en.wikipedia.org/wiki/Ernestine_Schumann-Heink" },
   },
   {
     id: 2,
@@ -35,6 +37,8 @@ const artists: SeedArtist[] = [
     email: "fisk.jubilee.quartet@pulzz.demo",
     bio: "Touring a cappella ensemble from Fisk University that carried the African American spiritual tradition worldwide.",
     genre: "Gospel",
+    roles: ["singer", "composer"],
+    links: { website: "https://en.wikipedia.org/wiki/Fisk_Jubilee_Singers" },
   },
   {
     id: 3,
@@ -42,6 +46,8 @@ const artists: SeedArtist[] = [
     email: "marion.harris@pulzz.demo",
     bio: "American singer (1896–1944), one of the first widely popular white performers of blues and jazz.",
     genre: "Jazz",
+    roles: ["singer", "lyricist"],
+    links: { website: "https://en.wikipedia.org/wiki/Marion_Harris" },
   },
   {
     id: 4,
@@ -49,6 +55,8 @@ const artists: SeedArtist[] = [
     email: "sophie.tucker@pulzz.demo",
     bio: "'The Last of the Red-Hot Mamas' (1887–1966), a defining voice of the vaudeville era.",
     genre: "Jazz",
+    roles: ["singer", "lyricist", "composer"],
+    links: { website: "https://en.wikipedia.org/wiki/Sophie_Tucker" },
   },
   {
     id: 5,
@@ -56,6 +64,8 @@ const artists: SeedArtist[] = [
     email: "bessie.smith@pulzz.demo",
     bio: "The 'Empress of the Blues' (1894–1937), among the most influential blues vocalists ever recorded.",
     genre: "Blues",
+    roles: ["singer", "composer", "instrumentalist"],
+    links: { website: "https://en.wikipedia.org/wiki/Bessie_Smith" },
   },
 ];
 

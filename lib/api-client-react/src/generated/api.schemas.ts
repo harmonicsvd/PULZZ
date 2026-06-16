@@ -306,6 +306,19 @@ export interface WallEntry {
   badges?: string[];
 }
 
+export interface ArtistLinks {
+  /** @pattern ^https?:// */
+  website?: string;
+  /** @pattern ^https?:// */
+  spotify?: string;
+  /** @pattern ^https?:// */
+  instagram?: string;
+  /** @pattern ^https?:// */
+  soundcloud?: string;
+  /** @pattern ^https?:// */
+  youtube?: string;
+}
+
 export interface Artist {
   id: number;
   name: string;
@@ -314,6 +327,9 @@ export interface Artist {
   bio?: string | null;
   /** @nullable */
   genre?: string | null;
+  /** @nullable */
+  roles?: string[] | null;
+  links?: ArtistLinks | null;
   createdAt: string;
 }
 
@@ -322,6 +338,8 @@ export interface ArtistInput {
   email: string;
   bio?: string;
   genre?: string;
+  roles?: string[];
+  links?: ArtistLinks;
 }
 
 export interface ArtistDashboard {

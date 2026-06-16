@@ -292,13 +292,57 @@ export const GetWallResponse = zod.array(GetWallResponseItem)
 
 
 /**
+ * @summary List all artists with their collaboration profiles
+ */
+export const listArtistsResponseLinksOneWebsiteRegExp = new RegExp('^https?:\/');
+export const listArtistsResponseLinksOneSpotifyRegExp = new RegExp('^https?:\/');
+export const listArtistsResponseLinksOneInstagramRegExp = new RegExp('^https?:\/');
+export const listArtistsResponseLinksOneSoundcloudRegExp = new RegExp('^https?:\/');
+export const listArtistsResponseLinksOneYoutubeRegExp = new RegExp('^https?:\/');
+
+
+export const ListArtistsResponseItem = zod.object({
+  "id": zod.number(),
+  "name": zod.string(),
+  "email": zod.string(),
+  "bio": zod.string().nullish(),
+  "genre": zod.string().nullish(),
+  "roles": zod.array(zod.string()).nullish(),
+  "links": zod.union([zod.object({
+  "website": zod.string().regex(listArtistsResponseLinksOneWebsiteRegExp).optional(),
+  "spotify": zod.string().regex(listArtistsResponseLinksOneSpotifyRegExp).optional(),
+  "instagram": zod.string().regex(listArtistsResponseLinksOneInstagramRegExp).optional(),
+  "soundcloud": zod.string().regex(listArtistsResponseLinksOneSoundcloudRegExp).optional(),
+  "youtube": zod.string().regex(listArtistsResponseLinksOneYoutubeRegExp).optional()
+}),zod.null()]).optional(),
+  "createdAt": zod.string()
+})
+export const ListArtistsResponse = zod.array(ListArtistsResponseItem)
+
+
+/**
  * @summary Register an artist account
  */
+export const createArtistBodyLinksWebsiteRegExp = new RegExp('^https?:\/');
+export const createArtistBodyLinksSpotifyRegExp = new RegExp('^https?:\/');
+export const createArtistBodyLinksInstagramRegExp = new RegExp('^https?:\/');
+export const createArtistBodyLinksSoundcloudRegExp = new RegExp('^https?:\/');
+export const createArtistBodyLinksYoutubeRegExp = new RegExp('^https?:\/');
+
+
 export const CreateArtistBody = zod.object({
   "name": zod.string(),
   "email": zod.string(),
   "bio": zod.string().optional(),
-  "genre": zod.string().optional()
+  "genre": zod.string().optional(),
+  "roles": zod.array(zod.string()).optional(),
+  "links": zod.object({
+  "website": zod.string().regex(createArtistBodyLinksWebsiteRegExp).optional(),
+  "spotify": zod.string().regex(createArtistBodyLinksSpotifyRegExp).optional(),
+  "instagram": zod.string().regex(createArtistBodyLinksInstagramRegExp).optional(),
+  "soundcloud": zod.string().regex(createArtistBodyLinksSoundcloudRegExp).optional(),
+  "youtube": zod.string().regex(createArtistBodyLinksYoutubeRegExp).optional()
+}).optional()
 })
 
 
@@ -309,12 +353,27 @@ export const GetArtistParams = zod.object({
   "id": zod.coerce.number()
 })
 
+export const getArtistResponseLinksOneWebsiteRegExp = new RegExp('^https?:\/');
+export const getArtistResponseLinksOneSpotifyRegExp = new RegExp('^https?:\/');
+export const getArtistResponseLinksOneInstagramRegExp = new RegExp('^https?:\/');
+export const getArtistResponseLinksOneSoundcloudRegExp = new RegExp('^https?:\/');
+export const getArtistResponseLinksOneYoutubeRegExp = new RegExp('^https?:\/');
+
+
 export const GetArtistResponse = zod.object({
   "id": zod.number(),
   "name": zod.string(),
   "email": zod.string(),
   "bio": zod.string().nullish(),
   "genre": zod.string().nullish(),
+  "roles": zod.array(zod.string()).nullish(),
+  "links": zod.union([zod.object({
+  "website": zod.string().regex(getArtistResponseLinksOneWebsiteRegExp).optional(),
+  "spotify": zod.string().regex(getArtistResponseLinksOneSpotifyRegExp).optional(),
+  "instagram": zod.string().regex(getArtistResponseLinksOneInstagramRegExp).optional(),
+  "soundcloud": zod.string().regex(getArtistResponseLinksOneSoundcloudRegExp).optional(),
+  "youtube": zod.string().regex(getArtistResponseLinksOneYoutubeRegExp).optional()
+}),zod.null()]).optional(),
   "createdAt": zod.string()
 })
 
