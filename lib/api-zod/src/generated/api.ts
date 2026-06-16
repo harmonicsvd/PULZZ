@@ -63,6 +63,7 @@ export const SubmitSongBody = zod.object({
   "language": zod.string().optional(),
   "releaseDate": zod.string(),
   "isrc": zod.string(),
+  "streamingId": zod.string().optional(),
   "audioUrl": zod.string(),
   "story": zod.string(),
   "lyrics": zod.string().nullish(),
@@ -103,6 +104,7 @@ export const GetSongResponse = zod.object({
   "durationSeconds": zod.number().nullish(),
   "instruments": zod.array(zod.string()).optional(),
   "isrc": zod.string().nullish(),
+  "streamingId": zod.string().nullish().describe('Artist-supplied released-track identifier (ISRC or Spotify link) used for Songstats lookups'),
   "discoveredCount": zod.number().nullish(),
   "skipCount": zod.number().nullish(),
   "momentCount": zod.number().nullish(),
@@ -156,6 +158,63 @@ export const UpdateSongAnalysisResponse = zod.object({
   "themes": zod.array(zod.string()).optional(),
   "language": zod.string().nullish()
 })
+})
+
+
+/**
+ * @summary Attach a released-track identifier (ISRC or Spotify link) to a song
+ */
+export const UpdateSongStreamingIdParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const UpdateSongStreamingIdBody = zod.object({
+  "streamingId": zod.string().describe('ISRC, Spotify track id, or Spotify track URL. Empty string clears it.')
+})
+
+export const UpdateSongStreamingIdResponse = zod.object({
+  "ok": zod.boolean(),
+  "streamingId": zod.string().nullable()
+})
+
+
+/**
+ * @summary Get post-release performance stats for a song from Songstats
+ */
+export const GetSongSongstatsParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const GetSongSongstatsResponse = zod.object({
+  "status": zod.enum(['ok', 'no_identifier', 'not_found', 'unconfigured', 'error']),
+  "available": zod.boolean(),
+  "message": zod.string().nullish(),
+  "identifier": zod.string().nullish(),
+  "trackInfo": zod.union([zod.object({
+  "title": zod.string().nullish(),
+  "artistName": zod.string().nullish(),
+  "releaseDate": zod.string().nullish()
+}),zod.null()]).optional(),
+  "streamsTotal": zod.number().nullish(),
+  "playlistReachTotal": zod.number().nullish(),
+  "playlistsTotal": zod.number().nullish(),
+  "chartsTotal": zod.number().nullish(),
+  "sources": zod.array(zod.object({
+  "source": zod.string(),
+  "streamsTotal": zod.number().nullish(),
+  "streamsCurrent": zod.number().nullish(),
+  "playsTotal": zod.number().nullish(),
+  "viewsTotal": zod.number().nullish(),
+  "playlistsTotal": zod.number().nullish(),
+  "playlistsCurrent": zod.number().nullish(),
+  "playlistReachTotal": zod.number().nullish(),
+  "chartsTotal": zod.number().nullish(),
+  "chartsCurrent": zod.number().nullish(),
+  "videosTotal": zod.number().nullish(),
+  "creatorReachTotal": zod.number().nullish(),
+  "shazamsTotal": zod.number().nullish()
+})),
+  "fetchedAt": zod.string()
 })
 
 

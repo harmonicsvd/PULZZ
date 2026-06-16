@@ -13,6 +13,7 @@ export interface SongInput {
   language?: string;
   releaseDate: string;
   isrc: string;
+  streamingId?: string;
   audioUrl: string;
   story: string;
   /** @nullable */

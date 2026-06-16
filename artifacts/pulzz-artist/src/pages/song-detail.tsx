@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { LyricSyncTool } from "@/components/lyric-sync-tool";
 import { AnalysisEditor } from "@/components/analysis-editor";
+import { PostReleaseStats } from "@/components/post-release-stats";
 import {
   Loader2,
   ArrowLeft,
@@ -243,6 +244,8 @@ export default function SongDetailPage({ id }: Props) {
                 </Card>
               )}
             </div>
+
+            <PostReleaseStats songId={songId} streamingId={song.streamingId} />
 
             <AnalysisEditor songId={songId} analysis={song.analysis} />
 

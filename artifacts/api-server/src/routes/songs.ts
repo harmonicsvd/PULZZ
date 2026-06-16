@@ -16,9 +16,15 @@ import {
   UpdateSongLyricsBody,
   UpdateSongLyricsParams,
   UpdateSongLyricsResponse,
+  UpdateSongStreamingIdBody,
+  UpdateSongStreamingIdParams,
+  UpdateSongStreamingIdResponse,
+  GetSongSongstatsParams,
+  GetSongSongstatsResponse,
 } from "@workspace/api-zod";
 import type { SongAnalysis } from "@workspace/db";
 import { analyzeLyrics } from "../lib/musixmatch";
+import { getTrackStats } from "../lib/songstats";
 
 const router: IRouter = Router();
 
@@ -159,6 +165,7 @@ router.get("/songs/:id", async (req, res): Promise<void> => {
       license: songsTable.license,
       instruments: songsTable.instruments,
       isrc: songsTable.isrc,
+      streamingId: songsTable.streamingId,
     })
     .from(songsTable)
     .innerJoin(artistsTable, eq(songsTable.artistId, artistsTable.id))
@@ -266,6 +273,61 @@ router.put("/songs/:id/analysis", async (req, res): Promise<void> => {
       analysis: updated[0].analysis ?? { mood: [], themes: [] },
     })
   );
+});
+
+router.put("/songs/:id/streaming-id", async (req, res): Promise<void> => {
+  const params = UpdateSongStreamingIdParams.safeParse(req.params);
+  if (!params.success) {
+    res.status(400).json({ error: params.error.message });
+    return;
+  }
+  const body = UpdateSongStreamingIdBody.safeParse(req.body);
+  if (!body.success) {
+    res.status(400).json({ error: body.error.message });
+    return;
+  }
+
+  const trimmed = body.data.streamingId.trim();
+  const streamingId = trimmed.length > 0 ? trimmed : null;
+
+  const updated = await db
+    .update(songsTable)
+    .set({ streamingId })
+    .where(eq(songsTable.id, params.data.id))
+    .returning({ id: songsTable.id, streamingId: songsTable.streamingId });
+
+  if (updated.length === 0) {
+    res.status(404).json({ error: "Song not found" });
+    return;
+  }
+
+  res.json(
+    UpdateSongStreamingIdResponse.parse({
+      ok: true,
+      streamingId: updated[0].streamingId,
+    })
+  );
+});
+
+router.get("/songs/:id/songstats", async (req, res): Promise<void> => {
+  const params = GetSongSongstatsParams.safeParse(req.params);
+  if (!params.success) {
+    res.status(400).json({ error: params.error.message });
+    return;
+  }
+
+  const [song] = await db
+    .select({ streamingId: songsTable.streamingId })
+    .from(songsTable)
+    .where(eq(songsTable.id, params.data.id));
+
+  if (!song) {
+    res.status(404).json({ error: "Song not found" });
+    return;
+  }
+
+  const stats = await getTrackStats(song.streamingId);
+  res.json(GetSongSongstatsResponse.parse(stats));
 });
 
 router.get("/songs/:id/reactions", async (req, res): Promise<void> => {

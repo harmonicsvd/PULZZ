@@ -38,6 +38,11 @@ export interface SongDetail {
   instruments?: string[];
   /** @nullable */
   isrc?: string | null;
+  /**
+     * Artist-supplied released-track identifier (ISRC or Spotify link) used for Songstats lookups
+     * @nullable
+     */
+  streamingId?: string | null;
   /** @nullable */
   discoveredCount?: number | null;
   /** @nullable */

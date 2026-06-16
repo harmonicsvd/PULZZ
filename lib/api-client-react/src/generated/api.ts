@@ -42,10 +42,13 @@ import type {
   SongDetail,
   SongInput,
   SongReactions,
+  SongstatsResult,
   UpdateSongAnalysis,
   UpdateSongAnalysisResult,
   UpdateSongLyrics,
   UpdateSongLyricsResult,
+  UpdateStreamingId,
+  UpdateStreamingIdResult,
   WallEntry
 } from './api.schemas';
 
@@ -513,6 +516,155 @@ export const useUpdateSongAnalysis = <TError = ErrorType<void>,
       > => {
       return useMutation(getUpdateSongAnalysisMutationOptions(options));
     }
+
+export const getUpdateSongStreamingIdUrl = (id: number,) => {
+
+
+
+
+  return `/api/songs/${id}/streaming-id`
+}
+
+/**
+ * @summary Attach a released-track identifier (ISRC or Spotify link) to a song
+ */
+export const updateSongStreamingId = async (id: number,
+    updateStreamingId: UpdateStreamingId, options?: RequestInit): Promise<UpdateStreamingIdResult> => {
+
+  return customFetch<UpdateStreamingIdResult>(getUpdateSongStreamingIdUrl(id),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateStreamingId,)
+  }
+);}
+
+
+
+
+export const getUpdateSongStreamingIdMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateSongStreamingId>>, TError,{id: number;data: BodyType<UpdateStreamingId>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateSongStreamingId>>, TError,{id: number;data: BodyType<UpdateStreamingId>}, TContext> => {
+
+const mutationKey = ['updateSongStreamingId'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateSongStreamingId>>, {id: number;data: BodyType<UpdateStreamingId>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateSongStreamingId(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateSongStreamingIdMutationResult = NonNullable<Awaited<ReturnType<typeof updateSongStreamingId>>>
+    export type UpdateSongStreamingIdMutationBody = BodyType<UpdateStreamingId>
+    export type UpdateSongStreamingIdMutationError = ErrorType<void>
+
+    /**
+ * @summary Attach a released-track identifier (ISRC or Spotify link) to a song
+ */
+export const useUpdateSongStreamingId = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateSongStreamingId>>, TError,{id: number;data: BodyType<UpdateStreamingId>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateSongStreamingId>>,
+        TError,
+        {id: number;data: BodyType<UpdateStreamingId>},
+        TContext
+      > => {
+      return useMutation(getUpdateSongStreamingIdMutationOptions(options));
+    }
+
+export const getGetSongSongstatsUrl = (id: number,) => {
+
+
+
+
+  return `/api/songs/${id}/songstats`
+}
+
+/**
+ * @summary Get post-release performance stats for a song from Songstats
+ */
+export const getSongSongstats = async (id: number, options?: RequestInit): Promise<SongstatsResult> => {
+
+  return customFetch<SongstatsResult>(getGetSongSongstatsUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetSongSongstatsQueryKey = (id: number,) => {
+    return [
+    `/api/songs/${id}/songstats`
+    ] as const;
+    }
+
+
+export const getGetSongSongstatsQueryOptions = <TData = Awaited<ReturnType<typeof getSongSongstats>>, TError = ErrorType<void>>(id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getSongSongstats>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetSongSongstatsQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getSongSongstats>>> = ({ signal }) => getSongSongstats(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getSongSongstats>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetSongSongstatsQueryResult = NonNullable<Awaited<ReturnType<typeof getSongSongstats>>>
+export type GetSongSongstatsQueryError = ErrorType<void>
+
+
+/**
+ * @summary Get post-release performance stats for a song from Songstats
+ */
+
+export function useGetSongSongstats<TData = Awaited<ReturnType<typeof getSongSongstats>>, TError = ErrorType<void>>(
+ id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getSongSongstats>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetSongSongstatsQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
 
 export const getGetSongReactionsUrl = (id: number,) => {
 

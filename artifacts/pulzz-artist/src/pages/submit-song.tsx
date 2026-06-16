@@ -36,6 +36,7 @@ export default function SubmitSongPage() {
     genre: "",
     releaseDate: "",
     isrc: "",
+    streamingId: "",
     audioUrl: "",
     story: "",
     lyrics: "",
@@ -66,6 +67,7 @@ export default function SubmitSongPage() {
           genre: form.genre,
           releaseDate: form.releaseDate,
           isrc: form.isrc.trim() || "",
+          streamingId: form.streamingId.trim() || undefined,
           audioUrl: form.audioUrl.trim(),
           story: form.story.trim(),
           lyrics: form.lyrics.trim() || undefined,
@@ -193,6 +195,21 @@ export default function SubmitSongPage() {
                     className="bg-background"
                   />
                 </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="streamingId">Streaming Link / ISRC</Label>
+                <Input
+                  id="streamingId"
+                  placeholder="ISRC or https://open.spotify.com/track/…"
+                  value={form.streamingId}
+                  onChange={(e) => update("streamingId", e.target.value)}
+                  className="bg-background"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Optional — once released, this pulls real post-release stats
+                  from Songstats into the song's dashboard.
+                </p>
               </div>
             </CardContent>
           </Card>

@@ -156,6 +156,54 @@ paths:
         "404":
           description: Not found
 
+  /songs/{id}/streaming-id:
+    put:
+      operationId: updateSongStreamingId
+      tags: [songs]
+      summary: Attach a released-track identifier (ISRC or Spotify link) to a song
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateStreamingId"
+      responses:
+        "200":
+          description: Saved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdateStreamingIdResult"
+        "404":
+          description: Not found
+
+  /songs/{id}/songstats:
+    get:
+      operationId: getSongSongstats
+      tags: [songs]
+      summary: Get post-release performance stats for a song from Songstats
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Post-release stats (or a fallback state when unavailable)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SongstatsResult"
+        "404":
+          description: Not found
+
   /songs/{id}/reactions:
     get:
       operationId: getSongReactions
@@ -513,6 +561,8 @@ components:
           type: string
         isrc:
           type: string
+        streamingId:
+          type: string
         audioUrl:
           type: string
         story:
@@ -574,6 +624,9 @@ components:
             type: string
         isrc:
           type: ["string", "null"]
+        streamingId:
+          type: ["string", "null"]
+          description: Artist-supplied released-track identifier (ISRC or Spotify link) used for Songstats lookups
         discoveredCount:
           type: ["integer", "null"]
         skipCount:
@@ -671,6 +724,96 @@ components:
           type: boolean
         analysis:
           $ref: "#/components/schemas/SongAnalysis"
+
+    UpdateStreamingId:
+      type: object
+      required: [streamingId]
+      properties:
+        streamingId:
+          type: string
+          description: ISRC, Spotify track id, or Spotify track URL. Empty string clears it.
+
+    UpdateStreamingIdResult:
+      type: object
+      required: [ok, streamingId]
+      properties:
+        ok:
+          type: boolean
+        streamingId:
+          type: ["string", "null"]
+
+    SongstatsSource:
+      type: object
+      required: [source]
+      properties:
+        source:
+          type: string
+        streamsTotal:
+          type: ["integer", "null"]
+        streamsCurrent:
+          type: ["integer", "null"]
+        playsTotal:
+          type: ["integer", "null"]
+        viewsTotal:
+          type: ["integer", "null"]
+        playlistsTotal:
+          type: ["integer", "null"]
+        playlistsCurrent:
+          type: ["integer", "null"]
+        playlistReachTotal:
+          type: ["integer", "null"]
+        chartsTotal:
+          type: ["integer", "null"]
+        chartsCurrent:
+          type: ["integer", "null"]
+        videosTotal:
+          type: ["integer", "null"]
+        creatorReachTotal:
+          type: ["integer", "null"]
+        shazamsTotal:
+          type: ["integer", "null"]
+
+    SongstatsTrackInfo:
+      type: object
+      properties:
+        title:
+          type: ["string", "null"]
+        artistName:
+          type: ["string", "null"]
+        releaseDate:
+          type: ["string", "null"]
+
+    SongstatsResult:
+      type: object
+      required: [status, available, sources, fetchedAt]
+      properties:
+        status:
+          type: string
+          enum: [ok, no_identifier, not_found, unconfigured, error]
+        available:
+          type: boolean
+        message:
+          type: ["string", "null"]
+        identifier:
+          type: ["string", "null"]
+        trackInfo:
+          oneOf:
+            - $ref: "#/components/schemas/SongstatsTrackInfo"
+            - type: "null"
+        streamsTotal:
+          type: ["integer", "null"]
+        playlistReachTotal:
+          type: ["integer", "null"]
+        playlistsTotal:
+          type: ["integer", "null"]
+        chartsTotal:
+          type: ["integer", "null"]
+        sources:
+          type: array
+          items:
+            $ref: "#/components/schemas/SongstatsSource"
+        fetchedAt:
+          type: string
 
     SongReactions:
       type: object

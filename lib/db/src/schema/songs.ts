@@ -41,6 +41,7 @@ export const songsTable = pgTable("songs", {
   language: text("language").default("en"),
   releaseDate: date("release_date", { mode: "string" }).notNull(),
   isrc: text("isrc"),
+  streamingId: text("streaming_id"),
   audioUrl: text("audio_url").notNull(),
   artworkUrl: text("artwork_url"),
   story: text("story").notNull().default(""),

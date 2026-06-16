@@ -64,6 +64,7 @@ export interface SongInput {
   language?: string;
   releaseDate: string;
   isrc: string;
+  streamingId?: string;
   audioUrl: string;
   story: string;
   /** @nullable */
@@ -116,6 +117,11 @@ export interface SongDetail {
   instruments?: string[];
   /** @nullable */
   isrc?: string | null;
+  /**
+     * Artist-supplied released-track identifier (ISRC or Spotify link) used for Songstats lookups
+     * @nullable
+     */
+  streamingId?: string | null;
   /** @nullable */
   discoveredCount?: number | null;
   /** @nullable */
@@ -146,6 +152,85 @@ export interface UpdateSongAnalysis {
 export interface UpdateSongAnalysisResult {
   ok: boolean;
   analysis: SongAnalysis;
+}
+
+export interface UpdateStreamingId {
+  /** ISRC, Spotify track id, or Spotify track URL. Empty string clears it. */
+  streamingId: string;
+}
+
+export interface UpdateStreamingIdResult {
+  ok: boolean;
+  /** @nullable */
+  streamingId: string | null;
+}
+
+export interface SongstatsSource {
+  source: string;
+  /** @nullable */
+  streamsTotal?: number | null;
+  /** @nullable */
+  streamsCurrent?: number | null;
+  /** @nullable */
+  playsTotal?: number | null;
+  /** @nullable */
+  viewsTotal?: number | null;
+  /** @nullable */
+  playlistsTotal?: number | null;
+  /** @nullable */
+  playlistsCurrent?: number | null;
+  /** @nullable */
+  playlistReachTotal?: number | null;
+  /** @nullable */
+  chartsTotal?: number | null;
+  /** @nullable */
+  chartsCurrent?: number | null;
+  /** @nullable */
+  videosTotal?: number | null;
+  /** @nullable */
+  creatorReachTotal?: number | null;
+  /** @nullable */
+  shazamsTotal?: number | null;
+}
+
+export interface SongstatsTrackInfo {
+  /** @nullable */
+  title?: string | null;
+  /** @nullable */
+  artistName?: string | null;
+  /** @nullable */
+  releaseDate?: string | null;
+}
+
+export type SongstatsResultStatus = typeof SongstatsResultStatus[keyof typeof SongstatsResultStatus];
+
+
+export const SongstatsResultStatus = {
+  ok: 'ok',
+  no_identifier: 'no_identifier',
+  not_found: 'not_found',
+  unconfigured: 'unconfigured',
+  error: 'error',
+} as const;
+
+export interface SongstatsResult {
+  status: SongstatsResultStatus;
+  available: boolean;
+  /** @nullable */
+  message?: string | null;
+  /** @nullable */
+  identifier?: string | null;
+  trackInfo?: SongstatsTrackInfo | null;
+  /** @nullable */
+  streamsTotal?: number | null;
+  /** @nullable */
+  playlistReachTotal?: number | null;
+  /** @nullable */
+  playlistsTotal?: number | null;
+  /** @nullable */
+  chartsTotal?: number | null;
+  sources: SongstatsSource[];
+  fetchedAt: string;
 }
 
 export type SongReactionsTopMomentsItem = {
