@@ -7,6 +7,7 @@ import wallRouter from "./wall";
 import artistsRouter from "./artists";
 import listenersRouter from "./listeners";
 import musixmatchRouter from "./musixmatch";
+import cyaniteRouter from "./cyanite";
 
 const router: IRouter = Router();
 
@@ -18,5 +19,6 @@ router.use(wallRouter);
 router.use(artistsRouter);
 router.use(listenersRouter);
 router.use(musixmatchRouter);
+router.use(cyaniteRouter);
 
 export default router;
