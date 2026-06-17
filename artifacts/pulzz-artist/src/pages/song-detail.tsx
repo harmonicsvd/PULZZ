@@ -3,12 +3,15 @@ import {
   useGetSong,
   useGetSongReactions,
   useGetSongMoments,
+  useSetSongRelease,
   getGetSongQueryKey,
   getGetSongReactionsQueryKey,
   getGetSongMomentsQueryKey,
 } from "@workspace/api-client-react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { LyricSyncTool } from "@/components/lyric-sync-tool";
 import { AnalysisEditor } from "@/components/analysis-editor";
 import { PostReleaseStats } from "@/components/post-release-stats";
@@ -21,6 +24,7 @@ import {
   Users,
   Zap,
   Clock,
+  Rocket,
 } from "lucide-react";
 import { Link } from "wouter";
 
@@ -39,6 +43,21 @@ export default function SongDetailPage({ id }: Props) {
   const { data: moments } = useGetSongMoments(songId, {
     query: { enabled: !!songId, queryKey: getGetSongMomentsQueryKey(songId) },
   });
+
+  const queryClient = useQueryClient();
+  const { mutate: setRelease, isPending: isReleasing } = useSetSongRelease({
+    mutation: {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: getGetSongQueryKey(songId) });
+      },
+    },
+  });
+
+  const isReleased = song?.status === "released";
+
+  function handleRelease() {
+    setRelease({ id: songId, data: { released: !isReleased } });
+  }
 
   const discoveredPct = reactions
     ? reactions.totalListeners > 0
@@ -63,7 +82,7 @@ export default function SongDetailPage({ id }: Props) {
             </div>
           </Link>
           {song && (
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 flex-1">
               <div
                 className="w-12 h-12 rounded-lg flex-shrink-0"
                 style={{ backgroundColor: song.coverColor }}
@@ -74,12 +93,26 @@ export default function SongDetailPage({ id }: Props) {
                     {song.title}
                   </h1>
                   <Badge variant="secondary">
-                    {song.status === "active" ? "Active" : "Released"}
+                    {isReleased ? "Released" : "Active"}
                   </Badge>
                 </div>
                 <p className="text-muted-foreground text-sm">
                   {song.artistName} · {song.genre}
                 </p>
+              </div>
+              <div className="ml-auto">
+                <Button
+                  onClick={handleRelease}
+                  disabled={isReleasing}
+                  variant={isReleased ? "outline" : "default"}
+                >
+                  {isReleasing ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Rocket className="w-4 h-4" />
+                  )}
+                  {isReleased ? "Revert release" : "Mark as released"}
+                </Button>
               </div>
             </div>
           )}

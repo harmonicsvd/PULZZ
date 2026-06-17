@@ -118,6 +118,15 @@ export interface MxmAnalysis {
   themes: string[];
 }
 
+export interface ReleaseNotification {
+  songId: number;
+  songTitle: string;
+  artistName: string;
+  coverColor: string;
+  artworkUrl: string | null;
+  releasedAt: string;
+}
+
 export const api = {
   fetchSongs: () => apiFetch<ApiSong[]>("/songs"),
 
@@ -153,6 +162,29 @@ export const api = {
       method: "POST",
       body: JSON.stringify(data),
     }),
+
+  subscribeRelease: (listenerId: number, songId: number) =>
+    apiFetch<unknown>(`/listeners/${listenerId}/release-subscriptions`, {
+      method: "POST",
+      body: JSON.stringify({ songId }),
+    }),
+
+  unsubscribeRelease: (listenerId: number, songId: number) =>
+    apiFetch<unknown>(
+      `/listeners/${listenerId}/release-subscriptions/${songId}`,
+      { method: "DELETE" }
+    ),
+
+  fetchReleaseNotifications: (listenerId: number) =>
+    apiFetch<ReleaseNotification[]>(
+      `/listeners/${listenerId}/release-notifications`
+    ),
+
+  ackReleaseNotifications: (listenerId: number, songIds: number[]) =>
+    apiFetch<{ ok: boolean; count: number }>(
+      `/listeners/${listenerId}/release-notifications`,
+      { method: "POST", body: JSON.stringify({ songIds }) }
+    ),
 
   fetchMusixmatchGenres: () =>
     apiFetch<MxmGenre[]>("/musixmatch/genres"),

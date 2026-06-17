@@ -1,6 +1,7 @@
 import { Feather } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import React from "react";
+import { useFocusEffect } from "expo-router";
+import React, { useCallback } from "react";
 import {
   FlatList,
   Platform,
@@ -18,8 +19,22 @@ import { useColors } from "@/hooks/useColors";
 export default function DiscoveriesScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
-  const { discoveries, momentMarks, getDiscoveryPoints } = useApp();
+  const {
+    discoveries,
+    momentMarks,
+    getDiscoveryPoints,
+    releaseNotifications,
+    refreshReleaseNotifications,
+    dismissReleaseNotification,
+  } = useApp();
   const botPad = Platform.OS === "web" ? 34 : insets.bottom;
+
+  // Check for freshly released discoveries whenever this tab gains focus.
+  useFocusEffect(
+    useCallback(() => {
+      refreshReleaseNotifications();
+    }, [refreshReleaseNotifications])
+  );
 
   function getDaysUntilRelease(releaseDate: string) {
     const diff = new Date(releaseDate).getTime() - Date.now();
@@ -49,6 +64,40 @@ export default function DiscoveriesScreen() {
           </Text>
         </View>
       </View>
+
+      {releaseNotifications.length > 0 && (
+        <View style={{ paddingHorizontal: 16, paddingBottom: 4 }}>
+          {releaseNotifications.map((n) => (
+            <View
+              key={n.songId}
+              style={[
+                styles.notifBanner,
+                { backgroundColor: colors.primary },
+              ]}
+            >
+              <View style={styles.notifIcon}>
+                <Feather name="bell" size={16} color="#FFF" />
+              </View>
+              <View style={styles.notifInfo}>
+                <Text style={styles.notifTitle} numberOfLines={1}>
+                  {n.songTitle} is out now!
+                </Text>
+                <Text style={styles.notifSub} numberOfLines={1}>
+                  {n.artistName} just released a song you discovered early
+                </Text>
+              </View>
+              <TouchableOpacity
+                style={styles.notifDismiss}
+                activeOpacity={0.7}
+                onPress={() => dismissReleaseNotification(n.songId)}
+                accessibilityLabel="Dismiss notification"
+              >
+                <Feather name="x" size={16} color="#FFF" />
+              </TouchableOpacity>
+            </View>
+          ))}
+        </View>
+      )}
 
       {discoveries.length > 0 && (
         <View style={[styles.statsRow, { paddingHorizontal: 20 }]}>
@@ -226,6 +275,49 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: "700",
     fontFamily: fontFor("700"),
+  },
+  notifBanner: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    borderRadius: 18,
+    padding: 12,
+    marginBottom: 10,
+    shadowColor: "#1B2A4A",
+    shadowOpacity: 0.12,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 3,
+  },
+  notifIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "rgba(255,255,255,0.2)",
+  },
+  notifInfo: {
+    flex: 1,
+  },
+  notifTitle: {
+    color: "#FFF",
+    fontSize: 14,
+    fontWeight: "700",
+    fontFamily: fontFor("700"),
+  },
+  notifSub: {
+    color: "rgba(255,255,255,0.85)",
+    fontSize: 11,
+    fontFamily: fontFor("400"),
+    marginTop: 2,
+  },
+  notifDismiss: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    alignItems: "center",
+    justifyContent: "center",
   },
   statsRow: {
     flexDirection: "row",

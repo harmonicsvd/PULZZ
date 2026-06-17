@@ -8,6 +8,7 @@ import {
   Platform,
   ScrollView,
   StyleSheet,
+  Switch,
   Text,
   TouchableOpacity,
   View,
@@ -21,8 +22,14 @@ import { useColors } from "@/hooks/useColors";
 export default function ProfileScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
-  const { profile, discoveries, listenedSongIds, getDiscoveryPoints } =
-    useApp();
+  const {
+    profile,
+    discoveries,
+    listenedSongIds,
+    getDiscoveryPoints,
+    releaseNotificationsEnabled,
+    setReleaseNotificationsEnabled,
+  } = useApp();
   const botPad = Platform.OS === "web" ? 34 : insets.bottom;
 
   const personalityInfo = {
@@ -222,6 +229,43 @@ export default function ProfileScreen() {
 
       <View style={styles.section}>
         <Text style={[styles.sectionTitle, { color: colors.mutedForeground }]}>
+          NOTIFICATIONS
+        </Text>
+        <View
+          style={[
+            styles.toggleCard,
+            { backgroundColor: colors.card, borderColor: colors.border },
+          ]}
+        >
+          <View
+            style={[
+              styles.toggleIcon,
+              { backgroundColor: colors.primary + "1F" },
+            ]}
+          >
+            <Feather name="bell" size={16} color={colors.primary} />
+          </View>
+          <View style={styles.toggleInfo}>
+            <Text style={[styles.toggleTitle, { color: colors.foreground }]}>
+              Release-day alerts
+            </Text>
+            <Text
+              style={[styles.toggleDesc, { color: colors.mutedForeground }]}
+            >
+              Get pinged when a song you discovered drops
+            </Text>
+          </View>
+          <Switch
+            value={releaseNotificationsEnabled}
+            onValueChange={setReleaseNotificationsEnabled}
+            trackColor={{ false: colors.muted, true: colors.primary }}
+            thumbColor="#FFF"
+          />
+        </View>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={[styles.sectionTitle, { color: colors.mutedForeground }]}>
           ABOUT PULZZ
         </Text>
         <View
@@ -402,6 +446,34 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     fontFamily: fontFor("600"),
     flexShrink: 1,
+  },
+  toggleCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    borderRadius: 20,
+    borderWidth: 1,
+    padding: 16,
+  },
+  toggleIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  toggleInfo: {
+    flex: 1,
+  },
+  toggleTitle: {
+    fontSize: 14,
+    fontWeight: "700",
+    fontFamily: fontFor("700"),
+  },
+  toggleDesc: {
+    fontSize: 12,
+    fontFamily: fontFor("400"),
+    marginTop: 2,
   },
   infoCard: {
     borderRadius: 20,

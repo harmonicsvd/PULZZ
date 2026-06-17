@@ -246,6 +246,33 @@ paths:
         "404":
           description: Not found
 
+  /songs/{id}/release:
+    put:
+      operationId: setSongRelease
+      tags: [songs]
+      summary: Mark a song as released (or revert), triggering release-day notifications
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SetSongReleaseInput"
+      responses:
+        "200":
+          description: Release state updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SetSongReleaseResult"
+        "404":
+          description: Not found
+
   /songs/{id}/reactions:
     get:
       operationId: getSongReactions
@@ -492,6 +519,101 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Listener"
+
+  /listeners/{id}/release-subscriptions:
+    post:
+      operationId: subscribeRelease
+      tags: [listeners]
+      summary: Opt a listener in to a release-day notification for a song
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReleaseSubscriptionInput"
+      responses:
+        "201":
+          description: Subscription created (or already existed)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReleaseSubscription"
+        "404":
+          description: Listener or song not found
+
+  /listeners/{id}/release-subscriptions/{songId}:
+    delete:
+      operationId: unsubscribeRelease
+      tags: [listeners]
+      summary: Opt a listener out of a song's release-day notification
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: songId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Subscription removed (idempotent)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResult"
+
+  /listeners/{id}/release-notifications:
+    get:
+      operationId: getReleaseNotifications
+      tags: [listeners]
+      summary: Pending release-day notifications for songs the listener discovered
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Pending release notifications
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ReleaseNotification"
+    post:
+      operationId: ackReleaseNotifications
+      tags: [listeners]
+      summary: Acknowledge release-day notifications so they are not shown again
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AckReleaseNotificationsInput"
+      responses:
+        "200":
+          description: Notifications acknowledged
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AckReleaseNotificationsResult"
 
   /musixmatch/genres:
     get:
@@ -1030,6 +1152,88 @@ components:
         type:
           type: string
           enum: [discovered, skip]
+
+    SetSongReleaseInput:
+      type: object
+      required: [released]
+      properties:
+        released:
+          type: boolean
+
+    SetSongReleaseResult:
+      type: object
+      required: [ok, released, releasedAt]
+      properties:
+        ok:
+          type: boolean
+        released:
+          type: boolean
+        releasedAt:
+          type: ["string", "null"]
+
+    ReleaseSubscriptionInput:
+      type: object
+      required: [songId]
+      properties:
+        songId:
+          type: integer
+
+    ReleaseSubscription:
+      type: object
+      required: [id, listenerId, songId, createdAt]
+      properties:
+        id:
+          type: integer
+        listenerId:
+          type: integer
+        songId:
+          type: integer
+        notifiedAt:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+
+    ReleaseNotification:
+      type: object
+      required: [songId, songTitle, artistName, coverColor, releasedAt]
+      properties:
+        songId:
+          type: integer
+        songTitle:
+          type: string
+        artistName:
+          type: string
+        coverColor:
+          type: string
+        artworkUrl:
+          type: ["string", "null"]
+        releasedAt:
+          type: string
+
+    AckReleaseNotificationsInput:
+      type: object
+      required: [songIds]
+      properties:
+        songIds:
+          type: array
+          items:
+            type: integer
+
+    AckReleaseNotificationsResult:
+      type: object
+      required: [ok, count]
+      properties:
+        ok:
+          type: boolean
+        count:
+          type: integer
+
+    OkResult:
+      type: object
+      required: [ok]
+      properties:
+        ok:
+          type: boolean
 
     MomentMark:
       type: object

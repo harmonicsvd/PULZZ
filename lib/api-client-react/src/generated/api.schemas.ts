@@ -374,6 +374,53 @@ export interface ReactionInput {
   type: ReactionInputType;
 }
 
+export interface SetSongReleaseInput {
+  released: boolean;
+}
+
+export interface SetSongReleaseResult {
+  ok: boolean;
+  released: boolean;
+  /** @nullable */
+  releasedAt: string | null;
+}
+
+export interface ReleaseSubscriptionInput {
+  songId: number;
+}
+
+export interface ReleaseSubscription {
+  id: number;
+  listenerId: number;
+  songId: number;
+  /** @nullable */
+  notifiedAt?: string | null;
+  createdAt: string;
+}
+
+export interface ReleaseNotification {
+  songId: number;
+  songTitle: string;
+  artistName: string;
+  coverColor: string;
+  /** @nullable */
+  artworkUrl?: string | null;
+  releasedAt: string;
+}
+
+export interface AckReleaseNotificationsInput {
+  songIds: number[];
+}
+
+export interface AckReleaseNotificationsResult {
+  ok: boolean;
+  count: number;
+}
+
+export interface OkResult {
+  ok: boolean;
+}
+
 export interface MomentMark {
   id: number;
   songId: number;

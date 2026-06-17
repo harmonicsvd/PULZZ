@@ -19,6 +19,9 @@ import {
   UpdateSongStreamingIdBody,
   UpdateSongStreamingIdParams,
   UpdateSongStreamingIdResponse,
+  SetSongReleaseBody,
+  SetSongReleaseParams,
+  SetSongReleaseResponse,
   GetSongSongstatsParams,
   GetSongSongstatsResponse,
   GetSongSoundAnalysisParams,
@@ -325,6 +328,43 @@ router.put("/songs/:id/streaming-id", async (req, res): Promise<void> => {
     UpdateSongStreamingIdResponse.parse({
       ok: true,
       streamingId: updated[0].streamingId,
+    })
+  );
+});
+
+router.put("/songs/:id/release", async (req, res): Promise<void> => {
+  const params = SetSongReleaseParams.safeParse(req.params);
+  if (!params.success) {
+    res.status(400).json({ error: params.error.message });
+    return;
+  }
+  const body = SetSongReleaseBody.safeParse(req.body);
+  if (!body.success) {
+    res.status(400).json({ error: body.error.message });
+    return;
+  }
+
+  const releasedAt = body.data.released ? new Date() : null;
+  const status = body.data.released ? "released" : "active";
+
+  const updated = await db
+    .update(songsTable)
+    .set({ releasedAt, status })
+    .where(eq(songsTable.id, params.data.id))
+    .returning({ id: songsTable.id, releasedAt: songsTable.releasedAt });
+
+  if (updated.length === 0) {
+    res.status(404).json({ error: "Song not found" });
+    return;
+  }
+
+  res.json(
+    SetSongReleaseResponse.parse({
+      ok: true,
+      released: body.data.released,
+      releasedAt: updated[0].releasedAt
+        ? updated[0].releasedAt.toISOString()
+        : null,
     })
   );
 });

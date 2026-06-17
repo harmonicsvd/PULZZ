@@ -6,6 +6,8 @@
  * OpenAPI spec version: 0.1.0
  */
 
+export * from './ackReleaseNotificationsInput';
+export * from './ackReleaseNotificationsResult';
 export * from './analyzeSongResult';
 export * from './analyzeSongResultStatus';
 export * from './artist';
@@ -30,11 +32,17 @@ export * from './musixmatchAnalysis';
 export * from './musixmatchGenre';
 export * from './musixmatchSubtitle';
 export * from './musixmatchTrack';
+export * from './okResult';
 export * from './reaction';
 export * from './reactionInput';
 export * from './reactionInputType';
 export * from './reactionType';
+export * from './releaseNotification';
+export * from './releaseSubscription';
+export * from './releaseSubscriptionInput';
 export * from './searchMusixmatchTracksParams';
+export * from './setSongReleaseInput';
+export * from './setSongReleaseResult';
 export * from './song';
 export * from './songAnalysis';
 export * from './songCredits';

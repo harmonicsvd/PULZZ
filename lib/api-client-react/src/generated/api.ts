@@ -20,6 +20,8 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  AckReleaseNotificationsInput,
+  AckReleaseNotificationsResult,
   AnalyzeSongResult,
   Artist,
   ArtistDashboard,
@@ -36,9 +38,15 @@ import type {
   MusixmatchGenre,
   MusixmatchSubtitle,
   MusixmatchTrack,
+  OkResult,
   Reaction,
   ReactionInput,
+  ReleaseNotification,
+  ReleaseSubscription,
+  ReleaseSubscriptionInput,
   SearchMusixmatchTracksParams,
+  SetSongReleaseInput,
+  SetSongReleaseResult,
   Song,
   SongDetail,
   SongInput,
@@ -814,6 +822,78 @@ export const useAnalyzeSong = <TError = ErrorType<void>,
         TContext
       > => {
       return useMutation(getAnalyzeSongMutationOptions(options));
+    }
+
+export const getSetSongReleaseUrl = (id: number,) => {
+
+
+
+
+  return `/api/songs/${id}/release`
+}
+
+/**
+ * @summary Mark a song as released (or revert), triggering release-day notifications
+ */
+export const setSongRelease = async (id: number,
+    setSongReleaseInput: SetSongReleaseInput, options?: RequestInit): Promise<SetSongReleaseResult> => {
+
+  return customFetch<SetSongReleaseResult>(getSetSongReleaseUrl(id),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      setSongReleaseInput,)
+  }
+);}
+
+
+
+
+export const getSetSongReleaseMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof setSongRelease>>, TError,{id: number;data: BodyType<SetSongReleaseInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof setSongRelease>>, TError,{id: number;data: BodyType<SetSongReleaseInput>}, TContext> => {
+
+const mutationKey = ['setSongRelease'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof setSongRelease>>, {id: number;data: BodyType<SetSongReleaseInput>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  setSongRelease(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SetSongReleaseMutationResult = NonNullable<Awaited<ReturnType<typeof setSongRelease>>>
+    export type SetSongReleaseMutationBody = BodyType<SetSongReleaseInput>
+    export type SetSongReleaseMutationError = ErrorType<void>
+
+    /**
+ * @summary Mark a song as released (or revert), triggering release-day notifications
+ */
+export const useSetSongRelease = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof setSongRelease>>, TError,{id: number;data: BodyType<SetSongReleaseInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof setSongRelease>>,
+        TError,
+        {id: number;data: BodyType<SetSongReleaseInput>},
+        TContext
+      > => {
+      return useMutation(getSetSongReleaseMutationOptions(options));
     }
 
 export const getGetSongReactionsUrl = (id: number,) => {
@@ -1787,6 +1867,299 @@ export function useGetListener<TData = Awaited<ReturnType<typeof getListener>>, 
 
 
 
+
+export const getSubscribeReleaseUrl = (id: number,) => {
+
+
+
+
+  return `/api/listeners/${id}/release-subscriptions`
+}
+
+/**
+ * @summary Opt a listener in to a release-day notification for a song
+ */
+export const subscribeRelease = async (id: number,
+    releaseSubscriptionInput: ReleaseSubscriptionInput, options?: RequestInit): Promise<ReleaseSubscription> => {
+
+  return customFetch<ReleaseSubscription>(getSubscribeReleaseUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      releaseSubscriptionInput,)
+  }
+);}
+
+
+
+
+export const getSubscribeReleaseMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof subscribeRelease>>, TError,{id: number;data: BodyType<ReleaseSubscriptionInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof subscribeRelease>>, TError,{id: number;data: BodyType<ReleaseSubscriptionInput>}, TContext> => {
+
+const mutationKey = ['subscribeRelease'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof subscribeRelease>>, {id: number;data: BodyType<ReleaseSubscriptionInput>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  subscribeRelease(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SubscribeReleaseMutationResult = NonNullable<Awaited<ReturnType<typeof subscribeRelease>>>
+    export type SubscribeReleaseMutationBody = BodyType<ReleaseSubscriptionInput>
+    export type SubscribeReleaseMutationError = ErrorType<void>
+
+    /**
+ * @summary Opt a listener in to a release-day notification for a song
+ */
+export const useSubscribeRelease = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof subscribeRelease>>, TError,{id: number;data: BodyType<ReleaseSubscriptionInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof subscribeRelease>>,
+        TError,
+        {id: number;data: BodyType<ReleaseSubscriptionInput>},
+        TContext
+      > => {
+      return useMutation(getSubscribeReleaseMutationOptions(options));
+    }
+
+export const getUnsubscribeReleaseUrl = (id: number,
+    songId: number,) => {
+
+
+
+
+  return `/api/listeners/${id}/release-subscriptions/${songId}`
+}
+
+/**
+ * @summary Opt a listener out of a song's release-day notification
+ */
+export const unsubscribeRelease = async (id: number,
+    songId: number, options?: RequestInit): Promise<OkResult> => {
+
+  return customFetch<OkResult>(getUnsubscribeReleaseUrl(id,songId),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getUnsubscribeReleaseMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof unsubscribeRelease>>, TError,{id: number;songId: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof unsubscribeRelease>>, TError,{id: number;songId: number}, TContext> => {
+
+const mutationKey = ['unsubscribeRelease'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof unsubscribeRelease>>, {id: number;songId: number}> = (props) => {
+          const {id,songId} = props ?? {};
+
+          return  unsubscribeRelease(id,songId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UnsubscribeReleaseMutationResult = NonNullable<Awaited<ReturnType<typeof unsubscribeRelease>>>
+
+    export type UnsubscribeReleaseMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Opt a listener out of a song's release-day notification
+ */
+export const useUnsubscribeRelease = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof unsubscribeRelease>>, TError,{id: number;songId: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof unsubscribeRelease>>,
+        TError,
+        {id: number;songId: number},
+        TContext
+      > => {
+      return useMutation(getUnsubscribeReleaseMutationOptions(options));
+    }
+
+export const getGetReleaseNotificationsUrl = (id: number,) => {
+
+
+
+
+  return `/api/listeners/${id}/release-notifications`
+}
+
+/**
+ * @summary Pending release-day notifications for songs the listener discovered
+ */
+export const getReleaseNotifications = async (id: number, options?: RequestInit): Promise<ReleaseNotification[]> => {
+
+  return customFetch<ReleaseNotification[]>(getGetReleaseNotificationsUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetReleaseNotificationsQueryKey = (id: number,) => {
+    return [
+    `/api/listeners/${id}/release-notifications`
+    ] as const;
+    }
+
+
+export const getGetReleaseNotificationsQueryOptions = <TData = Awaited<ReturnType<typeof getReleaseNotifications>>, TError = ErrorType<unknown>>(id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getReleaseNotifications>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetReleaseNotificationsQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getReleaseNotifications>>> = ({ signal }) => getReleaseNotifications(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getReleaseNotifications>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetReleaseNotificationsQueryResult = NonNullable<Awaited<ReturnType<typeof getReleaseNotifications>>>
+export type GetReleaseNotificationsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Pending release-day notifications for songs the listener discovered
+ */
+
+export function useGetReleaseNotifications<TData = Awaited<ReturnType<typeof getReleaseNotifications>>, TError = ErrorType<unknown>>(
+ id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getReleaseNotifications>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetReleaseNotificationsQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getAckReleaseNotificationsUrl = (id: number,) => {
+
+
+
+
+  return `/api/listeners/${id}/release-notifications`
+}
+
+/**
+ * @summary Acknowledge release-day notifications so they are not shown again
+ */
+export const ackReleaseNotifications = async (id: number,
+    ackReleaseNotificationsInput: AckReleaseNotificationsInput, options?: RequestInit): Promise<AckReleaseNotificationsResult> => {
+
+  return customFetch<AckReleaseNotificationsResult>(getAckReleaseNotificationsUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      ackReleaseNotificationsInput,)
+  }
+);}
+
+
+
+
+export const getAckReleaseNotificationsMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ackReleaseNotifications>>, TError,{id: number;data: BodyType<AckReleaseNotificationsInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof ackReleaseNotifications>>, TError,{id: number;data: BodyType<AckReleaseNotificationsInput>}, TContext> => {
+
+const mutationKey = ['ackReleaseNotifications'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof ackReleaseNotifications>>, {id: number;data: BodyType<AckReleaseNotificationsInput>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  ackReleaseNotifications(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AckReleaseNotificationsMutationResult = NonNullable<Awaited<ReturnType<typeof ackReleaseNotifications>>>
+    export type AckReleaseNotificationsMutationBody = BodyType<AckReleaseNotificationsInput>
+    export type AckReleaseNotificationsMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Acknowledge release-day notifications so they are not shown again
+ */
+export const useAckReleaseNotifications = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ackReleaseNotifications>>, TError,{id: number;data: BodyType<AckReleaseNotificationsInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof ackReleaseNotifications>>,
+        TError,
+        {id: number;data: BodyType<AckReleaseNotificationsInput>},
+        TContext
+      > => {
+      return useMutation(getAckReleaseNotificationsMutationOptions(options));
+    }
 
 export const getListMusixmatchGenresUrl = () => {
 

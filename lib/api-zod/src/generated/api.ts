@@ -284,6 +284,24 @@ export const AnalyzeSongResponse = zod.object({
 
 
 /**
+ * @summary Mark a song as released (or revert), triggering release-day notifications
+ */
+export const SetSongReleaseParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const SetSongReleaseBody = zod.object({
+  "released": zod.boolean()
+})
+
+export const SetSongReleaseResponse = zod.object({
+  "ok": zod.boolean(),
+  "released": zod.boolean(),
+  "releasedAt": zod.string().nullable()
+})
+
+
+/**
  * @summary Get aggregated reaction stats for a song
  */
 export const GetSongReactionsParams = zod.object({
@@ -663,6 +681,66 @@ export const GetListenerResponse = zod.object({
   "discoveryCount": zod.number().optional(),
   "points": zod.number().optional(),
   "createdAt": zod.string()
+})
+
+
+/**
+ * @summary Opt a listener in to a release-day notification for a song
+ */
+export const SubscribeReleaseParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const SubscribeReleaseBody = zod.object({
+  "songId": zod.number()
+})
+
+
+/**
+ * @summary Opt a listener out of a song's release-day notification
+ */
+export const UnsubscribeReleaseParams = zod.object({
+  "id": zod.coerce.number(),
+  "songId": zod.coerce.number()
+})
+
+export const UnsubscribeReleaseResponse = zod.object({
+  "ok": zod.boolean()
+})
+
+
+/**
+ * @summary Pending release-day notifications for songs the listener discovered
+ */
+export const GetReleaseNotificationsParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const GetReleaseNotificationsResponseItem = zod.object({
+  "songId": zod.number(),
+  "songTitle": zod.string(),
+  "artistName": zod.string(),
+  "coverColor": zod.string(),
+  "artworkUrl": zod.string().nullish(),
+  "releasedAt": zod.string()
+})
+export const GetReleaseNotificationsResponse = zod.array(GetReleaseNotificationsResponseItem)
+
+
+/**
+ * @summary Acknowledge release-day notifications so they are not shown again
+ */
+export const AckReleaseNotificationsParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const AckReleaseNotificationsBody = zod.object({
+  "songIds": zod.array(zod.number())
+})
+
+export const AckReleaseNotificationsResponse = zod.object({
+  "ok": zod.boolean(),
+  "count": zod.number()
 })
 
 

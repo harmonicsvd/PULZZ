@@ -83,6 +83,7 @@ export const songsTable = pgTable("songs", {
   coverColor: text("cover_color").notNull().default("#7B61FF"),
   tags: text("tags").array().default([]),
   status: text("status").notNull().default("active"),
+  releasedAt: timestamp("released_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
