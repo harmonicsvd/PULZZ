@@ -103,6 +103,11 @@ const LISTENER_FLOW: Step[] = [
     title: "Be there on release day",
     body: "When a song you discovered goes live on streaming, Pulzz lets you know — so you're first to press play on release day.",
   },
+  {
+    n: "05",
+    title: "Tuned to your taste",
+    body: "Pulzz analyzes the actual sound of every track with AI and ranks your Discover feed around the genres and moods you love — the more you react, the sharper it gets.",
+  },
 ];
 
 const ARTIST_FLOW: Step[] = [
@@ -125,6 +130,11 @@ const ARTIST_FLOW: Step[] = [
     n: "04",
     title: "Find artists & collaborate",
     body: "Discover other artists in the pool and team up — the Collaborate space helps you find your next co-writer or feature.",
+  },
+  {
+    n: "05",
+    title: "Matched to the right ears",
+    body: "Cyanite's AI fingerprints your song's sound and surfaces it to listeners whose taste fits — the same matching that powers your collaborator suggestions in Collaborate.",
   },
 ];
 
