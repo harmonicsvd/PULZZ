@@ -67,6 +67,11 @@ const PARTNERS: Partner[] = [
   },
   { name: "Songstats", role: "Streaming analytics", href: "https://songstats.com" },
   {
+    name: "Cyanite",
+    role: "AI sound & mood analysis — genre, mood, tempo, key & energy",
+    href: "https://cyanite.ai",
+  },
+  {
     name: "Internet Archive",
     role: "Public-domain recordings",
     href: "https://archive.org",
@@ -316,69 +321,6 @@ export default function Landing() {
                 </div>
               ))}
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Two-sided value */}
-      <section className="mx-auto max-w-6xl px-5 pb-20">
-        <div className="grid gap-6 md:grid-cols-2">
-          {/* Listeners */}
-          <div className="flex flex-col rounded-3xl border border-card-border bg-card p-8 shadow-sm">
-            <span className="text-sm font-semibold uppercase tracking-wide text-primary">
-              For listeners
-            </span>
-            <h3 className="mt-2 font-display text-2xl font-bold tracking-tight">
-              Be first. Be the one who found it.
-            </h3>
-            <ul className="mt-5 space-y-3 text-sm text-muted-foreground">
-              {[
-                "Stream unreleased songs before release day",
-                "Mark your favorite moments as you listen",
-                "React Discovered or Skip and earn points",
-                "Build a profile of the tracks you found early",
-              ].map((t) => (
-                <li key={t} className="flex items-start gap-3">
-                  <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-primary" />
-                  <span>{t}</span>
-                </li>
-              ))}
-            </ul>
-            <Link
-              href={LISTEN_GUIDE_URL}
-              className="mt-7 inline-flex w-fit items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-sm transition-opacity hover:opacity-90"
-            >
-              Start discovering →
-            </Link>
-          </div>
-
-          {/* Artists */}
-          <div className="flex flex-col rounded-3xl border border-card-border bg-card p-8 shadow-sm">
-            <span className="text-sm font-semibold uppercase tracking-wide text-primary">
-              For artists
-            </span>
-            <h3 className="mt-2 font-display text-2xl font-bold tracking-tight">
-              Watch your song find its people.
-            </h3>
-            <ul className="mt-5 space-y-3 text-sm text-muted-foreground">
-              {[
-                "Submit your track to the discovery pool",
-                "See reactions and discovery stats in real time",
-                "Find the exact moments listeners love most",
-                "Climb the Discovery Wall leaderboard",
-              ].map((t) => (
-                <li key={t} className="flex items-start gap-3">
-                  <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-primary" />
-                  <span>{t}</span>
-                </li>
-              ))}
-            </ul>
-            <a
-              href={ARTIST_URL}
-              className="mt-7 inline-flex w-fit items-center gap-2 rounded-full border border-border bg-background px-6 py-3 text-sm font-semibold text-foreground shadow-sm transition-opacity hover:opacity-90"
-            >
-              Open the dashboard →
-            </a>
           </div>
         </div>
       </section>

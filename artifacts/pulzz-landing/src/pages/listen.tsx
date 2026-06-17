@@ -10,23 +10,17 @@ type Step = { n: string; title: ReactNode; body: ReactNode };
 const STEPS: Step[] = [
   {
     n: "01",
-    title: "Install Expo Go — it's free",
-    body: (
-      <>
-        Grab the free <span className="font-semibold text-foreground">Expo
-        Go</span> app from the App Store or Google Play (links below). No App
-        Store purchase, no account needed.
-      </>
-    ),
+    title: "Point your phone camera at the code",
+    body: "Open your phone's camera (or any QR scanner) and aim it at the code on the right. No app to install.",
   },
   {
     n: "02",
-    title: "Scan the code (or tap the link)",
+    title: "Tap the link that pops up",
     body: (
       <>
-        Open Expo Go (or your phone camera) and scan the QR code, or tap the
-        link below — it points straight to the live{" "}
-        <Wordmark className="text-foreground" /> listener.
+        Your phone shows a link — tap it and{" "}
+        <Wordmark className="text-foreground" /> opens right in your browser. No
+        scanner? Use the tappable link below the code.
       </>
     ),
   },
@@ -126,13 +120,14 @@ export default function ListenGuide() {
 
             <div className="mt-8 rounded-2xl border border-border bg-background p-5">
               <p className="text-sm font-semibold text-foreground">
-                Get Expo Go — free, no purchase
+                Optional: want the native-app feel?
               </p>
               <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+                The browser is all you need. But{" "}
                 <Wordmark className="text-foreground" /> is built with{" "}
-                <span className="font-semibold text-foreground">Expo</span>, so
-                Expo Go is the free companion app that runs it on your phone.
-                Install it from your store below, then scan the code.
+                <span className="font-semibold text-foreground">Expo</span>, so if
+                you&rsquo;d like to run it in Expo&rsquo;s free companion app, grab
+                Expo Go below — then scan the same code from inside it.
               </p>
               <div className="mt-4 flex flex-wrap gap-3">
                 <a

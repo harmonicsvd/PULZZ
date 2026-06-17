@@ -60,8 +60,6 @@ export default function SubmitSongPage() {
     releaseTime: "",
     distributor: "",
     streamingId: "",
-    isrc: "",
-    audioUrl: "",
     story: "",
     lyrics: "",
     language: "en",
@@ -116,9 +114,8 @@ export default function SubmitSongPage() {
           releaseDate: form.releaseDate,
           releaseTime: form.releaseTime || undefined,
           distributor: form.distributor || undefined,
-          isrc: form.isrc.trim() || "",
+          isrc: "",
           streamingId: form.streamingId.trim() || undefined,
-          audioUrl: form.audioUrl.trim() || undefined,
           story: form.story.trim(),
           lyrics: form.lyrics.trim() || undefined,
           credits:
@@ -344,38 +341,6 @@ export default function SubmitSongPage() {
                   value={form.lyrics}
                   onChange={(e) => update("lyrics", e.target.value)}
                   className="bg-background resize-none min-h-[100px]"
-                />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-card border-border">
-            <CardHeader className="pb-4">
-              <CardTitle className="text-base">Audio (optional)</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-1.5">
-                <Label htmlFor="audioUrl">Audio URL</Label>
-                <Input
-                  id="audioUrl"
-                  placeholder="https://… (direct MP3 link, for demo playback)"
-                  value={form.audioUrl}
-                  onChange={(e) => update("audioUrl", e.target.value)}
-                  className="bg-background"
-                />
-                <p className="text-xs text-muted-foreground">
-                  Optional — add a preview so listeners can play the track before
-                  release.
-                </p>
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="isrc">ISRC</Label>
-                <Input
-                  id="isrc"
-                  placeholder="e.g. USRC17607839"
-                  value={form.isrc}
-                  onChange={(e) => update("isrc", e.target.value)}
-                  className="bg-background"
                 />
               </div>
             </CardContent>
