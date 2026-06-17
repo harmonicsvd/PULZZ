@@ -18,7 +18,11 @@
       "bundleIdentifier": "com.pulzz.app"
     },
     "android": {
-      "package": "com.pulzz.app"
+      "package": "com.pulzz.app",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/icon.png",
+        "backgroundColor": "#F4EDE4"
+      }
     },
     "web": {
       "favicon": "./assets/images/favicon.png"
