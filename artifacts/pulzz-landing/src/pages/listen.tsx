@@ -1,27 +1,43 @@
-import { useEffect, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import { Link } from "wouter";
 import { QRCodeSVG } from "qrcode.react";
 import { Wordmark } from "@/components/Wordmark";
 
 const LISTENER_PATH = "/pulzz-listener/";
 
-type Step = { n: string; title: string; body: string };
+type Step = { n: string; title: ReactNode; body: ReactNode };
 
 const STEPS: Step[] = [
   {
     n: "01",
-    title: "Grab your phone",
-    body: "Pulzz is built for mobile. The full discovery experience — swiping, marking moments, reacting — lives on your phone.",
+    title: "Install Expo Go — it's free",
+    body: (
+      <>
+        Grab the free <span className="font-semibold text-foreground">Expo
+        Go</span> app from the App Store or Google Play (links below). No App
+        Store purchase, no account needed.
+      </>
+    ),
   },
   {
     n: "02",
     title: "Scan the code (or tap the link)",
-    body: "Point your phone camera at the QR code below, then tap the prompt. No phone camera? Use the tappable link instead.",
+    body: (
+      <>
+        Open Expo Go (or your phone camera) and scan the QR code, or tap the
+        link below — it points straight to the live{" "}
+        <Wordmark className="text-foreground" /> listener.
+      </>
+    ),
   },
   {
     n: "03",
-    title: "Pulzz opens — start discovering",
-    body: "The listener app loads instantly. Pick your taste, then stream unreleased tracks before anyone else.",
+    title: (
+      <>
+        <Wordmark className="text-foreground" /> opens — start discovering
+      </>
+    ),
+    body: "Pick your taste, then stream unreleased tracks and mark the moments you love before anyone else.",
   },
 ];
 
@@ -110,15 +126,13 @@ export default function ListenGuide() {
 
             <div className="mt-8 rounded-2xl border border-border bg-background p-5">
               <p className="text-sm font-semibold text-foreground">
-                No install needed
+                Get Expo Go — free, no purchase
               </p>
               <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
-                Scanning the code opens <Wordmark className="text-foreground" />{" "}
-                right in your phone&rsquo;s browser — nothing to download, no
-                purchase. <Wordmark className="text-foreground" /> is built with{" "}
-                <span className="font-semibold text-foreground">Expo</span>; if
-                you&rsquo;d like to explore its free companion app, grab Expo Go
-                below.
+                <Wordmark className="text-foreground" /> is built with{" "}
+                <span className="font-semibold text-foreground">Expo</span>, so
+                Expo Go is the free companion app that runs it on your phone.
+                Install it from your store below, then scan the code.
               </p>
               <div className="mt-4 flex flex-wrap gap-3">
                 <a
@@ -163,7 +177,7 @@ export default function ListenGuide() {
               href={LISTENER_PATH}
               className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-sm transition-opacity hover:opacity-90"
             >
-              Open Pulzz on this device →
+              Open the listener on this device →
             </a>
             <a
               href={LISTENER_PATH}
