@@ -67,7 +67,7 @@ type Partner = { name: string; role: string; href: string };
 const PARTNERS: Partner[] = [
   {
     name: "Musixmatch",
-    role: "Lyrics, mood analysis & taste profiling",
+    role: "Lyrics, mood & theme analysis, taste profiling",
     href: "https://www.musixmatch.com",
   },
   { name: "Songstats", role: "Streaming analytics", href: "https://songstats.com" },
