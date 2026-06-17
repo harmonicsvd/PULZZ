@@ -100,8 +100,8 @@ const LISTENER_FLOW: Step[] = [
   },
   {
     n: "04",
-    title: "Climb the Discovery Wall",
-    body: "Your discoveries and points rank you on the live Discovery Wall — the more great songs you catch early, the higher you climb.",
+    title: "Be there on release day",
+    body: "When a song you discovered goes live on streaming, Pulzz lets you know — so you're first to press play on release day.",
   },
 ];
 
