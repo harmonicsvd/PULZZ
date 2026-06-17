@@ -44,6 +44,7 @@ export * from './songstatsResultStatus';
 export * from './songstatsSource';
 export * from './songstatsTrackInfo';
 export * from './songStatus';
+export * from './updateArtistInput';
 export * from './updateSongAnalysis';
 export * from './updateSongAnalysisResult';
 export * from './updateSongLyrics';

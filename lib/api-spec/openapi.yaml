@@ -347,6 +347,31 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Artist"
+    put:
+      operationId: updateArtist
+      tags: [artists]
+      summary: Update an artist's profile
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateArtistInput"
+      responses:
+        "200":
+          description: Updated artist profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Artist"
+        "404":
+          description: Not found
 
   /artists/{id}/songs:
     get:
@@ -560,7 +585,7 @@ components:
 
     SongInput:
       type: object
-      required: [title, artistId, genre, releaseDate, isrc, audioUrl, story]
+      required: [title, artistId, genre, releaseDate, isrc, story]
       properties:
         title:
           type: string
@@ -572,6 +597,10 @@ components:
           type: string
         releaseDate:
           type: string
+        releaseTime:
+          type: string
+        distributor:
+          type: string
         isrc:
           type: string
         streamingId:
@@ -582,6 +611,8 @@ components:
           type: string
         lyrics:
           type: ["string", "null"]
+        credits:
+          $ref: "#/components/schemas/SongCredits"
         instruments:
           type: array
           items:
@@ -603,6 +634,10 @@ components:
           type: string
         releaseDate:
           type: string
+        releaseTime:
+          type: ["string", "null"]
+        distributor:
+          type: ["string", "null"]
         daysUntilRelease:
           type: integer
         status:
@@ -679,6 +714,8 @@ components:
         vocalist:
           type: string
         mixEngineer:
+          type: string
+        masteringEngineer:
           type: string
         producer:
           type: string
@@ -939,6 +976,9 @@ components:
         spotify:
           type: string
           pattern: "^https?://"
+        appleMusic:
+          type: string
+          pattern: "^https?://"
         instagram:
           type: string
           pattern: "^https?://"
@@ -946,6 +986,9 @@ components:
           type: string
           pattern: "^https?://"
         youtube:
+          type: string
+          pattern: "^https?://"
+        tiktok:
           type: string
           pattern: "^https?://"
 
@@ -962,6 +1005,8 @@ components:
         bio:
           type: ["string", "null"]
         genre:
+          type: ["string", "null"]
+        distributor:
           type: ["string", "null"]
         roles:
           type: ["array", "null"]
@@ -985,6 +1030,26 @@ components:
         bio:
           type: string
         genre:
+          type: string
+        distributor:
+          type: string
+        roles:
+          type: array
+          items:
+            type: string
+        links:
+          $ref: "#/components/schemas/ArtistLinks"
+
+    UpdateArtistInput:
+      type: object
+      properties:
+        name:
+          type: string
+        bio:
+          type: string
+        genre:
+          type: string
+        distributor:
           type: string
         roles:
           type: array

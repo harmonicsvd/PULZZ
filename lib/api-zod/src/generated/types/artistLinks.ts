@@ -12,9 +12,13 @@ export interface ArtistLinks {
   /** @pattern ^https?:// */
   spotify?: string;
   /** @pattern ^https?:// */
+  appleMusic?: string;
+  /** @pattern ^https?:// */
   instagram?: string;
   /** @pattern ^https?:// */
   soundcloud?: string;
   /** @pattern ^https?:// */
   youtube?: string;
+  /** @pattern ^https?:// */
+  tiktok?: string;
 }

@@ -16,6 +16,10 @@ export interface SongDetail {
   artistName: string;
   genre: string;
   releaseDate: string;
+  /** @nullable */
+  releaseTime?: string | null;
+  /** @nullable */
+  distributor?: string | null;
   daysUntilRelease: number;
   status: SongDetailStatus;
   coverColor: string;

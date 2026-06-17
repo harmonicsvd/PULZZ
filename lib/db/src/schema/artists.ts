@@ -20,9 +20,11 @@ export type ArtistRole = (typeof ARTIST_ROLES)[number];
 export interface ArtistLinks {
   website?: string;
   spotify?: string;
+  appleMusic?: string;
   instagram?: string;
   soundcloud?: string;
   youtube?: string;
+  tiktok?: string;
 }
 
 export const artistsTable = pgTable("artists", {
@@ -31,6 +33,7 @@ export const artistsTable = pgTable("artists", {
   email: text("email").notNull().unique(),
   bio: text("bio"),
   genre: text("genre"),
+  distributor: text("distributor"),
   roles: text("roles").array().default([]),
   links: jsonb("links").$type<ArtistLinks>(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),

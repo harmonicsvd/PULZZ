@@ -16,6 +16,8 @@ export interface Artist {
   /** @nullable */
   genre?: string | null;
   /** @nullable */
+  distributor?: string | null;
+  /** @nullable */
   roles?: string[] | null;
   links?: ArtistLinks | null;
   createdAt: string;

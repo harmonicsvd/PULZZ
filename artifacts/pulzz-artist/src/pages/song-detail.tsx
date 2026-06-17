@@ -264,7 +264,10 @@ export default function SongDetailPage({ id }: Props) {
                 <dl className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                   <div>
                     <dt className="text-muted-foreground mb-1">Release Date</dt>
-                    <dd className="font-medium">{song.releaseDate}</dd>
+                    <dd className="font-medium">
+                      {song.releaseDate}
+                      {song.releaseTime ? ` · ${song.releaseTime}` : ""}
+                    </dd>
                   </div>
                   <div>
                     <dt className="text-muted-foreground mb-1">Days Left</dt>
@@ -274,6 +277,12 @@ export default function SongDetailPage({ id }: Props) {
                         : `${song.daysUntilRelease} days`}
                     </dd>
                   </div>
+                  {song.distributor && (
+                    <div>
+                      <dt className="text-muted-foreground mb-1">Distributor</dt>
+                      <dd className="font-medium">{song.distributor}</dd>
+                    </div>
+                  )}
                   {song.isrc && (
                     <div>
                       <dt className="text-muted-foreground mb-1">ISRC</dt>
@@ -304,6 +313,40 @@ export default function SongDetailPage({ id }: Props) {
                 </dl>
               </CardContent>
             </Card>
+
+            {song.credits &&
+              Object.entries(song.credits).some(
+                ([, v]) => typeof v === "string" && v.trim()
+              ) && (
+                <Card className="bg-card border-border">
+                  <CardHeader>
+                    <CardTitle className="text-base">Credits</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <dl className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+                      {(
+                        [
+                          ["lyricist", "Lyricist"],
+                          ["composer", "Composer"],
+                          ["vocalist", "Vocalist"],
+                          ["producer", "Producer"],
+                          ["mixEngineer", "Mix Engineer"],
+                          ["masteringEngineer", "Mastering Engineer"],
+                        ] as const
+                      ).map(([key, label]) => {
+                        const value = song.credits?.[key];
+                        if (!value || !value.trim()) return null;
+                        return (
+                          <div key={key}>
+                            <dt className="text-muted-foreground mb-1">{label}</dt>
+                            <dd className="font-medium">{value}</dd>
+                          </div>
+                        );
+                      })}
+                    </dl>
+                  </CardContent>
+                </Card>
+              )}
           </>
         ) : (
           <div className="flex items-center justify-center h-64 text-muted-foreground">

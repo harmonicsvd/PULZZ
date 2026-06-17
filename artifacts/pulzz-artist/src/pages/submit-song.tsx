@@ -1,6 +1,8 @@
 import { AppLayout } from "@/components/layout/app-layout";
 import {
   useSubmitSong,
+  useGetArtist,
+  getGetArtistQueryKey,
   getGetArtistSongsQueryKey,
   getGetArtistDashboardQueryKey,
 } from "@workspace/api-client-react";
@@ -17,60 +19,110 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Loader2, ArrowLeft, CheckCircle } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
+import { GENRES, DISTRIBUTORS, CREDIT_FIELDS } from "@/lib/artist-meta";
 
-const GENRES = [
-  "Pop", "Hip-Hop", "R&B", "Electronic", "Indie", "Alternative",
-  "Jazz", "Classical", "Rock", "Folk", "Synth-pop", "Soul",
-];
+const ARTIST_ID = 1;
+
+type Credits = {
+  lyricist: string;
+  composer: string;
+  vocalist: string;
+  mixEngineer: string;
+  masteringEngineer: string;
+  producer: string;
+};
+
+const EMPTY_CREDITS: Credits = {
+  lyricist: "",
+  composer: "",
+  vocalist: "",
+  mixEngineer: "",
+  masteringEngineer: "",
+  producer: "",
+};
 
 export default function SubmitSongPage() {
   const [, navigate] = useLocation();
   const queryClient = useQueryClient();
   const { mutate: submitSong, isPending } = useSubmitSong();
+  const { data: artist } = useGetArtist(ARTIST_ID, {
+    query: { queryKey: getGetArtistQueryKey(ARTIST_ID) },
+  });
   const [submitted, setSubmitted] = useState(false);
+  const [prefilled, setPrefilled] = useState(false);
 
   const [form, setForm] = useState({
     title: "",
     genre: "",
     releaseDate: "",
-    isrc: "",
+    releaseTime: "",
+    distributor: "",
     streamingId: "",
+    isrc: "",
     audioUrl: "",
     story: "",
     lyrics: "",
     language: "en",
     durationSeconds: "",
   });
+  const [credits, setCredits] = useState<Credits>(EMPTY_CREDITS);
+
+  // Pre-fill known values from the artist profile once it loads.
+  useEffect(() => {
+    if (artist && !prefilled) {
+      setForm((prev) => ({
+        ...prev,
+        genre: prev.genre || artist.genre || "",
+        distributor: prev.distributor || artist.distributor || "",
+      }));
+      setCredits((prev) => ({
+        ...prev,
+        vocalist: prev.vocalist || artist.name || "",
+        composer: prev.composer || artist.name || "",
+      }));
+      setPrefilled(true);
+    }
+  }, [artist, prefilled]);
 
   function update(key: keyof typeof form, value: string) {
     setForm((prev) => ({ ...prev, [key]: value }));
   }
 
+  function updateCredit(key: keyof Credits, value: string) {
+    setCredits((prev) => ({ ...prev, [key]: value }));
+  }
+
   const canSubmit =
-    form.title.trim() &&
-    form.genre &&
-    form.releaseDate &&
-    form.audioUrl.trim() &&
-    form.story.trim();
+    form.title.trim() && form.genre && form.releaseDate && form.story.trim();
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!canSubmit) return;
 
+    const cleanedCredits: Record<string, string> = {};
+    (Object.keys(credits) as (keyof Credits)[]).forEach((k) => {
+      const v = credits[k].trim();
+      if (v) cleanedCredits[k] = v;
+    });
+
     submitSong(
       {
         data: {
           title: form.title.trim(),
-          artistId: 1,
+          artistId: ARTIST_ID,
           genre: form.genre,
           releaseDate: form.releaseDate,
+          releaseTime: form.releaseTime || undefined,
+          distributor: form.distributor || undefined,
           isrc: form.isrc.trim() || "",
           streamingId: form.streamingId.trim() || undefined,
-          audioUrl: form.audioUrl.trim(),
+          audioUrl: form.audioUrl.trim() || undefined,
           story: form.story.trim(),
           lyrics: form.lyrics.trim() || undefined,
+          credits:
+            Object.keys(cleanedCredits).length > 0 ? cleanedCredits : undefined,
           language: form.language,
           durationSeconds: form.durationSeconds
             ? parseInt(form.durationSeconds)
@@ -81,10 +133,10 @@ export default function SubmitSongPage() {
       {
         onSuccess: () => {
           queryClient.invalidateQueries({
-            queryKey: getGetArtistSongsQueryKey(1),
+            queryKey: getGetArtistSongsQueryKey(ARTIST_ID),
           });
           queryClient.invalidateQueries({
-            queryKey: getGetArtistDashboardQueryKey(1),
+            queryKey: getGetArtistDashboardQueryKey(ARTIST_ID),
           });
           setSubmitted(true);
           setTimeout(() => navigate("/songs"), 1800);
@@ -162,29 +214,6 @@ export default function SubmitSongPage() {
                   </Select>
                 </div>
                 <div className="space-y-1.5">
-                  <Label htmlFor="releaseDate">Release Date *</Label>
-                  <Input
-                    id="releaseDate"
-                    type="date"
-                    value={form.releaseDate}
-                    onChange={(e) => update("releaseDate", e.target.value)}
-                    className="bg-background"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <Label htmlFor="isrc">ISRC</Label>
-                  <Input
-                    id="isrc"
-                    placeholder="e.g. USRC17607839"
-                    value={form.isrc}
-                    onChange={(e) => update("isrc", e.target.value)}
-                    className="bg-background"
-                  />
-                </div>
-                <div className="space-y-1.5">
                   <Label htmlFor="duration">Duration (seconds)</Label>
                   <Input
                     id="duration"
@@ -196,7 +225,58 @@ export default function SubmitSongPage() {
                   />
                 </div>
               </div>
+            </CardContent>
+          </Card>
 
+          <Card className="bg-card border-border">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-base">Release & Distribution</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-xs text-muted-foreground">
+                The date and time you scheduled on your distributor, so it goes
+                live on Pulzz in sync with release day.
+              </p>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <Label htmlFor="releaseDate">Release Date *</Label>
+                  <Input
+                    id="releaseDate"
+                    type="date"
+                    value={form.releaseDate}
+                    onChange={(e) => update("releaseDate", e.target.value)}
+                    className="bg-background"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="releaseTime">Release Time</Label>
+                  <Input
+                    id="releaseTime"
+                    type="time"
+                    value={form.releaseTime}
+                    onChange={(e) => update("releaseTime", e.target.value)}
+                    className="bg-background"
+                  />
+                </div>
+              </div>
+              <div className="space-y-1.5">
+                <Label>Distributor</Label>
+                <Select
+                  value={form.distributor}
+                  onValueChange={(v) => update("distributor", v)}
+                >
+                  <SelectTrigger className="bg-background">
+                    <SelectValue placeholder="Select distributor" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {DISTRIBUTORS.map((d) => (
+                      <SelectItem key={d} value={d}>
+                        {d}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
               <div className="space-y-1.5">
                 <Label htmlFor="streamingId">Streaming Link / ISRC</Label>
                 <Input
@@ -216,21 +296,27 @@ export default function SubmitSongPage() {
 
           <Card className="bg-card border-border">
             <CardHeader className="pb-4">
-              <CardTitle className="text-base">Audio</CardTitle>
+              <CardTitle className="text-base">Credits</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="space-y-1.5">
-                <Label htmlFor="audioUrl">Audio URL *</Label>
-                <Input
-                  id="audioUrl"
-                  placeholder="https://..."
-                  value={form.audioUrl}
-                  onChange={(e) => update("audioUrl", e.target.value)}
-                  className="bg-background"
-                />
-                <p className="text-xs text-muted-foreground">
-                  Direct link to MP3 or streaming-compatible audio file
-                </p>
+              <p className="text-xs text-muted-foreground">
+                Who made it. Pre-filled from your profile where we can.
+              </p>
+              <div className="grid grid-cols-2 gap-4">
+                {CREDIT_FIELDS.map((field) => (
+                  <div key={field.key} className="space-y-1.5">
+                    <Label htmlFor={`credit-${field.key}`}>{field.label}</Label>
+                    <Input
+                      id={`credit-${field.key}`}
+                      placeholder={field.label}
+                      value={credits[field.key as keyof Credits]}
+                      onChange={(e) =>
+                        updateCredit(field.key as keyof Credits, e.target.value)
+                      }
+                      className="bg-background"
+                    />
+                  </div>
+                ))}
               </div>
             </CardContent>
           </Card>
@@ -258,6 +344,38 @@ export default function SubmitSongPage() {
                   value={form.lyrics}
                   onChange={(e) => update("lyrics", e.target.value)}
                   className="bg-background resize-none min-h-[100px]"
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-card border-border">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-base">Audio (optional)</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="audioUrl">Audio URL</Label>
+                <Input
+                  id="audioUrl"
+                  placeholder="https://… (direct MP3 link, for demo playback)"
+                  value={form.audioUrl}
+                  onChange={(e) => update("audioUrl", e.target.value)}
+                  className="bg-background"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Optional — add a preview so listeners can play the track before
+                  release.
+                </p>
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="isrc">ISRC</Label>
+                <Input
+                  id="isrc"
+                  placeholder="e.g. USRC17607839"
+                  value={form.isrc}
+                  onChange={(e) => update("isrc", e.target.value)}
+                  className="bg-background"
                 />
               </div>
             </CardContent>

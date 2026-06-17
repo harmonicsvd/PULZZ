@@ -83,7 +83,7 @@ router.post("/songs", async (req, res): Promise<void> => {
     return;
   }
 
-  const { artistId, releaseDate, ...rest } = parsed.data;
+  const { artistId, releaseDate, audioUrl, ...rest } = parsed.data;
 
   let analysis: SongAnalysis | null = null;
   if (rest.lyrics && rest.lyrics.trim().length > 0) {
@@ -108,6 +108,7 @@ router.post("/songs", async (req, res): Promise<void> => {
     .values({
       artistId,
       releaseDate,
+      audioUrl: audioUrl ?? "",
       ...rest,
       analysis,
     })
@@ -151,6 +152,8 @@ router.get("/songs/:id", async (req, res): Promise<void> => {
       artistName: artistsTable.name,
       genre: songsTable.genre,
       releaseDate: songsTable.releaseDate,
+      releaseTime: songsTable.releaseTime,
+      distributor: songsTable.distributor,
       status: songsTable.status,
       coverColor: songsTable.coverColor,
       tags: songsTable.tags,

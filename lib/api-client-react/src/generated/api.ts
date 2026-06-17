@@ -43,6 +43,7 @@ import type {
   SongInput,
   SongReactions,
   SongstatsResult,
+  UpdateArtistInput,
   UpdateSongAnalysis,
   UpdateSongAnalysisResult,
   UpdateSongLyrics,
@@ -1263,6 +1264,78 @@ export function useGetArtist<TData = Awaited<ReturnType<typeof getArtist>>, TErr
 
 
 
+
+export const getUpdateArtistUrl = (id: number,) => {
+
+
+
+
+  return `/api/artists/${id}`
+}
+
+/**
+ * @summary Update an artist's profile
+ */
+export const updateArtist = async (id: number,
+    updateArtistInput: UpdateArtistInput, options?: RequestInit): Promise<Artist> => {
+
+  return customFetch<Artist>(getUpdateArtistUrl(id),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateArtistInput,)
+  }
+);}
+
+
+
+
+export const getUpdateArtistMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateArtist>>, TError,{id: number;data: BodyType<UpdateArtistInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateArtist>>, TError,{id: number;data: BodyType<UpdateArtistInput>}, TContext> => {
+
+const mutationKey = ['updateArtist'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateArtist>>, {id: number;data: BodyType<UpdateArtistInput>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateArtist(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateArtistMutationResult = NonNullable<Awaited<ReturnType<typeof updateArtist>>>
+    export type UpdateArtistMutationBody = BodyType<UpdateArtistInput>
+    export type UpdateArtistMutationError = ErrorType<void>
+
+    /**
+ * @summary Update an artist's profile
+ */
+export const useUpdateArtist = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateArtist>>, TError,{id: number;data: BodyType<UpdateArtistInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateArtist>>,
+        TError,
+        {id: number;data: BodyType<UpdateArtistInput>},
+        TContext
+      > => {
+      return useMutation(getUpdateArtistMutationOptions(options));
+    }
 
 export const getGetArtistSongsUrl = (id: number,) => {
 

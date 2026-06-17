@@ -57,18 +57,30 @@ export interface Song {
   license?: SongLicense | null;
 }
 
+export interface SongCredits {
+  lyricist?: string;
+  composer?: string;
+  vocalist?: string;
+  mixEngineer?: string;
+  masteringEngineer?: string;
+  producer?: string;
+}
+
 export interface SongInput {
   title: string;
   artistId: number;
   genre: string;
   language?: string;
   releaseDate: string;
+  releaseTime?: string;
+  distributor?: string;
   isrc: string;
   streamingId?: string;
-  audioUrl: string;
+  audioUrl?: string;
   story: string;
   /** @nullable */
   lyrics?: string | null;
+  credits?: SongCredits;
   instruments?: string[];
   durationSeconds?: number;
 }
@@ -81,20 +93,16 @@ export const SongDetailStatus = {
   released: 'released',
 } as const;
 
-export interface SongCredits {
-  lyricist?: string;
-  composer?: string;
-  vocalist?: string;
-  mixEngineer?: string;
-  producer?: string;
-}
-
 export interface SongDetail {
   id: number;
   title: string;
   artistName: string;
   genre: string;
   releaseDate: string;
+  /** @nullable */
+  releaseTime?: string | null;
+  /** @nullable */
+  distributor?: string | null;
   daysUntilRelease: number;
   status: SongDetailStatus;
   coverColor: string;
@@ -312,11 +320,15 @@ export interface ArtistLinks {
   /** @pattern ^https?:// */
   spotify?: string;
   /** @pattern ^https?:// */
+  appleMusic?: string;
+  /** @pattern ^https?:// */
   instagram?: string;
   /** @pattern ^https?:// */
   soundcloud?: string;
   /** @pattern ^https?:// */
   youtube?: string;
+  /** @pattern ^https?:// */
+  tiktok?: string;
 }
 
 export interface Artist {
@@ -328,6 +340,8 @@ export interface Artist {
   /** @nullable */
   genre?: string | null;
   /** @nullable */
+  distributor?: string | null;
+  /** @nullable */
   roles?: string[] | null;
   links?: ArtistLinks | null;
   createdAt: string;
@@ -338,6 +352,16 @@ export interface ArtistInput {
   email: string;
   bio?: string;
   genre?: string;
+  distributor?: string;
+  roles?: string[];
+  links?: ArtistLinks;
+}
+
+export interface UpdateArtistInput {
+  name?: string;
+  bio?: string;
+  genre?: string;
+  distributor?: string;
   roles?: string[];
   links?: ArtistLinks;
 }

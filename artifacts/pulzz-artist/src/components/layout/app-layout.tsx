@@ -65,10 +65,17 @@ export function AppLayout({ children }: { children: ReactNode }) {
             <Headphones className="w-4 h-4" />
             Open the app
           </a>
-          <div className="flex items-center gap-3 text-sm text-muted-foreground px-3 py-2 cursor-pointer hover:text-foreground transition-colors">
-            <Settings className="w-4 h-4" />
-            Settings
-          </div>
+          <Link href="/settings">
+            <div className={cn(
+              "flex items-center gap-3 text-sm px-3 py-2 cursor-pointer transition-colors",
+              location === "/settings"
+                ? "text-primary"
+                : "text-muted-foreground hover:text-foreground"
+            )}>
+              <Settings className="w-4 h-4" />
+              Settings
+            </div>
+          </Link>
           <div className="flex items-center gap-3 text-sm text-muted-foreground px-3 py-2 cursor-pointer hover:text-foreground transition-colors mt-1">
             <LogOut className="w-4 h-4" />
             Sign Out

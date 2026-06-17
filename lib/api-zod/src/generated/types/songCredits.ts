@@ -11,5 +11,6 @@ export interface SongCredits {
   composer?: string;
   vocalist?: string;
   mixEngineer?: string;
+  masteringEngineer?: string;
   producer?: string;
 }

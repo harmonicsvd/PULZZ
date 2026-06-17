@@ -17,9 +17,24 @@ import {
   GetArtistSongsParams,
   GetArtistSongsResponse,
   ListArtistsResponse,
+  UpdateArtistBody,
+  UpdateArtistParams,
+  UpdateArtistResponse,
 } from "@workspace/api-zod";
 
 const router: IRouter = Router();
+
+const URL_RE = /^https?:\/\/.+/;
+
+function findInvalidLink(
+  links: Record<string, string | undefined> | null | undefined
+): string | null {
+  if (!links) return null;
+  for (const [key, value] of Object.entries(links)) {
+    if (value && !URL_RE.test(value)) return key;
+  }
+  return null;
+}
 
 router.get("/artists", async (_req, res): Promise<void> => {
   const artists = await db
@@ -44,6 +59,14 @@ router.post("/artists", async (req, res): Promise<void> => {
     return;
   }
 
+  const badLink = findInvalidLink(parsed.data.links);
+  if (badLink) {
+    res
+      .status(400)
+      .json({ error: `Invalid ${badLink} link — must start with https://` });
+    return;
+  }
+
   const [artist] = await db
     .insert(artistsTable)
     .values(parsed.data)
@@ -53,6 +76,7 @@ router.post("/artists", async (req, res): Promise<void> => {
         name: parsed.data.name,
         bio: parsed.data.bio,
         genre: parsed.data.genre,
+        distributor: parsed.data.distributor,
         roles: parsed.data.roles,
         links: parsed.data.links,
       },
@@ -88,6 +112,54 @@ router.get("/artists/:id", async (req, res): Promise<void> => {
     GetArtistResponse.parse({
       ...artist,
       createdAt: artist.createdAt.toISOString(),
+    })
+  );
+});
+
+router.put("/artists/:id", async (req, res): Promise<void> => {
+  const params = UpdateArtistParams.safeParse(req.params);
+  if (!params.success) {
+    res.status(400).json({ error: params.error.message });
+    return;
+  }
+  const body = UpdateArtistBody.safeParse(req.body);
+  if (!body.success) {
+    res.status(400).json({ error: body.error.message });
+    return;
+  }
+
+  const badLink = findInvalidLink(body.data.links);
+  if (badLink) {
+    res
+      .status(400)
+      .json({ error: `Invalid ${badLink} link — must start with https://` });
+    return;
+  }
+
+  const updated = await db
+    .update(artistsTable)
+    .set({
+      ...(body.data.name !== undefined ? { name: body.data.name } : {}),
+      ...(body.data.bio !== undefined ? { bio: body.data.bio } : {}),
+      ...(body.data.genre !== undefined ? { genre: body.data.genre } : {}),
+      ...(body.data.distributor !== undefined
+        ? { distributor: body.data.distributor }
+        : {}),
+      ...(body.data.roles !== undefined ? { roles: body.data.roles } : {}),
+      ...(body.data.links !== undefined ? { links: body.data.links } : {}),
+    })
+    .where(eq(artistsTable.id, params.data.id))
+    .returning();
+
+  if (updated.length === 0) {
+    res.status(404).json({ error: "Artist not found" });
+    return;
+  }
+
+  res.json(
+    UpdateArtistResponse.parse({
+      ...updated[0],
+      createdAt: updated[0].createdAt.toISOString(),
     })
   );
 });

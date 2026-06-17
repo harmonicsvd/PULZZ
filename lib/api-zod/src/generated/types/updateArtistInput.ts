@@ -7,9 +7,8 @@
  */
 import type { ArtistLinks } from './artistLinks';
 
-export interface ArtistInput {
-  name: string;
-  email: string;
+export interface UpdateArtistInput {
+  name?: string;
   bio?: string;
   genre?: string;
   distributor?: string;

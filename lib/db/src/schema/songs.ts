@@ -16,6 +16,7 @@ export interface SongCredits {
   composer?: string;
   vocalist?: string;
   mixEngineer?: string;
+  masteringEngineer?: string;
   producer?: string;
 }
 
@@ -40,6 +41,8 @@ export const songsTable = pgTable("songs", {
   genre: text("genre").notNull(),
   language: text("language").default("en"),
   releaseDate: date("release_date", { mode: "string" }).notNull(),
+  releaseTime: text("release_time"),
+  distributor: text("distributor"),
   isrc: text("isrc"),
   streamingId: text("streaming_id"),
   audioUrl: text("audio_url").notNull(),

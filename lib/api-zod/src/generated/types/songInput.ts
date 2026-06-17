@@ -5,6 +5,7 @@
  * Pulzz — pre-release music discovery platform API
  * OpenAPI spec version: 0.1.0
  */
+import type { SongCredits } from './songCredits';
 
 export interface SongInput {
   title: string;
@@ -12,12 +13,15 @@ export interface SongInput {
   genre: string;
   language?: string;
   releaseDate: string;
+  releaseTime?: string;
+  distributor?: string;
   isrc: string;
   streamingId?: string;
-  audioUrl: string;
+  audioUrl?: string;
   story: string;
   /** @nullable */
   lyrics?: string | null;
+  credits?: SongCredits;
   instruments?: string[];
   durationSeconds?: number;
 }
