@@ -248,6 +248,72 @@ export interface SongstatsResult {
   fetchedAt: string;
 }
 
+export type CyaniteAnalysisGenre = {[key: string]: number};
+
+export type CyaniteAnalysisMood = {[key: string]: number};
+
+export interface CyaniteAnalysis {
+  genreTags: string[];
+  moodTags: string[];
+  /** @nullable */
+  bpm?: number | null;
+  /** @nullable */
+  musicalKey?: string | null;
+  /** @nullable */
+  energyLevel?: string | null;
+  /** @nullable */
+  energyDynamics?: string | null;
+  /** @nullable */
+  valence?: number | null;
+  /** @nullable */
+  arousal?: number | null;
+  /** @nullable */
+  caption?: string | null;
+  /** @nullable */
+  era?: string | null;
+  genre: CyaniteAnalysisGenre;
+  mood: CyaniteAnalysisMood;
+  analyzedAt: string;
+}
+
+export type SoundAnalysisResultStatus = typeof SoundAnalysisResultStatus[keyof typeof SoundAnalysisResultStatus];
+
+
+export const SoundAnalysisResultStatus = {
+  not_started: 'not_started',
+  unconfigured: 'unconfigured',
+  processing: 'processing',
+  finished: 'finished',
+  failed: 'failed',
+  not_found: 'not_found',
+  error: 'error',
+} as const;
+
+export interface SoundAnalysisResult {
+  status: SoundAnalysisResultStatus;
+  /** @nullable */
+  trackId: string | null;
+  analysis: CyaniteAnalysis | null;
+}
+
+export type AnalyzeSongResultStatus = typeof AnalyzeSongResultStatus[keyof typeof AnalyzeSongResultStatus];
+
+
+export const AnalyzeSongResultStatus = {
+  not_started: 'not_started',
+  unconfigured: 'unconfigured',
+  processing: 'processing',
+  finished: 'finished',
+  failed: 'failed',
+  not_found: 'not_found',
+  error: 'error',
+} as const;
+
+export interface AnalyzeSongResult {
+  ok: boolean;
+  status: AnalyzeSongResultStatus;
+}
+
 export type SongReactionsTopMomentsItem = {
   timestampMs: number;
   count: number;

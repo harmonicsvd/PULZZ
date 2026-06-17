@@ -6,10 +6,15 @@
  * OpenAPI spec version: 0.1.0
  */
 
+export * from './analyzeSongResult';
+export * from './analyzeSongResultStatus';
 export * from './artist';
 export * from './artistDashboard';
 export * from './artistInput';
 export * from './artistLinks';
+export * from './cyaniteAnalysis';
+export * from './cyaniteAnalysisGenre';
+export * from './cyaniteAnalysisMood';
 export * from './getMusixmatchAnalysisParams';
 export * from './getMusixmatchSubtitleParams';
 export * from './healthStatus';
@@ -44,6 +49,8 @@ export * from './songstatsResultStatus';
 export * from './songstatsSource';
 export * from './songstatsTrackInfo';
 export * from './songStatus';
+export * from './soundAnalysisResult';
+export * from './soundAnalysisResultStatus';
 export * from './updateArtistInput';
 export * from './updateSongAnalysis';
 export * from './updateSongAnalysisResult';

@@ -235,6 +235,47 @@ export const GetSongSongstatsResponse = zod.object({
 
 
 /**
+ * @summary Get Cyanite sound-based analysis for a song (lazily syncs if still processing)
+ */
+export const GetSongSoundAnalysisParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const GetSongSoundAnalysisResponse = zod.object({
+  "status": zod.enum(['not_started', 'unconfigured', 'processing', 'finished', 'failed', 'not_found', 'error']),
+  "trackId": zod.string().nullable(),
+  "analysis": zod.union([zod.object({
+  "genreTags": zod.array(zod.string()),
+  "moodTags": zod.array(zod.string()),
+  "bpm": zod.number().nullish(),
+  "musicalKey": zod.string().nullish(),
+  "energyLevel": zod.string().nullish(),
+  "energyDynamics": zod.string().nullish(),
+  "valence": zod.number().nullish(),
+  "arousal": zod.number().nullish(),
+  "caption": zod.string().nullish(),
+  "era": zod.string().nullish(),
+  "genre": zod.record(zod.string(), zod.number()),
+  "mood": zod.record(zod.string(), zod.number()),
+  "analyzedAt": zod.string()
+}),zod.null()])
+})
+
+
+/**
+ * @summary Trigger (or re-trigger) Cyanite sound analysis for a song
+ */
+export const AnalyzeSongParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const AnalyzeSongResponse = zod.object({
+  "ok": zod.boolean(),
+  "status": zod.enum(['not_started', 'unconfigured', 'processing', 'finished', 'failed', 'not_found', 'error'])
+})
+
+
+/**
  * @summary Get aggregated reaction stats for a song
  */
 export const GetSongReactionsParams = zod.object({

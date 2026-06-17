@@ -20,6 +20,7 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  AnalyzeSongResult,
   Artist,
   ArtistDashboard,
   ArtistInput,
@@ -43,6 +44,7 @@ import type {
   SongInput,
   SongReactions,
   SongstatsResult,
+  SoundAnalysisResult,
   UpdateArtistInput,
   UpdateSongAnalysis,
   UpdateSongAnalysisResult,
@@ -666,6 +668,153 @@ export function useGetSongSongstats<TData = Awaited<ReturnType<typeof getSongSon
 
 
 
+
+export const getGetSongSoundAnalysisUrl = (id: number,) => {
+
+
+
+
+  return `/api/songs/${id}/sound-analysis`
+}
+
+/**
+ * @summary Get Cyanite sound-based analysis for a song (lazily syncs if still processing)
+ */
+export const getSongSoundAnalysis = async (id: number, options?: RequestInit): Promise<SoundAnalysisResult> => {
+
+  return customFetch<SoundAnalysisResult>(getGetSongSoundAnalysisUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetSongSoundAnalysisQueryKey = (id: number,) => {
+    return [
+    `/api/songs/${id}/sound-analysis`
+    ] as const;
+    }
+
+
+export const getGetSongSoundAnalysisQueryOptions = <TData = Awaited<ReturnType<typeof getSongSoundAnalysis>>, TError = ErrorType<void>>(id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getSongSoundAnalysis>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetSongSoundAnalysisQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getSongSoundAnalysis>>> = ({ signal }) => getSongSoundAnalysis(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getSongSoundAnalysis>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetSongSoundAnalysisQueryResult = NonNullable<Awaited<ReturnType<typeof getSongSoundAnalysis>>>
+export type GetSongSoundAnalysisQueryError = ErrorType<void>
+
+
+/**
+ * @summary Get Cyanite sound-based analysis for a song (lazily syncs if still processing)
+ */
+
+export function useGetSongSoundAnalysis<TData = Awaited<ReturnType<typeof getSongSoundAnalysis>>, TError = ErrorType<void>>(
+ id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getSongSoundAnalysis>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetSongSoundAnalysisQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getAnalyzeSongUrl = (id: number,) => {
+
+
+
+
+  return `/api/songs/${id}/analyze`
+}
+
+/**
+ * @summary Trigger (or re-trigger) Cyanite sound analysis for a song
+ */
+export const analyzeSong = async (id: number, options?: RequestInit): Promise<AnalyzeSongResult> => {
+
+  return customFetch<AnalyzeSongResult>(getAnalyzeSongUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+export const getAnalyzeSongMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof analyzeSong>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof analyzeSong>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['analyzeSong'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof analyzeSong>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  analyzeSong(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AnalyzeSongMutationResult = NonNullable<Awaited<ReturnType<typeof analyzeSong>>>
+
+    export type AnalyzeSongMutationError = ErrorType<void>
+
+    /**
+ * @summary Trigger (or re-trigger) Cyanite sound analysis for a song
+ */
+export const useAnalyzeSong = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof analyzeSong>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof analyzeSong>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getAnalyzeSongMutationOptions(options));
+    }
 
 export const getGetSongReactionsUrl = (id: number,) => {
 

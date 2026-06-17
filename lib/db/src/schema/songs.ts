@@ -26,6 +26,28 @@ export interface SongAnalysis {
   language?: string;
 }
 
+/**
+ * Normalized, sound-based analysis from Cyanite (distinct from the lyrics-based
+ * `SongAnalysis` above). Stored once an analysis reaches the Finished state.
+ * Distributions (`genre`/`mood`) are kept for sound-similarity scoring; the
+ * scalar fields drive the artist-facing "Sound DNA" display.
+ */
+export interface CyaniteAnalysis {
+  genreTags: string[];
+  moodTags: string[];
+  bpm: number | null;
+  musicalKey: string | null;
+  energyLevel: string | null;
+  energyDynamics: string | null;
+  valence: number | null;
+  arousal: number | null;
+  caption: string | null;
+  era: string | null;
+  genre: Record<string, number>;
+  mood: Record<string, number>;
+  analyzedAt: string;
+}
+
 export interface SongLicense {
   type: string;
   detail?: string;
@@ -52,6 +74,9 @@ export const songsTable = pgTable("songs", {
   lrc: text("lrc"),
   credits: jsonb("credits").$type<SongCredits>(),
   analysis: jsonb("analysis").$type<SongAnalysis>(),
+  cyaniteTrackId: text("cyanite_track_id"),
+  cyaniteStatus: text("cyanite_status"),
+  cyaniteAnalysis: jsonb("cyanite_analysis").$type<CyaniteAnalysis>(),
   license: jsonb("license").$type<SongLicense>(),
   instruments: text("instruments").array().default([]),
   durationSeconds: integer("duration_seconds"),

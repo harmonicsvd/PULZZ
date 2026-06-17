@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { LyricSyncTool } from "@/components/lyric-sync-tool";
 import { AnalysisEditor } from "@/components/analysis-editor";
 import { PostReleaseStats } from "@/components/post-release-stats";
+import { SoundDna } from "@/components/sound-dna";
 import {
   Loader2,
   ArrowLeft,
@@ -244,6 +245,8 @@ export default function SongDetailPage({ id }: Props) {
                 </Card>
               )}
             </div>
+
+            <SoundDna songId={songId} />
 
             <PostReleaseStats songId={songId} streamingId={song.streamingId} />
 

@@ -21,10 +21,16 @@ import {
   UpdateSongStreamingIdResponse,
   GetSongSongstatsParams,
   GetSongSongstatsResponse,
+  GetSongSoundAnalysisParams,
+  GetSongSoundAnalysisResponse,
+  AnalyzeSongParams,
+  AnalyzeSongResponse,
 } from "@workspace/api-zod";
 import type { SongAnalysis } from "@workspace/db";
 import { analyzeLyrics } from "../lib/musixmatch";
 import { getTrackStats } from "../lib/songstats";
+import { isConfigured } from "../lib/cyanite";
+import { startSongAnalysis, syncSong } from "../lib/cyaniteSync";
 
 const router: IRouter = Router();
 
@@ -113,6 +119,11 @@ router.post("/songs", async (req, res): Promise<void> => {
       analysis,
     })
     .returning();
+
+  // Kick off Cyanite sound analysis in the background (non-blocking).
+  if (song.audioUrl && song.audioUrl.trim().length > 0) {
+    startSongAnalysis(song.id, song.audioUrl, song.title);
+  }
 
   const artist = await db
     .select({ name: artistsTable.name })
@@ -342,6 +353,67 @@ router.get("/songs/:id/songstats", async (req, res): Promise<void> => {
 
   const stats = await getTrackStats(song.streamingId, { released });
   res.json(GetSongSongstatsResponse.parse(stats));
+});
+
+router.get("/songs/:id/sound-analysis", async (req, res): Promise<void> => {
+  const params = GetSongSoundAnalysisParams.safeParse(req.params);
+  if (!params.success) {
+    res.status(400).json({ error: params.error.message });
+    return;
+  }
+
+  const [song] = await db
+    .select({ id: songsTable.id })
+    .from(songsTable)
+    .where(eq(songsTable.id, params.data.id));
+  if (!song) {
+    res.status(404).json({ error: "Song not found" });
+    return;
+  }
+
+  const state = await syncSong(params.data.id);
+  res.json(GetSongSoundAnalysisResponse.parse(state));
+});
+
+router.post("/songs/:id/analyze", async (req, res): Promise<void> => {
+  const params = AnalyzeSongParams.safeParse(req.params);
+  if (!params.success) {
+    res.status(400).json({ error: params.error.message });
+    return;
+  }
+
+  const [song] = await db
+    .select({
+      id: songsTable.id,
+      title: songsTable.title,
+      audioUrl: songsTable.audioUrl,
+    })
+    .from(songsTable)
+    .where(eq(songsTable.id, params.data.id));
+  if (!song) {
+    res.status(404).json({ error: "Song not found" });
+    return;
+  }
+
+  if (!isConfigured()) {
+    res.json(AnalyzeSongResponse.parse({ ok: false, status: "unconfigured" }));
+    return;
+  }
+  if (!song.audioUrl || song.audioUrl.trim().length === 0) {
+    res.json(AnalyzeSongResponse.parse({ ok: false, status: "error" }));
+    return;
+  }
+
+  await db
+    .update(songsTable)
+    .set({
+      cyaniteTrackId: null,
+      cyaniteStatus: "processing",
+      cyaniteAnalysis: null,
+    })
+    .where(eq(songsTable.id, song.id));
+  startSongAnalysis(song.id, song.audioUrl, song.title);
+  res.json(AnalyzeSongResponse.parse({ ok: true, status: "processing" }));
 });
 
 router.get("/songs/:id/reactions", async (req, res): Promise<void> => {

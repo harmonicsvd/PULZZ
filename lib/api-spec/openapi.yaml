@@ -204,6 +204,48 @@ paths:
         "404":
           description: Not found
 
+  /songs/{id}/sound-analysis:
+    get:
+      operationId: getSongSoundAnalysis
+      tags: [songs]
+      summary: Get Cyanite sound-based analysis for a song (lazily syncs if still processing)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Current sound-analysis state
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SoundAnalysisResult"
+        "404":
+          description: Not found
+
+  /songs/{id}/analyze:
+    post:
+      operationId: analyzeSong
+      tags: [songs]
+      summary: Trigger (or re-trigger) Cyanite sound analysis for a song
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Analysis triggered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnalyzeSongResult"
+        "404":
+          description: Not found
+
   /songs/{id}/reactions:
     get:
       operationId: getSongReactions
@@ -870,6 +912,69 @@ components:
             $ref: "#/components/schemas/SongstatsSource"
         fetchedAt:
           type: string
+
+    CyaniteAnalysis:
+      type: object
+      required: [genreTags, moodTags, genre, mood, analyzedAt]
+      properties:
+        genreTags:
+          type: array
+          items:
+            type: string
+        moodTags:
+          type: array
+          items:
+            type: string
+        bpm:
+          type: ["integer", "null"]
+        musicalKey:
+          type: ["string", "null"]
+        energyLevel:
+          type: ["string", "null"]
+        energyDynamics:
+          type: ["string", "null"]
+        valence:
+          type: ["number", "null"]
+        arousal:
+          type: ["number", "null"]
+        caption:
+          type: ["string", "null"]
+        era:
+          type: ["string", "null"]
+        genre:
+          type: object
+          additionalProperties:
+            type: number
+        mood:
+          type: object
+          additionalProperties:
+            type: number
+        analyzedAt:
+          type: string
+
+    SoundAnalysisResult:
+      type: object
+      required: [status, trackId, analysis]
+      properties:
+        status:
+          type: string
+          enum: [not_started, unconfigured, processing, finished, failed, not_found, error]
+        trackId:
+          type: ["string", "null"]
+        analysis:
+          oneOf:
+            - $ref: "#/components/schemas/CyaniteAnalysis"
+            - type: "null"
+
+    AnalyzeSongResult:
+      type: object
+      required: [ok, status]
+      properties:
+        ok:
+          type: boolean
+        status:
+          type: string
+          enum: [not_started, unconfigured, processing, finished, failed, not_found, error]
 
     SongReactions:
       type: object
