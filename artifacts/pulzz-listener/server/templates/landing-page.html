@@ -4,7 +4,7 @@
     <title>APP_NAME_PLACEHOLDER</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg width='180' height='180' viewBox='0 0 180 180' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='180' height='180' rx='36' fill='%23FF3C00'/%3E%3C/svg%3E" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='36' fill='%23F4EDE4'/%3E%3Ctext x='50%25' y='54%25' text-anchor='middle' dominant-baseline='central' font-family='Arial,Helvetica,sans-serif' font-weight='bold' font-size='62' letter-spacing='-3'%3E%3Ctspan fill='%231B2A4A'%3EPul%3C/tspan%3E%3Ctspan fill='%23FF5C49'%3Ezz%3C/tspan%3E%3C/text%3E%3C/svg%3E" />
     <style>
       * {
         box-sizing: border-box;
@@ -14,8 +14,8 @@
         margin: 0;
         padding: 32px 20px;
         text-align: center;
-        background: #fff;
-        color: #222;
+        background: #f4ede4;
+        color: #1b2a4a;
         line-height: 1.5;
         min-height: 100vh;
       }
@@ -24,14 +24,18 @@
         margin: 0 auto;
       }
       h1 {
-        font-size: 26px;
-        font-weight: 600;
+        font-size: 30px;
+        font-weight: 800;
+        letter-spacing: -1px;
         margin: 0;
-        color: #111;
+        color: #1b2a4a;
+      }
+      h1 .accent {
+        color: #ff5c49;
       }
       .subtitle {
         font-size: 15px;
-        color: #666;
+        color: rgba(27, 42, 74, 0.7);
         margin-top: 8px;
         margin-bottom: 32px;
       }
@@ -69,10 +73,10 @@
 
       .step {
         padding: 24px;
-        border: 1px solid #ddd;
+        border: 1px solid #e7ddcd;
         border-radius: 12px;
         text-align: center;
-        background: #fafafa;
+        background: #fffaf3;
       }
       .step-header {
         display: flex;
@@ -84,26 +88,26 @@
       .step-number {
         width: 28px;
         height: 28px;
-        border: 1px solid #999;
+        border: 1px solid #ff5c49;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-weight: 600;
+        font-weight: 700;
         font-size: 14px;
         flex-shrink: 0;
-        color: #555;
+        color: #ff5c49;
       }
       .step-title {
         font-size: 18px;
-        font-weight: 600;
+        font-weight: 700;
         margin: 0;
-        color: #222;
+        color: #1b2a4a;
       }
       .step-description {
         font-size: 14px;
         margin-bottom: 16px;
-        color: #666;
+        color: rgba(27, 42, 74, 0.7);
       }
 
       .store-buttons {
@@ -160,9 +164,9 @@
       }
 
       .qr-section {
-        background: #333;
+        background: #1b2a4a;
         color: #fff;
-        border-color: #333;
+        border-color: #1b2a4a;
       }
       .qr-section .step-number {
         border-color: rgba(255, 255, 255, 0.5);
@@ -261,72 +265,7 @@
         }
       }
 
-      /* Dark mode */
-      @media (prefers-color-scheme: dark) {
-        body {
-          background: #0d0d0d;
-          color: #e0e0e0;
-        }
-        h1 {
-          color: #f5f5f5;
-        }
-        .subtitle {
-          color: #999;
-        }
-        .spinner {
-          border-color: #444;
-          border-top-color: #ccc;
-        }
-        .loading-text {
-          color: #aaa;
-        }
-        .step {
-          border-color: #333;
-          background: #1a1a1a;
-        }
-        .step-number {
-          border-color: #666;
-          color: #bbb;
-        }
-        .step-title {
-          color: #f0f0f0;
-        }
-        .step-description {
-          color: #888;
-        }
-        .store-button {
-          border-color: #444;
-          color: #e0e0e0;
-          background: #222;
-        }
-        .store-button:hover {
-          background: #2a2a2a;
-          border-color: #666;
-        }
-        .store-link {
-          color: #888;
-        }
-        .store-link:hover {
-          color: #ccc;
-        }
-        .qr-section {
-          background: #111;
-          border-color: #333;
-        }
-        .qr-section .step-number {
-          border-color: rgba(255, 255, 255, 0.4);
-        }
-        .qr-section .step-description {
-          color: rgba(255, 255, 255, 0.6);
-        }
-        .open-button {
-          background: #f0f0f0;
-          color: #111;
-        }
-        .open-button:hover {
-          background: #e0e0e0;
-        }
-      }
+      /* Brand is intentionally light-only (cream/navy/coral) — no dark theme. */
     </style>
   </head>
   <body>
@@ -337,8 +276,8 @@
       </div>
 
       <div class="content" id="content">
-        <h1>APP_NAME_PLACEHOLDER</h1>
-        <p class="subtitle">Preview this app on your phone</p>
+        <h1>Pul<span class="accent">zz</span></h1>
+        <p class="subtitle">Scan the code to open Pulzz in Expo Go on your phone</p>
 
         <div class="steps-container">
           <div class="step">

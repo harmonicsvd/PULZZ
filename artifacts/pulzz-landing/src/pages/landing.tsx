@@ -65,7 +65,11 @@ const PARTNERS: Partner[] = [
     role: "Lyrics, mood & theme analysis, taste profiling",
     href: "https://www.musixmatch.com",
   },
-  { name: "Songstats", role: "Streaming analytics", href: "https://songstats.com" },
+  {
+    name: "Songstats",
+    role: "Streaming analytics",
+    href: "https://songstats.com",
+  },
   {
     name: "Cyanite",
     role: "AI sound & mood analysis — genre, mood, tempo, key & energy",
@@ -94,6 +98,11 @@ const LISTENER_FLOW: Step[] = [
     title: "Champion it first",
     body: "React Discovered or Skip, earn points, and become the one who found the song early.",
   },
+  {
+    n: "04",
+    title: "Climb the Discovery Wall",
+    body: "Your discoveries and points rank you on the live Discovery Wall — the more great songs you catch early, the higher you climb.",
+  },
 ];
 
 const ARTIST_FLOW: Step[] = [
@@ -111,6 +120,11 @@ const ARTIST_FLOW: Step[] = [
     n: "03",
     title: "Build true fans early",
     body: "Grow a base of listeners who genuinely care — before the big streaming-day push begins.",
+  },
+  {
+    n: "04",
+    title: "Find artists & collaborate",
+    body: "Discover other artists in the pool and team up — the Collaborate space helps you find your next co-writer or feature.",
   },
 ];
 
@@ -153,18 +167,19 @@ export default function Landing() {
             className="animate-float-up mt-6 font-display text-5xl font-bold leading-[1.05] tracking-tight sm:text-7xl"
             style={{ animationDelay: "0.05s" }}
           >
-            Catch a song&rsquo;s{" "}
-            <span className="text-primary">pulse</span> before it drops.
+            Catch a song&rsquo;s <span className="text-primary">pulse</span>{" "}
+            before it drops.
           </h1>
           <p
             className="animate-float-up mx-auto mt-6 max-w-2xl text-lg text-muted-foreground sm:text-xl"
             style={{ animationDelay: "0.12s" }}
           >
-<Wordmark className="text-foreground" /> helps emerging artists build a
-            base of true fans who genuinely care — <em className="not-italic text-foreground">before</em>{" "}
-            the big streaming-day push begins. Listeners discover unreleased
-            songs early, mark the moments that move them, and champion the music
-            first.
+            <Wordmark className="text-foreground" /> helps emerging artists
+            build a base of true fans who genuinely care —{" "}
+            <em className="not-italic text-foreground">before</em> the big
+            streaming-day push begins. Listeners discover unreleased songs and
+            artists early, mark the moments that move them, and champion the
+            music first.
           </p>
           <div
             className="animate-float-up mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row"
@@ -203,9 +218,9 @@ export default function Landing() {
               Great music is getting lost on both sides.
             </h2>
             <p className="mx-auto mt-3 max-w-2xl text-muted-foreground">
-              The flood of new releases has broken discovery. Artists can&rsquo;t
-              break through the noise, and listeners can&rsquo;t find the music
-              worth caring about.
+              The flood of new releases has broken discovery. Artists
+              can&rsquo;t break through the noise, and listeners can&rsquo;t
+              find the music worth caring about.
             </p>
           </div>
 
@@ -260,8 +275,8 @@ export default function Landing() {
           </div>
 
           <p className="mx-auto mt-10 max-w-2xl text-center text-base text-foreground">
-            Pulzz closes the gap: artists earn true fans early, and listeners get
-            to discover and champion new music first.
+            Pulzz closes the gap: artists earn true fans early, and listeners
+            get to discover and champion new music first.
           </p>
         </div>
       </section>
@@ -273,9 +288,10 @@ export default function Landing() {
             How Pulzz works
           </h2>
           <p className="mx-auto mt-3 max-w-2xl text-muted-foreground">
-            One loop, two sides. Pulzz turns early listens into real signal — giving
-            emerging artists genuine exposure and a base of true fans before release
-            day, while listeners discover and champion new music first.
+            One loop, two sides. Pulzz turns early listens into real signal —
+            giving emerging artists genuine exposure and a base of true fans
+            before release day, while listeners discover and champion new music
+            first.
           </p>
         </div>
         <div className="mt-12 grid gap-6 md:grid-cols-2">
@@ -342,13 +358,17 @@ export default function Landing() {
             <span className="font-semibold text-foreground">
               20+ original songs
             </span>{" "}
-            released on streaming platforms and{" "}
+            released on streaming platforms,{" "}
             <span className="font-semibold text-foreground">
               15 years of training in Indian classical music
             </span>
-            . Pulzz is the tool they wished existed: a way to find the people who
-            truly care about a song before release day, instead of shouting into
-            an algorithm.
+            , and a{" "}
+            <span className="font-semibold text-foreground">
+              Master&rsquo;s in Data Science from TU Hamburg
+            </span>
+            . Pulzz is the tool they wished existed: a way to find the people
+            who truly care about a song before release day, instead of shouting
+            into an algorithm.
           </p>
 
           {/* Listen to the maker */}
@@ -399,7 +419,9 @@ export default function Landing() {
                   rel="noopener noreferrer"
                   className="group rounded-full border border-border bg-card px-4 py-2 text-sm shadow-sm transition-colors hover:border-primary/60"
                 >
-                  <span className="font-semibold text-foreground">{p.name}</span>
+                  <span className="font-semibold text-foreground">
+                    {p.name}
+                  </span>
                   <span className="text-muted-foreground"> · {p.role}</span>
                 </a>
               ))}

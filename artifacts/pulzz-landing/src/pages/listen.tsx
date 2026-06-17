@@ -10,25 +10,25 @@ type Step = { n: string; title: ReactNode; body: ReactNode };
 const STEPS: Step[] = [
   {
     n: "01",
-    title: "Point your phone camera at the code",
-    body: "Open your phone's camera (or any QR scanner) and aim it at the code on the right. No app to install.",
+    title: "Get Expo Go (it's free)",
+    body: (
+      <>
+        <Wordmark className="text-foreground" /> is a mobile app, so it runs
+        inside Expo&rsquo;s free companion app. Install Expo Go from the App
+        Store or Google Play using the buttons below.
+      </>
+    ),
   },
   {
     n: "02",
-    title: "Tap the link that pops up",
-    body: (
-      <>
-        Your phone shows a link — tap it and{" "}
-        <Wordmark className="text-foreground" /> opens right in your browser. No
-        scanner? Use the tappable link below the code.
-      </>
-    ),
+    title: "Scan the code with your phone",
+    body: "Open your phone's camera (or Expo Go's built-in scanner) and aim it at the code on the right. Tap the link that pops up — or use the tappable link below the code.",
   },
   {
     n: "03",
     title: (
       <>
-        <Wordmark className="text-foreground" /> opens — start discovering
+        <Wordmark className="text-foreground" /> opens in Expo Go
       </>
     ),
     body: "Pick your taste, then stream unreleased tracks and mark the moments you love before anyone else.",
@@ -87,9 +87,10 @@ export default function ListenGuide() {
             className="animate-float-up mx-auto mt-5 max-w-xl text-lg text-muted-foreground"
             style={{ animationDelay: "0.12s" }}
           >
-            <Wordmark className="text-foreground" /> is a mobile-first discovery
-            app. Scan the code below to open it on your phone in seconds — no app
-            store purchase, no sign-up.
+            <Wordmark className="text-foreground" /> is a mobile app. Install the
+            free <span className="font-semibold text-foreground">Expo Go</span>{" "}
+            app, scan the code below, and <Wordmark className="text-foreground" />{" "}
+            opens on your phone in seconds — no purchase, no sign-up.
           </p>
         </div>
       </section>
@@ -120,14 +121,12 @@ export default function ListenGuide() {
 
             <div className="mt-8 rounded-2xl border border-border bg-background p-5">
               <p className="text-sm font-semibold text-foreground">
-                Optional: want the native-app feel?
+                Step 1 — get Expo Go free
               </p>
               <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
-                The browser is all you need. But{" "}
-                <Wordmark className="text-foreground" /> is built with{" "}
-                <span className="font-semibold text-foreground">Expo</span>, so if
-                you&rsquo;d like to run it in Expo&rsquo;s free companion app, grab
-                Expo Go below — then scan the same code from inside it.
+                Expo Go is Expo&rsquo;s free companion app for previewing mobile
+                apps. Install it once, then scan the code to open{" "}
+                <Wordmark className="text-foreground" /> inside it.
               </p>
               <div className="mt-4 flex flex-wrap gap-3">
                 <a
@@ -153,7 +152,7 @@ export default function ListenGuide() {
           {/* QR + links */}
           <div className="flex flex-col items-center justify-center rounded-3xl border border-card-border bg-card p-8 text-center shadow-sm">
             <span className="text-sm font-semibold uppercase tracking-wide text-primary">
-              Scan to open
+              Scan to open in Expo Go
             </span>
             <div className="mt-5 rounded-2xl bg-white p-5 shadow-sm">
               <QRCodeSVG
@@ -166,26 +165,22 @@ export default function ListenGuide() {
               />
             </div>
             <p className="mt-5 text-sm text-muted-foreground">
-              Point your phone camera here, or tap:
+              With Expo Go installed, point your phone camera here — or tap:
             </p>
             <a
               href={LISTENER_PATH}
               className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-sm transition-opacity hover:opacity-90"
             >
-              Open the listener on this device →
-            </a>
-            <a
-              href={LISTENER_PATH}
-              className="mt-3 text-sm font-medium text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
-            >
-              Just taking a quick look? Open in this browser
+              Open in Expo Go on this device →
             </a>
           </div>
         </div>
 
         <p className="mx-auto mt-10 max-w-xl text-center text-sm text-muted-foreground">
           Built for Musicathon 2026 · The <Wordmark className="text-foreground" />{" "}
-          listener runs free on any modern phone browser.
+          listener runs free in Expo Go on any modern phone. For the smoothest
+          scan, open this page from the published <Wordmark className="text-foreground" />{" "}
+          link.
         </p>
       </section>
     </div>
