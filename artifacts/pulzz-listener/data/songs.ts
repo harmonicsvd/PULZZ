@@ -12,6 +12,15 @@ export interface SongLicense {
   source?: string;
 }
 
+export interface SoundProfile {
+  energy: number;
+  valence: number;
+  arousal: number;
+  topGenres: string[];
+  topMoods: string[];
+  vector: number[];
+}
+
 export interface DemoSong {
   id: string;
   title: string;
@@ -32,6 +41,7 @@ export interface DemoSong {
   matchReason: string;
   bpm: number;
   instruments: string[];
+  soundProfile?: SoundProfile | null;
 }
 
 export const DEMO_SONGS: DemoSong[] = [

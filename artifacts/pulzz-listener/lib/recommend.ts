@@ -35,6 +35,46 @@ function hashJitter(id: string): number {
   return h / 997;
 }
 
+/** Cosine similarity (0..1) over two equal-length, non-negative vectors. */
+function cosineSimilarity(a: number[], b: number[]): number {
+  if (a.length === 0 || a.length !== b.length) return 0;
+  let dot = 0;
+  let na = 0;
+  let nb = 0;
+  for (let i = 0; i < a.length; i++) {
+    dot += a[i] * b[i];
+    na += a[i] * a[i];
+    nb += b[i] * b[i];
+  }
+  if (na === 0 || nb === 0) return 0;
+  return Math.max(0, Math.min(1, dot / (Math.sqrt(na) * Math.sqrt(nb))));
+}
+
+/**
+ * Mean of the sound vectors of the songs the listener has engaged with — their
+ * "sonic taste centroid". Returns null when none of those songs carry a Cyanite
+ * sound profile (e.g. the archival demo catalog), so callers skip the boost.
+ */
+function tasteSoundVector(input: RecommendInput): number[] | null {
+  const songById = new Map(input.songs.map((s) => [s.id, s]));
+  const liked = [
+    ...input.discoveries.map((d) => d.songId),
+    ...input.momentMarks.map((m) => m.songId),
+  ];
+  const vectors: number[][] = [];
+  for (const id of liked) {
+    const v = songById.get(id)?.soundProfile?.vector;
+    if (v && v.length > 0) vectors.push(v);
+  }
+  if (vectors.length === 0) return null;
+  const len = vectors[0].length;
+  const aligned = vectors.filter((v) => v.length === len);
+  if (aligned.length === 0) return null;
+  const sum = new Array<number>(len).fill(0);
+  for (const v of aligned) for (let i = 0; i < len; i++) sum[i] += v[i];
+  return sum.map((s) => s / aligned.length);
+}
+
 function buildSignals(input: RecommendInput): {
   positives: Signal[];
   negatives: Signal[];
@@ -134,6 +174,13 @@ export function rankSongs(input: RecommendInput): DemoSong[] {
   const { positives, negatives, tasteGenres } = buildSignals(input);
   const personality = input.profile?.discoveryPersonality ?? "balanced";
 
+  // Cyanite sound-similarity: boost songs whose sound fingerprint matches the
+  // listener's "sonic taste centroid". Explorers value novelty, so they get a
+  // lighter pull toward what already sounds familiar.
+  const tasteVector = tasteSoundVector(input);
+  const soundWeight =
+    personality === "familiar" ? 3 : personality === "explorer" ? 1.4 : 2.2;
+
   const scored = candidates.map((song) => {
     const tokens = songTokens(song);
 
@@ -156,23 +203,35 @@ export function rankSongs(input: RecommendInput): DemoSong[] {
     const freshness = Math.max(0, 14 - song.daysUntilRelease) * 0.04;
     const jitter = hashJitter(song.id);
 
+    const soundSim =
+      tasteVector && song.soundProfile
+        ? cosineSimilarity(tasteVector, song.soundProfile.vector)
+        : 0;
+    const soundBoost = soundSim * soundWeight;
+
     let score: number;
     let reason: string;
 
     if (personality === "familiar") {
-      score = familiarity * 1.3 + freshness;
+      score = familiarity * 1.3 + freshness + soundBoost;
       reason = best ? best.reason : "Close to what you love";
     } else if (personality === "explorer") {
       const novelty = isNovel ? 2.2 : 0;
-      score = familiarity * 0.55 + novelty + freshness + jitter * 1.6;
+      score =
+        familiarity * 0.55 + novelty + freshness + jitter * 1.6 + soundBoost;
       reason = isNovel
         ? "A fresh sound to explore"
         : best
           ? best.reason
           : "Worth a listen";
     } else {
-      score = familiarity + freshness + jitter * 0.7;
+      score = familiarity + freshness + jitter * 0.7 + soundBoost;
       reason = best ? best.reason : "New in your discovery pool";
+    }
+
+    // A strong sonic match is the most compelling story to tell — surface it.
+    if (soundSim >= 0.6 && soundBoost >= (best?.weight ?? 0)) {
+      reason = "Sounds like what you've been loving";
     }
 
     return { song: { ...song, matchReason: reason }, score };

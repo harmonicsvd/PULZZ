@@ -51,6 +51,7 @@ export * from './songstatsTrackInfo';
 export * from './songStatus';
 export * from './soundAnalysisResult';
 export * from './soundAnalysisResultStatus';
+export * from './soundProfile';
 export * from './updateArtistInput';
 export * from './updateSongAnalysis';
 export * from './updateSongAnalysisResult';

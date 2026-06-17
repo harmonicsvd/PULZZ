@@ -6,6 +6,7 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { ArtistLinks } from './artistLinks';
+import type { SoundProfile } from './soundProfile';
 
 export interface Artist {
   id: number;
@@ -20,5 +21,6 @@ export interface Artist {
   /** @nullable */
   roles?: string[] | null;
   links?: ArtistLinks | null;
+  soundProfile?: SoundProfile | null;
   createdAt: string;
 }

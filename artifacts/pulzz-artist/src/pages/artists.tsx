@@ -73,10 +73,39 @@ function initials(name: string): string {
     .toUpperCase();
 }
 
+/** Cosine similarity (0..1) over two equal-length, non-negative vectors. */
+function cosineSimilarity(a: number[], b: number[]): number {
+  if (a.length === 0 || a.length !== b.length) return 0;
+  let dot = 0;
+  let na = 0;
+  let nb = 0;
+  for (let i = 0; i < a.length; i++) {
+    dot += a[i] * b[i];
+    na += a[i] * a[i];
+    nb += b[i] * b[i];
+  }
+  if (na === 0 || nb === 0) return 0;
+  return Math.max(0, Math.min(1, dot / (Math.sqrt(na) * Math.sqrt(nb))));
+}
+
+/**
+ * How sonically alike two artists are (0..1), from their Cyanite sound
+ * profiles. Null when either artist has no analyzable catalog, so the UI can
+ * fall back to role-only matching rather than show a misleading number.
+ */
+function soundSimilarity(me: Artist, other: Artist): number | null {
+  const a = me.soundProfile?.vector;
+  const b = other.soundProfile?.vector;
+  if (!a || !b) return null;
+  return cosineSimilarity(a, b);
+}
+
 /**
  * Score how well `other` complements `me` for a collaboration:
  *  - +2 for each role the other artist offers that I don't have (fills a gap)
  *  - +1 if we share a genre (a creative starting point)
+ *  - up to +3 layered on for how similar their music sounds (Cyanite), when
+ *    both artists have an analyzed catalog
  */
 function matchScore(me: Artist, other: Artist): number {
   const myRoles = new Set(me.roles ?? []);
@@ -86,6 +115,8 @@ function matchScore(me: Artist, other: Artist): number {
     if (!myRoles.has(r)) score += 2;
   }
   if (me.genre && other.genre && me.genre === other.genre) score += 1;
+  const sound = soundSimilarity(me, other);
+  if (sound !== null) score += sound * 3;
   return score;
 }
 
@@ -120,6 +151,7 @@ export default function ArtistsPage() {
         artist: a,
         score: matchScore(me, a),
         fills: complementaryRoles(me, a),
+        sound: soundSimilarity(me, a),
       }))
       // Require at least one complementary role — genre is only a tiebreaker.
       .filter((s) => s.fills.length > 0)
@@ -177,7 +209,7 @@ export default function ArtistsPage() {
                   .
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {suggestions.map(({ artist, fills }) => {
+                  {suggestions.map(({ artist, fills, sound }) => {
                     return (
                       <Card
                         key={artist.id}
@@ -206,6 +238,14 @@ export default function ArtistsPage() {
                                 {fills.map(roleLabel).join(", ")}
                               </span>
                             </div>
+                          )}
+                          {sound !== null && (
+                            <Badge
+                              variant="secondary"
+                              className="text-xs font-medium"
+                            >
+                              Sounds {Math.round(sound * 100)}% alike
+                            </Badge>
                           )}
                           <Button
                             size="sm"

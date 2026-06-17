@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { count, desc, eq } from "drizzle-orm";
+import { count, desc, eq, isNotNull } from "drizzle-orm";
 import {
   db,
   artistsTable,
@@ -8,6 +8,11 @@ import {
   momentMarksTable,
   listenersTable,
 } from "@workspace/db";
+import {
+  toSoundProfile,
+  meanProfile,
+  type SoundProfile,
+} from "../lib/soundVector";
 import {
   CreateArtistBody,
   GetArtistDashboardParams,
@@ -26,6 +31,37 @@ const router: IRouter = Router();
 
 const URL_RE = /^https?:\/\/.+/;
 
+/**
+ * Builds a per-artist mean sound profile from every song that has a usable
+ * Cyanite analysis. Artists with no analyzable catalog map to `null`, so
+ * sound-based collaboration ranking degrades cleanly to role matching.
+ */
+async function soundProfilesByArtist(): Promise<Map<number, SoundProfile>> {
+  const rows = await db
+    .select({
+      artistId: songsTable.artistId,
+      cyaniteAnalysis: songsTable.cyaniteAnalysis,
+    })
+    .from(songsTable)
+    .where(isNotNull(songsTable.cyaniteAnalysis));
+
+  const grouped = new Map<number, SoundProfile[]>();
+  for (const r of rows) {
+    const profile = toSoundProfile(r.cyaniteAnalysis);
+    if (!profile) continue;
+    const list = grouped.get(r.artistId) ?? [];
+    list.push(profile);
+    grouped.set(r.artistId, list);
+  }
+
+  const out = new Map<number, SoundProfile>();
+  for (const [artistId, profiles] of grouped) {
+    const mean = meanProfile(profiles);
+    if (mean) out.set(artistId, mean);
+  }
+  return out;
+}
+
 function findInvalidLink(
   links: Record<string, string | undefined> | null | undefined
 ): string | null {
@@ -37,16 +73,17 @@ function findInvalidLink(
 }
 
 router.get("/artists", async (_req, res): Promise<void> => {
-  const artists = await db
-    .select()
-    .from(artistsTable)
-    .orderBy(artistsTable.name);
+  const [artists, profiles] = await Promise.all([
+    db.select().from(artistsTable).orderBy(artistsTable.name),
+    soundProfilesByArtist(),
+  ]);
 
   res.json(
     ListArtistsResponse.parse(
       artists.map((a) => ({
         ...a,
         createdAt: a.createdAt.toISOString(),
+        soundProfile: profiles.get(a.id) ?? null,
       }))
     )
   );

@@ -1,4 +1,4 @@
-import type { DemoSong, SongCredits } from "@/data/songs";
+import type { DemoSong, SongCredits, SoundProfile } from "@/data/songs";
 
 const getBase = () => {
   const domain = process.env.EXPO_PUBLIC_DOMAIN;
@@ -30,6 +30,7 @@ export interface ApiSong {
   durationSeconds: number;
   discoveredCount: number | null;
   skipCount: number | null;
+  soundProfile?: SoundProfile | null;
 }
 
 export interface ApiSongDetail extends ApiSong {
@@ -68,6 +69,7 @@ export function apiSongToDemoSong(s: ApiSong): DemoSong {
     matchReason: "In the discovery pool",
     bpm: 0,
     instruments: [],
+    soundProfile: s.soundProfile ?? null,
   };
 }
 

@@ -33,6 +33,22 @@ export interface SongLicense {
   source?: string;
 }
 
+/**
+ * Normalized sound fingerprint derived from Cyanite analysis, used for sound-similarity ranking. Null when a recording yields no usable tonal signal.
+ */
+export interface SoundProfile {
+  /** 0..1 */
+  energy: number;
+  /** 0..1 (musical positivity) */
+  valence: number;
+  /** 0..1 (intensity) */
+  arousal: number;
+  topGenres: string[];
+  topMoods: string[];
+  /** Deterministically-ordered feature vector for cosine similarity. */
+  vector: number[];
+}
+
 export interface Song {
   id: number;
   title: string;
@@ -55,6 +71,7 @@ export interface Song {
   skipCount?: number | null;
   analysis?: SongAnalysis | null;
   license?: SongLicense | null;
+  soundProfile?: SoundProfile | null;
 }
 
 export interface SongCredits {
@@ -410,6 +427,7 @@ export interface Artist {
   /** @nullable */
   roles?: string[] | null;
   links?: ArtistLinks | null;
+  soundProfile?: SoundProfile | null;
   createdAt: string;
 }
 

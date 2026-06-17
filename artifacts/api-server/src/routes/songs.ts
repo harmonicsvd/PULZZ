@@ -31,6 +31,7 @@ import { analyzeLyrics } from "../lib/musixmatch";
 import { getTrackStats } from "../lib/songstats";
 import { isConfigured } from "../lib/cyanite";
 import { startSongAnalysis, syncSong } from "../lib/cyaniteSync";
+import { toSoundProfile } from "../lib/soundVector";
 
 const router: IRouter = Router();
 
@@ -59,6 +60,7 @@ router.get("/songs", async (req, res): Promise<void> => {
       artworkUrl: songsTable.artworkUrl,
       durationSeconds: songsTable.durationSeconds,
       license: songsTable.license,
+      cyaniteAnalysis: songsTable.cyaniteAnalysis,
     })
     .from(songsTable)
     .innerJoin(artistsTable, eq(songsTable.artistId, artistsTable.id))
@@ -66,18 +68,22 @@ router.get("/songs", async (req, res): Promise<void> => {
     .orderBy(desc(songsTable.createdAt));
 
   const today = new Date();
-  const result = songs.map((s) => ({
-    ...s,
-    daysUntilRelease: Math.max(
-      0,
-      Math.ceil(
-        (new Date(s.releaseDate).getTime() - today.getTime()) /
-          (1000 * 60 * 60 * 24)
-      )
-    ),
-    discoveredCount: null,
-    skipCount: null,
-  }));
+  const result = songs.map((s) => {
+    const { cyaniteAnalysis, ...rest } = s;
+    return {
+      ...rest,
+      daysUntilRelease: Math.max(
+        0,
+        Math.ceil(
+          (new Date(s.releaseDate).getTime() - today.getTime()) /
+            (1000 * 60 * 60 * 24)
+        )
+      ),
+      discoveredCount: null,
+      skipCount: null,
+      soundProfile: toSoundProfile(cyaniteAnalysis),
+    };
+  });
 
   res.json(ListSongsResponse.parse(result));
 });

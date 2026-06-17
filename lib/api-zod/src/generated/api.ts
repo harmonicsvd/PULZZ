@@ -48,7 +48,15 @@ export const ListSongsResponseItem = zod.object({
   "type": zod.string().describe('License classification, e.g. \"Public Domain\".'),
   "detail": zod.string().optional().describe('Human-readable license rationale or terms.'),
   "source": zod.string().optional().describe('Attribution \/ source URL for the recording.')
-}),zod.null()]).optional()
+}),zod.null()]).optional(),
+  "soundProfile": zod.union([zod.object({
+  "energy": zod.number().describe('0..1'),
+  "valence": zod.number().describe('0..1 (musical positivity)'),
+  "arousal": zod.number().describe('0..1 (intensity)'),
+  "topGenres": zod.array(zod.string()),
+  "topMoods": zod.array(zod.string()),
+  "vector": zod.array(zod.number()).describe('Deterministically-ordered feature vector for cosine similarity.')
+}).describe('Normalized sound fingerprint derived from Cyanite analysis, used for sound-similarity ranking. Null when a recording yields no usable tonal signal.'),zod.null()]).optional()
 })
 export const ListSongsResponse = zod.array(ListSongsResponseItem)
 
@@ -374,6 +382,14 @@ export const ListArtistsResponseItem = zod.object({
   "youtube": zod.string().regex(listArtistsResponseLinksOneYoutubeRegExp).optional(),
   "tiktok": zod.string().regex(listArtistsResponseLinksOneTiktokRegExp).optional()
 }),zod.null()]).optional(),
+  "soundProfile": zod.union([zod.object({
+  "energy": zod.number().describe('0..1'),
+  "valence": zod.number().describe('0..1 (musical positivity)'),
+  "arousal": zod.number().describe('0..1 (intensity)'),
+  "topGenres": zod.array(zod.string()),
+  "topMoods": zod.array(zod.string()),
+  "vector": zod.array(zod.number()).describe('Deterministically-ordered feature vector for cosine similarity.')
+}).describe('Normalized sound fingerprint derived from Cyanite analysis, used for sound-similarity ranking. Null when a recording yields no usable tonal signal.'),zod.null()]).optional(),
   "createdAt": zod.string()
 })
 export const ListArtistsResponse = zod.array(ListArtistsResponseItem)
@@ -443,6 +459,14 @@ export const GetArtistResponse = zod.object({
   "youtube": zod.string().regex(getArtistResponseLinksOneYoutubeRegExp).optional(),
   "tiktok": zod.string().regex(getArtistResponseLinksOneTiktokRegExp).optional()
 }),zod.null()]).optional(),
+  "soundProfile": zod.union([zod.object({
+  "energy": zod.number().describe('0..1'),
+  "valence": zod.number().describe('0..1 (musical positivity)'),
+  "arousal": zod.number().describe('0..1 (intensity)'),
+  "topGenres": zod.array(zod.string()),
+  "topMoods": zod.array(zod.string()),
+  "vector": zod.array(zod.number()).describe('Deterministically-ordered feature vector for cosine similarity.')
+}).describe('Normalized sound fingerprint derived from Cyanite analysis, used for sound-similarity ranking. Null when a recording yields no usable tonal signal.'),zod.null()]).optional(),
   "createdAt": zod.string()
 })
 
@@ -506,6 +530,14 @@ export const UpdateArtistResponse = zod.object({
   "youtube": zod.string().regex(updateArtistResponseLinksOneYoutubeRegExp).optional(),
   "tiktok": zod.string().regex(updateArtistResponseLinksOneTiktokRegExp).optional()
 }),zod.null()]).optional(),
+  "soundProfile": zod.union([zod.object({
+  "energy": zod.number().describe('0..1'),
+  "valence": zod.number().describe('0..1 (musical positivity)'),
+  "arousal": zod.number().describe('0..1 (intensity)'),
+  "topGenres": zod.array(zod.string()),
+  "topMoods": zod.array(zod.string()),
+  "vector": zod.array(zod.number()).describe('Deterministically-ordered feature vector for cosine similarity.')
+}).describe('Normalized sound fingerprint derived from Cyanite analysis, used for sound-similarity ranking. Null when a recording yields no usable tonal signal.'),zod.null()]).optional(),
   "createdAt": zod.string()
 })
 
@@ -541,7 +573,15 @@ export const GetArtistSongsResponseItem = zod.object({
   "type": zod.string().describe('License classification, e.g. \"Public Domain\".'),
   "detail": zod.string().optional().describe('Human-readable license rationale or terms.'),
   "source": zod.string().optional().describe('Attribution \/ source URL for the recording.')
-}),zod.null()]).optional()
+}),zod.null()]).optional(),
+  "soundProfile": zod.union([zod.object({
+  "energy": zod.number().describe('0..1'),
+  "valence": zod.number().describe('0..1 (musical positivity)'),
+  "arousal": zod.number().describe('0..1 (intensity)'),
+  "topGenres": zod.array(zod.string()),
+  "topMoods": zod.array(zod.string()),
+  "vector": zod.array(zod.number()).describe('Deterministically-ordered feature vector for cosine similarity.')
+}).describe('Normalized sound fingerprint derived from Cyanite analysis, used for sound-similarity ranking. Null when a recording yields no usable tonal signal.'),zod.null()]).optional()
 })
 export const GetArtistSongsResponse = zod.array(GetArtistSongsResponseItem)
 
@@ -585,7 +625,15 @@ export const GetArtistDashboardResponse = zod.object({
   "type": zod.string().describe('License classification, e.g. \"Public Domain\".'),
   "detail": zod.string().optional().describe('Human-readable license rationale or terms.'),
   "source": zod.string().optional().describe('Attribution \/ source URL for the recording.')
-}),zod.null()]).optional()
+}),zod.null()]).optional(),
+  "soundProfile": zod.union([zod.object({
+  "energy": zod.number().describe('0..1'),
+  "valence": zod.number().describe('0..1 (musical positivity)'),
+  "arousal": zod.number().describe('0..1 (intensity)'),
+  "topGenres": zod.array(zod.string()),
+  "topMoods": zod.array(zod.string()),
+  "vector": zod.array(zod.number()).describe('Deterministically-ordered feature vector for cosine similarity.')
+}).describe('Normalized sound fingerprint derived from Cyanite analysis, used for sound-similarity ranking. Null when a recording yields no usable tonal signal.'),zod.null()]).optional()
 })).optional()
 })
 

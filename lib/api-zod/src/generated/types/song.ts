@@ -8,6 +8,7 @@
 import type { SongAnalysis } from './songAnalysis';
 import type { SongLicense } from './songLicense';
 import type { SongStatus } from './songStatus';
+import type { SoundProfile } from './soundProfile';
 
 export interface Song {
   id: number;
@@ -31,4 +32,5 @@ export interface Song {
   skipCount?: number | null;
   analysis?: SongAnalysis | null;
   license?: SongLicense | null;
+  soundProfile?: SoundProfile | null;
 }

@@ -624,6 +624,10 @@ components:
           oneOf:
             - $ref: "#/components/schemas/SongLicense"
             - type: "null"
+        soundProfile:
+          oneOf:
+            - $ref: "#/components/schemas/SoundProfile"
+            - type: "null"
 
     SongInput:
       type: object
@@ -1097,6 +1101,34 @@ components:
           type: string
           pattern: "^https?://"
 
+    SoundProfile:
+      type: object
+      description: Normalized sound fingerprint derived from Cyanite analysis, used for sound-similarity ranking. Null when a recording yields no usable tonal signal.
+      required: [energy, valence, arousal, topGenres, topMoods, vector]
+      properties:
+        energy:
+          type: number
+          description: 0..1
+        valence:
+          type: number
+          description: 0..1 (musical positivity)
+        arousal:
+          type: number
+          description: 0..1 (intensity)
+        topGenres:
+          type: array
+          items:
+            type: string
+        topMoods:
+          type: array
+          items:
+            type: string
+        vector:
+          type: array
+          description: Deterministically-ordered feature vector for cosine similarity.
+          items:
+            type: number
+
     Artist:
       type: object
       required: [id, name, email, createdAt]
@@ -1120,6 +1152,10 @@ components:
         links:
           oneOf:
             - $ref: "#/components/schemas/ArtistLinks"
+            - type: "null"
+        soundProfile:
+          oneOf:
+            - $ref: "#/components/schemas/SoundProfile"
             - type: "null"
         createdAt:
           type: string
