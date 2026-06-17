@@ -1,13 +1,8 @@
-const LISTENER_URL = "/pulzz-listener/";
-const ARTIST_URL = "/artist/";
+import { Link } from "wouter";
+import { Wordmark } from "@/components/Wordmark";
 
-function Wordmark({ className = "" }: { className?: string }) {
-  return (
-    <span className={`font-display font-bold tracking-tight ${className}`}>
-      Pul<span className="text-primary">zz</span>
-    </span>
-  );
-}
+const LISTEN_GUIDE_URL = "/listen";
+const ARTIST_URL = "/artist/";
 
 function PulseBars() {
   const bars = [0.5, 0.9, 0.3, 0.7, 1, 0.45, 0.8, 0.6, 0.95, 0.4, 0.75, 0.55];
@@ -125,12 +120,12 @@ export default function Landing() {
             <span className="hidden rounded-full border border-border bg-card px-3 py-1 text-xs font-medium text-muted-foreground sm:inline-block">
               Musicathon 2026 · June 15–21
             </span>
-            <a
-              href={LISTENER_URL}
+            <Link
+              href={LISTEN_GUIDE_URL}
               className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm transition-opacity hover:opacity-90"
             >
               Open the app
-            </a>
+            </Link>
           </div>
         </div>
       </header>
@@ -170,12 +165,12 @@ export default function Landing() {
             className="animate-float-up mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row"
             style={{ animationDelay: "0.18s" }}
           >
-            <a
-              href={LISTENER_URL}
+            <Link
+              href={LISTEN_GUIDE_URL}
               className="w-full rounded-full bg-primary px-7 py-3.5 text-base font-semibold text-primary-foreground shadow-md transition-transform hover:-translate-y-0.5 sm:w-auto"
             >
               Discover as a listener
-            </a>
+            </Link>
             <a
               href={ARTIST_URL}
               className="w-full rounded-full border border-border bg-card px-7 py-3.5 text-base font-semibold text-foreground shadow-sm transition-transform hover:-translate-y-0.5 sm:w-auto"
@@ -349,12 +344,12 @@ export default function Landing() {
                 </li>
               ))}
             </ul>
-            <a
-              href={LISTENER_URL}
+            <Link
+              href={LISTEN_GUIDE_URL}
               className="mt-7 inline-flex w-fit items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-sm transition-opacity hover:opacity-90"
             >
               Start discovering →
-            </a>
+            </Link>
           </div>
 
           {/* Artists */}
@@ -477,12 +472,12 @@ export default function Landing() {
           Catch the next song before it drops.
         </h2>
         <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-          <a
-            href={LISTENER_URL}
+          <Link
+            href={LISTEN_GUIDE_URL}
             className="w-full rounded-full bg-primary px-7 py-3.5 text-base font-semibold text-primary-foreground shadow-md transition-transform hover:-translate-y-0.5 sm:w-auto"
           >
             Discover as a listener
-          </a>
+          </Link>
           <a
             href={ARTIST_URL}
             className="w-full rounded-full border border-border bg-card px-7 py-3.5 text-base font-semibold text-foreground shadow-sm transition-transform hover:-translate-y-0.5 sm:w-auto"
