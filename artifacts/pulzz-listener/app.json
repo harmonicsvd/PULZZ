@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "Pulzz — Listener App",
-    "slug": "pulzz-listener",
+    "name": "Pulzz",
+    "slug": "pulzz",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "pulzz-listener",
+    "scheme": "pulzz",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
@@ -14,9 +14,12 @@
       "backgroundColor": "#F4EDE4"
     },
     "ios": {
-      "supportsTablet": false
+      "supportsTablet": false,
+      "bundleIdentifier": "com.pulzz.app"
     },
-    "android": {},
+    "android": {
+      "package": "com.pulzz.app"
+    },
     "web": {
       "favicon": "./assets/images/favicon.png"
     },

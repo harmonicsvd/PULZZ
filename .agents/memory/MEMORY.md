@@ -7,5 +7,6 @@
 - [Reaction sync idempotency](reaction-sync-idempotency.md) — listener syncs reactions/moments via an offline outbox; reaction scoring must adjust only on state transitions, never per POST
 - [Standalone TS scripts](standalone-ts-scripts.md) — a seed/CLI importing @workspace/db must be esbuild-bundled (Node can't resolve workspace pkgs at root nor drizzle's dir imports); follow the build.mjs pattern
 - [Artist app Pulse Coral theme](artist-pulse-coral-theme.md) — artist web app is light-only cream/navy/coral #FF5C49; white-on-coral primary is an intentional brand CTA (~3:1), don't "fix" it
+- [Brand asset generation](brand-asset-generation.md) — render Pulzz icon/splash/favicon from the wordmark via resvg + bundled Inter ExtraBold; no paid generation, keep wordmark in icon center for Android safe zone
 - [Expo web testing target](expo-web-testing.md) — test Expo listener via the Expo dev domain directly, not the proxy path; proxy serves HTML but not the bundle (blank screen)
 - [Orval pattern regex mangling](orval-pattern-regex.md) — OpenAPI string `pattern` is emitted as a broken RegExp; verify generated regex and add explicit guards for security-relevant validation

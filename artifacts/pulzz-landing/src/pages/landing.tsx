@@ -65,7 +65,11 @@ const LISTENER_STATS: Stat[] = [
 type Partner = { name: string; role: string; href: string };
 
 const PARTNERS: Partner[] = [
-  { name: "Musixmatch", role: "Synced lyrics", href: "https://www.musixmatch.com" },
+  {
+    name: "Musixmatch",
+    role: "Lyrics, mood analysis & taste profiling",
+    href: "https://www.musixmatch.com",
+  },
   { name: "Songstats", role: "Streaming analytics", href: "https://songstats.com" },
   {
     name: "Internet Archive",
@@ -74,11 +78,11 @@ const PARTNERS: Partner[] = [
   },
 ];
 
-const STEPS: Step[] = [
+const LISTENER_FLOW: Step[] = [
   {
     n: "01",
     title: "Discover before release",
-    body: "Listeners stream unreleased tracks days before they drop — the earliest possible ears on a song.",
+    body: "Stream unreleased tracks days before they drop — the earliest possible ears on a song.",
   },
   {
     n: "02",
@@ -87,8 +91,26 @@ const STEPS: Step[] = [
   },
   {
     n: "03",
-    title: "React & spread",
-    body: "Mark a song Discovered or Skip. Artists watch real-time discovery stats as the buzz builds.",
+    title: "Champion it first",
+    body: "React Discovered or Skip, earn points, and become the one who found the song early.",
+  },
+];
+
+const ARTIST_FLOW: Step[] = [
+  {
+    n: "01",
+    title: "Submit your track",
+    body: "Drop an unreleased song into the discovery pool before its release day.",
+  },
+  {
+    n: "02",
+    title: "Watch it find its people",
+    body: "See reactions and the exact moments listeners love most, in real time.",
+  },
+  {
+    n: "03",
+    title: "Build true fans early",
+    body: "Grow a base of listeners who genuinely care — before the big streaming-day push begins.",
   },
 ];
 
@@ -250,25 +272,56 @@ export default function Landing() {
           <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
             How Pulzz works
           </h2>
-          <p className="mx-auto mt-3 max-w-xl text-muted-foreground">
-            A simple loop that turns early listens into real signal.
+          <p className="mx-auto mt-3 max-w-2xl text-muted-foreground">
+            One loop, two sides. Pulzz turns early listens into real signal — giving
+            emerging artists genuine exposure and a base of true fans before release
+            day, while listeners discover and champion new music first.
           </p>
         </div>
-        <div className="mt-12 grid gap-5 md:grid-cols-3">
-          {STEPS.map((s) => (
-            <div
-              key={s.n}
-              className="rounded-2xl border border-card-border bg-card p-7 shadow-sm"
-            >
-              <span className="font-display text-3xl font-bold text-primary">
-                {s.n}
-              </span>
-              <h3 className="mt-3 text-lg font-semibold">{s.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                {s.body}
-              </p>
+        <div className="mt-12 grid gap-6 md:grid-cols-2">
+          {/* Listener side */}
+          <div className="rounded-3xl border border-card-border bg-card p-8 shadow-sm">
+            <span className="text-sm font-semibold uppercase tracking-wide text-primary">
+              For listeners
+            </span>
+            <div className="mt-6 space-y-6">
+              {LISTENER_FLOW.map((s) => (
+                <div key={s.n} className="flex gap-4">
+                  <span className="font-display text-2xl font-bold text-primary">
+                    {s.n}
+                  </span>
+                  <div>
+                    <h3 className="text-base font-semibold">{s.title}</h3>
+                    <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                      {s.body}
+                    </p>
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
+          </div>
+
+          {/* Artist side */}
+          <div className="rounded-3xl border border-card-border bg-card p-8 shadow-sm">
+            <span className="text-sm font-semibold uppercase tracking-wide text-primary">
+              For artists
+            </span>
+            <div className="mt-6 space-y-6">
+              {ARTIST_FLOW.map((s) => (
+                <div key={s.n} className="flex gap-4">
+                  <span className="font-display text-2xl font-bold text-primary">
+                    {s.n}
+                  </span>
+                  <div>
+                    <h3 className="text-base font-semibold">{s.title}</h3>
+                    <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                      {s.body}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 
@@ -360,6 +413,40 @@ export default function Landing() {
             truly care about a song before release day, instead of shouting into
             an algorithm.
           </p>
+
+          {/* Listen to the maker */}
+          <div className="mt-10">
+            <p className="text-center text-sm font-semibold text-foreground">
+              Listen to the maker&rsquo;s originals
+            </p>
+            <div className="mt-4 grid gap-4 md:grid-cols-[1fr_260px] md:items-stretch">
+              <iframe
+                title="The maker's music on Spotify"
+                src="https://open.spotify.com/embed/artist/32AhTkruwhaaQWTF0AC56r?utm_source=generator"
+                width="100%"
+                height="152"
+                loading="lazy"
+                style={{ border: 0, borderRadius: "16px" }}
+                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+              />
+              <a
+                href="https://www.youtube.com/@harmonics_vd"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2.5 rounded-2xl border border-card-border bg-card px-6 py-4 text-sm font-semibold text-foreground shadow-sm transition-colors hover:border-primary/60"
+              >
+                <svg
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  className="h-5 w-5 text-primary"
+                  fill="currentColor"
+                >
+                  <path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.2 31.2 0 0 0 0 12a31.2 31.2 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.2 31.2 0 0 0 24 12a31.2 31.2 0 0 0-.5-5.8ZM9.6 15.6V8.4l6.2 3.6Z" />
+                </svg>
+                Watch originals on YouTube
+              </a>
+            </div>
+          </div>
 
           {/* Partners */}
           <div className="mt-12 border-t border-border/70 pt-8">
