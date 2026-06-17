@@ -32,6 +32,48 @@ function PulseBars() {
 
 type Step = { n: string; title: string; body: string };
 
+type Stat = { figure: string; label: string; source: string };
+
+const ARTIST_STATS: Stat[] = [
+  {
+    figure: "100,000+",
+    label: "new tracks are uploaded to streaming services every single day.",
+    source: "Luminate 2023 Year-End Music Report",
+  },
+  {
+    figure: "86%",
+    label: "of all tracks on streaming earned fewer than 1,000 plays in 2023.",
+    source: "Luminate 2023 Year-End Music Report",
+  },
+];
+
+const LISTENER_STATS: Stat[] = [
+  {
+    figure: "184M",
+    label:
+      "tracks now sit on streaming services — far more than any person can sift through.",
+    source: "Luminate 2023 Year-End Music Report",
+  },
+  {
+    figure: "45.6M",
+    label:
+      "of those tracks got zero streams in 2023 — great music going completely unheard.",
+    source: "Luminate 2023 Year-End Music Report",
+  },
+];
+
+type Partner = { name: string; role: string; href: string };
+
+const PARTNERS: Partner[] = [
+  { name: "Musixmatch", role: "Synced lyrics", href: "https://www.musixmatch.com" },
+  { name: "Songstats", role: "Streaming analytics", href: "https://songstats.com" },
+  {
+    name: "Internet Archive",
+    role: "Public-domain recordings",
+    href: "https://archive.org",
+  },
+];
+
 const STEPS: Step[] = [
   {
     n: "01",
@@ -96,9 +138,11 @@ export default function Landing() {
             className="animate-float-up mx-auto mt-6 max-w-2xl text-lg text-muted-foreground sm:text-xl"
             style={{ animationDelay: "0.12s" }}
           >
-            <Wordmark className="text-foreground" /> is where listeners discover
-            unreleased songs early, mark the moments that move them, and react —
-            while artists watch the buzz build in real time.
+<Wordmark className="text-foreground" /> helps emerging artists build a
+            base of true fans who genuinely care — <em className="not-italic text-foreground">before</em>{" "}
+            the big streaming-day push begins. Listeners discover unreleased
+            songs early, mark the moments that move them, and champion the music
+            first.
           </p>
           <div
             className="animate-float-up mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row"
@@ -123,6 +167,80 @@ export default function Landing() {
           >
             <PulseBars />
           </div>
+        </div>
+      </section>
+
+      {/* The problem */}
+      <section className="border-y border-border/70 bg-card/40">
+        <div className="mx-auto max-w-6xl px-5 py-16">
+          <div className="text-center">
+            <span className="text-sm font-semibold uppercase tracking-wide text-primary">
+              The discovery gap
+            </span>
+            <h2 className="mt-2 font-display text-3xl font-bold tracking-tight sm:text-4xl">
+              Great music is getting lost on both sides.
+            </h2>
+            <p className="mx-auto mt-3 max-w-2xl text-muted-foreground">
+              The flood of new releases has broken discovery. Artists can&rsquo;t
+              break through the noise, and listeners can&rsquo;t find the music
+              worth caring about.
+            </p>
+          </div>
+
+          <div className="mt-12 grid gap-6 md:grid-cols-2">
+            {/* Artists side */}
+            <div className="rounded-3xl border border-card-border bg-card p-8 shadow-sm">
+              <h3 className="font-display text-xl font-bold tracking-tight">
+                Artists can&rsquo;t break through
+              </h3>
+              <div className="mt-6 space-y-6">
+                {ARTIST_STATS.map((s) => (
+                  <div key={s.figure}>
+                    <div className="flex items-baseline gap-3">
+                      <span className="font-display text-4xl font-bold text-primary">
+                        {s.figure}
+                      </span>
+                      <span className="text-sm text-muted-foreground">
+                        {s.label}
+                      </span>
+                    </div>
+                    <p className="mt-1.5 text-xs text-muted-foreground">
+                      Source: {s.source}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Listeners side */}
+            <div className="rounded-3xl border border-card-border bg-card p-8 shadow-sm">
+              <h3 className="font-display text-xl font-bold tracking-tight">
+                Listeners can&rsquo;t keep up
+              </h3>
+              <div className="mt-6 space-y-6">
+                {LISTENER_STATS.map((s) => (
+                  <div key={s.figure}>
+                    <div className="flex items-baseline gap-3">
+                      <span className="font-display text-4xl font-bold text-primary">
+                        {s.figure}
+                      </span>
+                      <span className="text-sm text-muted-foreground">
+                        {s.label}
+                      </span>
+                    </div>
+                    <p className="mt-1.5 text-xs text-muted-foreground">
+                      Source: {s.source}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <p className="mx-auto mt-10 max-w-2xl text-center text-base text-foreground">
+            Pulzz closes the gap: artists earn true fans early, and listeners get
+            to discover and champion new music first.
+          </p>
         </div>
       </section>
 
@@ -214,6 +332,76 @@ export default function Landing() {
               Open the dashboard →
             </a>
           </div>
+        </div>
+      </section>
+
+      {/* About the maker */}
+      <section className="border-t border-border/70 bg-card/40">
+        <div className="mx-auto max-w-3xl px-5 py-16">
+          <div className="text-center">
+            <span className="text-sm font-semibold uppercase tracking-wide text-primary">
+              About the maker
+            </span>
+            <h2 className="mt-2 font-display text-3xl font-bold tracking-tight">
+              Built by an artist, for artists.
+            </h2>
+          </div>
+          <p className="mt-6 text-center text-lg leading-relaxed text-muted-foreground">
+            Pulzz is built by an independent artist — a singer, composer, and
+            lyricist with{" "}
+            <span className="font-semibold text-foreground">
+              20+ original songs
+            </span>{" "}
+            released on streaming platforms and{" "}
+            <span className="font-semibold text-foreground">
+              15 years of training in Indian classical music
+            </span>
+            . Pulzz is the tool they wished existed: a way to find the people who
+            truly care about a song before release day, instead of shouting into
+            an algorithm.
+          </p>
+
+          {/* Partners */}
+          <div className="mt-12 border-t border-border/70 pt-8">
+            <p className="text-center text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Powered by
+            </p>
+            <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
+              {PARTNERS.map((p) => (
+                <a
+                  key={p.name}
+                  href={p.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group rounded-full border border-border bg-card px-4 py-2 text-sm shadow-sm transition-colors hover:border-primary/60"
+                >
+                  <span className="font-semibold text-foreground">{p.name}</span>
+                  <span className="text-muted-foreground"> · {p.role}</span>
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="mx-auto max-w-4xl px-5 py-16 text-center">
+        <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
+          Catch the next song before it drops.
+        </h2>
+        <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+          <a
+            href={LISTENER_URL}
+            className="w-full rounded-full bg-primary px-7 py-3.5 text-base font-semibold text-primary-foreground shadow-md transition-transform hover:-translate-y-0.5 sm:w-auto"
+          >
+            Discover as a listener
+          </a>
+          <a
+            href={ARTIST_URL}
+            className="w-full rounded-full border border-border bg-card px-7 py-3.5 text-base font-semibold text-foreground shadow-sm transition-transform hover:-translate-y-0.5 sm:w-auto"
+          >
+            Open the artist dashboard
+          </a>
         </div>
       </section>
 
