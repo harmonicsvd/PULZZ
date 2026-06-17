@@ -10,11 +10,12 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { router, Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import * as SplashScreen from "expo-splash-screen";
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { PulzzIntro } from "@/components/PulzzIntro";
 import { AppProvider, useApp } from "@/contexts/AppContext";
 
 SplashScreen.preventAutoHideAsync();
@@ -59,6 +60,9 @@ export default function RootLayout() {
     Inter_800ExtraBold,
   });
 
+  const [introDone, setIntroDone] = useState(false);
+  const handleIntroDone = useCallback(() => setIntroDone(true), []);
+
   useEffect(() => {
     if (fontsLoaded || fontError) {
       SplashScreen.hideAsync();
@@ -80,6 +84,7 @@ export default function RootLayout() {
           </AppProvider>
         </QueryClientProvider>
       </ErrorBoundary>
+      {!introDone && <PulzzIntro onDone={handleIntroDone} />}
     </SafeAreaProvider>
   );
 }
