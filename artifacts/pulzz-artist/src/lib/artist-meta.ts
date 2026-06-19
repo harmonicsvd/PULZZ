@@ -53,3 +53,47 @@ export const CREDIT_FIELDS: { key: string; label: string }[] = [
   { key: "masteringEngineer", label: "Mastering Engineer" },
   { key: "producer", label: "Producer" },
 ];
+
+// --- Submission rules (shown on the welcome page + enforced on the submit form) ---
+
+/** Minimum lead time (in days) between submission and the scheduled release. */
+export const MIN_RELEASE_LEAD_DAYS = 10;
+
+export const SUBMISSION_RULES: { title: string; body: string }[] = [
+  {
+    title: "Original work, your rights",
+    body: "The song must be your own original work and you must hold the rights to it.",
+  },
+  {
+    title: "Delivered to your distributor",
+    body: "The track must already be delivered to your distributor before you add it to Pulzz.",
+  },
+  {
+    title: "Submit ahead of release",
+    body: `Submit at least ${MIN_RELEASE_LEAD_DAYS} days (about a week and a half) before your release date, so listeners have time to discover it first.`,
+  },
+];
+
+// --- Streaming presence (artist profile) ---
+
+export const STREAMING_PLATFORMS: { key: LinkKey; label: string; metric: string }[] = [
+  { key: "spotify", label: "Spotify", metric: "monthly listeners" },
+  { key: "appleMusic", label: "Apple Music", metric: "monthly listeners" },
+  { key: "youtube", label: "YouTube", metric: "subscribers" },
+  { key: "soundcloud", label: "SoundCloud", metric: "followers" },
+  { key: "instagram", label: "Instagram", metric: "followers" },
+  { key: "tiktok", label: "TikTok", metric: "followers" },
+];
+
+/**
+ * Deterministic placeholder audience size for an artist on a given platform.
+ * Static demo data only — real figures will come from the streaming partners
+ * later. Stable across renders/sessions so the numbers don't flicker.
+ */
+export function placeholderFollowerCount(seed: number, key: string): number {
+  let h = ((seed + 1) * 2654435761) >>> 0;
+  for (let i = 0; i < key.length; i++) {
+    h = ((h ^ key.charCodeAt(i)) * 16777619) >>> 0;
+  }
+  return 5000 + (h % 95000);
+}

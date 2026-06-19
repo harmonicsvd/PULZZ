@@ -26,6 +26,8 @@ import {
   DISTRIBUTORS,
   ROLE_OPTIONS,
   LINK_FIELDS,
+  STREAMING_PLATFORMS,
+  placeholderFollowerCount,
 } from "@/lib/artist-meta";
 
 type LinkKey = (typeof LINK_FIELDS)[number]["key"];
@@ -111,6 +113,13 @@ export default function SettingsPage() {
       }
     );
   }
+
+  const connectedPlatforms = STREAMING_PLATFORMS.filter((p) =>
+    links[p.key]?.trim()
+  ).map((p) => ({
+    ...p,
+    count: placeholderFollowerCount(artist.id, p.key),
+  }));
 
   return (
     <AppLayout>
@@ -226,6 +235,44 @@ export default function SettingsPage() {
                     />
                   </div>
                 ))}
+              </CardContent>
+            </Card>
+
+            <Card className="bg-card border-border">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-base">Streaming Presence</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-xs text-muted-foreground mb-4">
+                  Your reach across platforms, shown on your profile. Just add
+                  your links above — we handle the rest automatically.{" "}
+                  <span className="italic">Demo figures for now.</span>
+                </p>
+                {connectedPlatforms.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">
+                    Add your streaming and social links above to show your
+                    audience here.
+                  </p>
+                ) : (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    {connectedPlatforms.map((p) => (
+                      <div
+                        key={p.key}
+                        className="rounded-lg border border-border bg-background p-3"
+                      >
+                        <div className="text-xs text-muted-foreground">
+                          {p.label}
+                        </div>
+                        <div className="text-lg font-bold tracking-tight">
+                          {p.count.toLocaleString()}
+                        </div>
+                        <div className="text-[11px] text-muted-foreground">
+                          {p.metric}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
 

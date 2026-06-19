@@ -3,6 +3,7 @@ import { Link, useLocation } from "wouter";
 import { useSignIn } from "@clerk/react";
 import { useCreateDemoSession } from "@workspace/api-client-react";
 import { ArrowRight, BarChart3, Eye, Loader2, Music, Trophy } from "lucide-react";
+import { SUBMISSION_RULES } from "@/lib/artist-meta";
 
 const features = [
   {
@@ -147,6 +148,29 @@ export default function Welcome() {
             </div>
           ))}
         </div>
+
+        <section className="mt-16 w-full">
+          <h2 className="font-display font-bold text-2xl tracking-tight text-center">
+            Before you submit
+          </h2>
+          <p className="text-muted-foreground text-sm mt-2 text-center max-w-xl mx-auto">
+            A few rules keep the Pulzz discovery pool fair and release-ready.
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6 text-left">
+            {SUBMISSION_RULES.map((rule, i) => (
+              <div
+                key={rule.title}
+                className="rounded-xl border border-border bg-card p-5"
+              >
+                <div className="w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center text-sm font-bold mb-3">
+                  {i + 1}
+                </div>
+                <p className="font-semibold text-sm">{rule.title}</p>
+                <p className="text-sm text-muted-foreground mt-1">{rule.body}</p>
+              </div>
+            ))}
+          </div>
+        </section>
       </main>
 
       <footer className="px-6 py-6 text-center text-xs text-muted-foreground">

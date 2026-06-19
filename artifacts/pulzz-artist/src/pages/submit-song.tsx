@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -28,7 +29,12 @@ import {
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "wouter";
-import { GENRES, DISTRIBUTORS, CREDIT_FIELDS } from "@/lib/artist-meta";
+import {
+  GENRES,
+  DISTRIBUTORS,
+  CREDIT_FIELDS,
+  MIN_RELEASE_LEAD_DAYS,
+} from "@/lib/artist-meta";
 
 type Credits = {
   lyricist: string;
@@ -59,6 +65,16 @@ function formatDuration(seconds: number) {
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
+/** Whole days from today (local midnight) until the given yyyy-mm-dd date. */
+function daysUntilDate(dateStr: string): number | null {
+  if (!dateStr) return null;
+  const target = new Date(`${dateStr}T00:00:00`);
+  if (Number.isNaN(target.getTime())) return null;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return Math.round((target.getTime() - today.getTime()) / 86_400_000);
+}
+
 export default function SubmitSongPage() {
   const [, navigate] = useLocation();
   const queryClient = useQueryClient();
@@ -66,6 +82,8 @@ export default function SubmitSongPage() {
   const artist = useCurrentArtist();
   const [submitted, setSubmitted] = useState(false);
   const [prefilled, setPrefilled] = useState(false);
+  const [confirmRights, setConfirmRights] = useState(false);
+  const [confirmDistributor, setConfirmDistributor] = useState(false);
 
   const [form, setForm] = useState({
     title: "",
@@ -159,8 +177,30 @@ export default function SubmitSongPage() {
     if (fileInputRef.current) fileInputRef.current.value = "";
   }
 
+  const releaseLeadDays = daysUntilDate(form.releaseDate);
+  const releaseDateValid =
+    releaseLeadDays !== null && releaseLeadDays >= MIN_RELEASE_LEAD_DAYS;
+
+  const minReleaseDate = (() => {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    d.setDate(d.getDate() + MIN_RELEASE_LEAD_DAYS);
+    // Format as local YYYY-MM-DD (avoid toISOString, which is UTC and can shift
+    // the date by a day in positive-offset timezones).
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${d.getFullYear()}-${month}-${day}`;
+  })();
+
   const canSubmit =
-    form.title.trim() && form.genre && form.releaseDate && form.story.trim() && !isUploading;
+    form.title.trim() &&
+    form.genre &&
+    form.releaseDate &&
+    releaseDateValid &&
+    form.story.trim() &&
+    confirmRights &&
+    confirmDistributor &&
+    !isUploading;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -418,6 +458,7 @@ export default function SubmitSongPage() {
                   <Input
                     id="releaseDate"
                     type="date"
+                    min={minReleaseDate}
                     value={form.releaseDate}
                     onChange={(e) => update("releaseDate", e.target.value)}
                     className="bg-background"
@@ -434,6 +475,13 @@ export default function SubmitSongPage() {
                   />
                 </div>
               </div>
+              {form.releaseDate && !releaseDateValid && (
+                <p className="text-xs text-destructive">
+                  Pick a release date at least {MIN_RELEASE_LEAD_DAYS} days out —
+                  songs must be submitted about a week and a half before release
+                  so listeners have time to discover them first.
+                </p>
+              )}
               <div className="space-y-1.5">
                 <Label>Distributor</Label>
                 <Select
@@ -523,6 +571,40 @@ export default function SubmitSongPage() {
                   className="bg-background resize-none min-h-[100px]"
                 />
               </div>
+            </CardContent>
+          </Card>
+
+          {/* Eligibility & Rights */}
+          <Card className="bg-card border-border">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-base">Eligibility & Rights</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <p className="text-xs text-muted-foreground">
+                Before submitting, please confirm your song meets Pulzz's rules.
+              </p>
+              <label className="flex items-start gap-3 cursor-pointer text-sm">
+                <Checkbox
+                  checked={confirmRights}
+                  onCheckedChange={(v) => setConfirmRights(v === true)}
+                  className="mt-0.5"
+                />
+                <span>
+                  This song is my <strong>original work</strong> and I own the
+                  rights to it.
+                </span>
+              </label>
+              <label className="flex items-start gap-3 cursor-pointer text-sm">
+                <Checkbox
+                  checked={confirmDistributor}
+                  onCheckedChange={(v) => setConfirmDistributor(v === true)}
+                  className="mt-0.5"
+                />
+                <span>
+                  This song has already been{" "}
+                  <strong>delivered to my distributor</strong>.
+                </span>
+              </label>
             </CardContent>
           </Card>
 
