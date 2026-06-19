@@ -488,7 +488,7 @@ export default function ListenScreen() {
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[styles.playBtn, { backgroundColor: colors.midBlue }]}
+            style={[styles.playBtn, { backgroundColor: colors.coral }]}
             onPress={togglePlayPause}
             activeOpacity={0.85}
           >
@@ -1031,10 +1031,10 @@ const styles = StyleSheet.create({
   playBtn: {
     width: 66,
     height: 66,
-    borderRadius: 26,
+    borderRadius: 20,
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: "#3E5C99",
+    shadowColor: "#FF5C49",
     shadowOpacity: 0.35,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 6 },

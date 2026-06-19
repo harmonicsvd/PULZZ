@@ -144,7 +144,12 @@ export default function Landing() {
       {/* Nav */}
       <header className="sticky top-0 z-20 border-b border-border/70 bg-background/80 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4">
-          <Wordmark className="text-2xl" />
+          <div className="flex items-center gap-2.5">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary shadow-sm">
+              <div className="h-2.5 w-2.5 rounded-full bg-background" />
+            </div>
+            <Wordmark className="text-2xl" />
+          </div>
           <div className="flex items-center gap-2">
             <span className="hidden rounded-full border border-border bg-card px-3 py-1 text-xs font-medium text-muted-foreground sm:inline-block">
               Musicathon 2026 · June 15–21
