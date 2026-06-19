@@ -26,6 +26,7 @@ import type {
   Artist,
   ArtistDashboard,
   ArtistInput,
+  ArtistSongstats,
   DemoSession,
   ErrorEnvelope,
   GetMusixmatchAnalysisParams,
@@ -1793,6 +1794,83 @@ export function useGetArtistSongs<TData = Awaited<ReturnType<typeof getArtistSon
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
   const queryOptions = getGetArtistSongsQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetArtistSongstatsUrl = (id: number,) => {
+
+
+
+
+  return `/api/artists/${id}/songstats`
+}
+
+/**
+ * @summary Aggregated Songstats streaming performance across an artist's songs
+ */
+export const getArtistSongstats = async (id: number, options?: RequestInit): Promise<ArtistSongstats> => {
+
+  return customFetch<ArtistSongstats>(getGetArtistSongstatsUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetArtistSongstatsQueryKey = (id: number,) => {
+    return [
+    `/api/artists/${id}/songstats`
+    ] as const;
+    }
+
+
+export const getGetArtistSongstatsQueryOptions = <TData = Awaited<ReturnType<typeof getArtistSongstats>>, TError = ErrorType<unknown>>(id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getArtistSongstats>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetArtistSongstatsQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getArtistSongstats>>> = ({ signal }) => getArtistSongstats(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getArtistSongstats>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetArtistSongstatsQueryResult = NonNullable<Awaited<ReturnType<typeof getArtistSongstats>>>
+export type GetArtistSongstatsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Aggregated Songstats streaming performance across an artist's songs
+ */
+
+export function useGetArtistSongstats<TData = Awaited<ReturnType<typeof getArtistSongstats>>, TError = ErrorType<unknown>>(
+ id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getArtistSongstats>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetArtistSongstatsQueryOptions(id,options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 

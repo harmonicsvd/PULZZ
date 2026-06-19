@@ -289,6 +289,74 @@ export interface SongstatsResult {
   fetchedAt: string;
 }
 
+export interface ArtistSongstatsPlatform {
+  source: string;
+  /** @nullable */
+  streamsTotal?: number | null;
+  /** @nullable */
+  playlistReachTotal?: number | null;
+  /** @nullable */
+  playlistsTotal?: number | null;
+  /** @nullable */
+  chartsTotal?: number | null;
+}
+
+export type ArtistSongstatsSongSongstatsStatus = typeof ArtistSongstatsSongSongstatsStatus[keyof typeof ArtistSongstatsSongSongstatsStatus];
+
+
+export const ArtistSongstatsSongSongstatsStatus = {
+  ok: 'ok',
+  pre_release: 'pre_release',
+  no_identifier: 'no_identifier',
+  not_found: 'not_found',
+  unconfigured: 'unconfigured',
+  error: 'error',
+} as const;
+
+export interface ArtistSongstatsSong {
+  id: number;
+  title: string;
+  /** @nullable */
+  coverColor?: string | null;
+  status: string;
+  songstatsStatus: ArtistSongstatsSongSongstatsStatus;
+  available: boolean;
+  /** @nullable */
+  streamsTotal?: number | null;
+  /** @nullable */
+  playlistReachTotal?: number | null;
+  /** @nullable */
+  chartsTotal?: number | null;
+}
+
+export type ArtistSongstatsStatus = typeof ArtistSongstatsStatus[keyof typeof ArtistSongstatsStatus];
+
+
+export const ArtistSongstatsStatus = {
+  ok: 'ok',
+  unconfigured: 'unconfigured',
+  no_songs: 'no_songs',
+  no_data: 'no_data',
+} as const;
+
+export interface ArtistSongstats {
+  status: ArtistSongstatsStatus;
+  configured: boolean;
+  songsTotal: number;
+  songsWithStats: number;
+  /** @nullable */
+  streamsTotal?: number | null;
+  /** @nullable */
+  playlistReachTotal?: number | null;
+  /** @nullable */
+  playlistsTotal?: number | null;
+  /** @nullable */
+  chartsTotal?: number | null;
+  platforms: ArtistSongstatsPlatform[];
+  songs: ArtistSongstatsSong[];
+  fetchedAt: string;
+}
+
 export type CyaniteAnalysisGenre = {[key: string]: number};
 
 export type CyaniteAnalysisMood = {[key: string]: number};

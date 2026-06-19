@@ -7,6 +7,7 @@ import { useCurrentArtist } from "@/lib/current-artist";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Play, SkipForward, Users, Activity, Loader2 } from "lucide-react";
 import { Link } from "wouter";
+import { StreamingStats } from "@/components/streaming-stats";
 
 export default function Dashboard() {
   const artist = useCurrentArtist();
@@ -69,6 +70,8 @@ export default function Dashboard() {
                 </CardContent>
               </Card>
             </div>
+
+            <StreamingStats artistId={artist.id} />
 
             <div className="space-y-4">
               <h2 className="text-xl font-bold tracking-tight">Recent Activity</h2>

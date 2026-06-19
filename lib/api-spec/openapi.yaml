@@ -509,6 +509,25 @@ paths:
                 items:
                   $ref: "#/components/schemas/Song"
 
+  /artists/{id}/songstats:
+    get:
+      operationId: getArtistSongstats
+      tags: [artists]
+      summary: Aggregated Songstats streaming performance across an artist's songs
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Aggregated streaming stats (or a fallback state when unavailable)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ArtistSongstats"
+
   /artists/{id}/dashboard:
     get:
       operationId: getArtistDashboard
@@ -1189,6 +1208,78 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/SongstatsSource"
+        fetchedAt:
+          type: string
+
+    ArtistSongstatsPlatform:
+      type: object
+      required: [source]
+      properties:
+        source:
+          type: string
+        streamsTotal:
+          type: ["integer", "null"]
+        playlistReachTotal:
+          type: ["integer", "null"]
+        playlistsTotal:
+          type: ["integer", "null"]
+        chartsTotal:
+          type: ["integer", "null"]
+
+    ArtistSongstatsSong:
+      type: object
+      required: [id, title, status, songstatsStatus, available]
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        coverColor:
+          type: ["string", "null"]
+        status:
+          type: string
+        songstatsStatus:
+          type: string
+          enum: [ok, pre_release, no_identifier, not_found, unconfigured, error]
+        available:
+          type: boolean
+        streamsTotal:
+          type: ["integer", "null"]
+        playlistReachTotal:
+          type: ["integer", "null"]
+        chartsTotal:
+          type: ["integer", "null"]
+
+    ArtistSongstats:
+      type: object
+      required:
+        [status, configured, songsTotal, songsWithStats, platforms, songs, fetchedAt]
+      properties:
+        status:
+          type: string
+          enum: [ok, unconfigured, no_songs, no_data]
+        configured:
+          type: boolean
+        songsTotal:
+          type: integer
+        songsWithStats:
+          type: integer
+        streamsTotal:
+          type: ["integer", "null"]
+        playlistReachTotal:
+          type: ["integer", "null"]
+        playlistsTotal:
+          type: ["integer", "null"]
+        chartsTotal:
+          type: ["integer", "null"]
+        platforms:
+          type: array
+          items:
+            $ref: "#/components/schemas/ArtistSongstatsPlatform"
+        songs:
+          type: array
+          items:
+            $ref: "#/components/schemas/ArtistSongstatsSong"
         fetchedAt:
           type: string
 

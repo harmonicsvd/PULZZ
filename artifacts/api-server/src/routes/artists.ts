@@ -22,11 +22,14 @@ import {
   GetArtistResponse,
   GetArtistSongsParams,
   GetArtistSongsResponse,
+  GetArtistSongstatsParams,
+  GetArtistSongstatsResponse,
   ListArtistsResponse,
   UpdateArtistBody,
   UpdateArtistParams,
   UpdateArtistResponse,
 } from "@workspace/api-zod";
+import { getTrackStats, isConfigured } from "../lib/songstats";
 
 const router: IRouter = Router();
 
@@ -276,6 +279,177 @@ router.get(
 
   res.json(GetArtistSongsResponse.parse(result));
 });
+
+router.get(
+  "/artists/:id/songstats",
+  requireArtist,
+  async (req, res): Promise<void> => {
+    const params = GetArtistSongstatsParams.safeParse(req.params);
+    if (!params.success) {
+      res.status(400).json({ error: params.error.message });
+      return;
+    }
+    if (params.data.id !== req.artist!.id) {
+      res
+        .status(403)
+        .json({ error: "You can only view your own streaming stats" });
+      return;
+    }
+
+    const songs = await db
+      .select({
+        id: songsTable.id,
+        title: songsTable.title,
+        coverColor: songsTable.coverColor,
+        status: songsTable.status,
+        streamingId: songsTable.streamingId,
+        releaseDate: songsTable.releaseDate,
+      })
+      .from(songsTable)
+      .where(eq(songsTable.artistId, params.data.id))
+      .orderBy(desc(songsTable.createdAt));
+
+    const fetchedAt = new Date().toISOString();
+
+    if (songs.length === 0) {
+      res.json(
+        GetArtistSongstatsResponse.parse({
+          status: "no_songs",
+          configured: isConfigured(),
+          songsTotal: 0,
+          songsWithStats: 0,
+          streamsTotal: null,
+          playlistReachTotal: null,
+          playlistsTotal: null,
+          chartsTotal: null,
+          platforms: [],
+          songs: [],
+          fetchedAt,
+        })
+      );
+      return;
+    }
+
+    // A song counts as released once its release date has arrived (UTC, day
+    // granularity) — mirrors the per-song /songs/:id/songstats gating so
+    // pre-release songs never show live numbers even with an identifier.
+    const todayUtc = new Date(new Date().toISOString().slice(0, 10)).getTime();
+
+    const perSong = await Promise.all(
+      songs.map(async (s) => {
+        const releaseUtc = new Date(`${s.releaseDate}T00:00:00Z`).getTime();
+        const released = Number.isFinite(releaseUtc)
+          ? releaseUtc <= todayUtc
+          : true;
+        const stats = await getTrackStats(s.streamingId, { released });
+        return { song: s, stats };
+      })
+    );
+
+    // Aggregate platform totals across every song that returned live data.
+    const platformAgg = new Map<
+      string,
+      {
+        source: string;
+        streamsTotal: number | null;
+        playlistReachTotal: number | null;
+        playlistsTotal: number | null;
+        chartsTotal: number | null;
+      }
+    >();
+
+    const addNullable = (a: number | null, b: number | null): number | null => {
+      if (a === null && b === null) return null;
+      return (a ?? 0) + (b ?? 0);
+    };
+
+    let streamsTotal: number | null = null;
+    let playlistReachTotal: number | null = null;
+    let playlistsTotal: number | null = null;
+    let chartsTotal: number | null = null;
+    let songsWithStats = 0;
+
+    for (const { stats } of perSong) {
+      if (!stats.available) continue;
+      songsWithStats++;
+      streamsTotal = addNullable(streamsTotal, stats.streamsTotal);
+      playlistReachTotal = addNullable(
+        playlistReachTotal,
+        stats.playlistReachTotal
+      );
+      playlistsTotal = addNullable(playlistsTotal, stats.playlistsTotal);
+      chartsTotal = addNullable(chartsTotal, stats.chartsTotal);
+
+      for (const src of stats.sources) {
+        const existing = platformAgg.get(src.source);
+        const srcStreams = src.streamsTotal ?? src.playsTotal;
+        if (existing) {
+          existing.streamsTotal = addNullable(existing.streamsTotal, srcStreams);
+          existing.playlistReachTotal = addNullable(
+            existing.playlistReachTotal,
+            src.playlistReachTotal
+          );
+          existing.playlistsTotal = addNullable(
+            existing.playlistsTotal,
+            src.playlistsTotal
+          );
+          existing.chartsTotal = addNullable(
+            existing.chartsTotal,
+            src.chartsTotal
+          );
+        } else {
+          platformAgg.set(src.source, {
+            source: src.source,
+            streamsTotal: srcStreams,
+            playlistReachTotal: src.playlistReachTotal,
+            playlistsTotal: src.playlistsTotal,
+            chartsTotal: src.chartsTotal,
+          });
+        }
+      }
+    }
+
+    const platforms = Array.from(platformAgg.values()).sort(
+      (a, b) => (b.streamsTotal ?? 0) - (a.streamsTotal ?? 0)
+    );
+
+    const configured = isConfigured();
+    let status: "ok" | "unconfigured" | "no_data";
+    if (songsWithStats > 0) {
+      status = "ok";
+    } else if (!configured) {
+      status = "unconfigured";
+    } else {
+      status = "no_data";
+    }
+
+    res.json(
+      GetArtistSongstatsResponse.parse({
+        status,
+        configured,
+        songsTotal: songs.length,
+        songsWithStats,
+        streamsTotal,
+        playlistReachTotal,
+        playlistsTotal,
+        chartsTotal,
+        platforms,
+        songs: perSong.map(({ song, stats }) => ({
+          id: song.id,
+          title: song.title,
+          coverColor: song.coverColor,
+          status: song.status,
+          songstatsStatus: stats.status,
+          available: stats.available,
+          streamsTotal: stats.streamsTotal,
+          playlistReachTotal: stats.playlistReachTotal,
+          chartsTotal: stats.chartsTotal,
+        })),
+        fetchedAt,
+      })
+    );
+  }
+);
 
 router.get(
   "/artists/:id/dashboard",

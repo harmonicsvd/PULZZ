@@ -63,6 +63,11 @@ function apiKey(): string | null {
   return key && key.trim().length > 0 ? key.trim() : null;
 }
 
+/** Whether a Songstats API key is configured in the environment. */
+export function isConfigured(): boolean {
+  return apiKey() !== null;
+}
+
 /**
  * Resolves an artist-supplied identifier (ISRC, Spotify track id, or a Spotify
  * track URL) into the appropriate Songstats query parameter.

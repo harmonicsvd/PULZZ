@@ -696,6 +696,44 @@ export const GetArtistSongsResponse = zod.array(GetArtistSongsResponseItem)
 
 
 /**
+ * @summary Aggregated Songstats streaming performance across an artist's songs
+ */
+export const GetArtistSongstatsParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const GetArtistSongstatsResponse = zod.object({
+  "status": zod.enum(['ok', 'unconfigured', 'no_songs', 'no_data']),
+  "configured": zod.boolean(),
+  "songsTotal": zod.number(),
+  "songsWithStats": zod.number(),
+  "streamsTotal": zod.number().nullish(),
+  "playlistReachTotal": zod.number().nullish(),
+  "playlistsTotal": zod.number().nullish(),
+  "chartsTotal": zod.number().nullish(),
+  "platforms": zod.array(zod.object({
+  "source": zod.string(),
+  "streamsTotal": zod.number().nullish(),
+  "playlistReachTotal": zod.number().nullish(),
+  "playlistsTotal": zod.number().nullish(),
+  "chartsTotal": zod.number().nullish()
+})),
+  "songs": zod.array(zod.object({
+  "id": zod.number(),
+  "title": zod.string(),
+  "coverColor": zod.string().nullish(),
+  "status": zod.string(),
+  "songstatsStatus": zod.enum(['ok', 'pre_release', 'no_identifier', 'not_found', 'unconfigured', 'error']),
+  "available": zod.boolean(),
+  "streamsTotal": zod.number().nullish(),
+  "playlistReachTotal": zod.number().nullish(),
+  "chartsTotal": zod.number().nullish()
+})),
+  "fetchedAt": zod.string()
+})
+
+
+/**
  * @summary Get dashboard summary stats for an artist
  */
 export const GetArtistDashboardParams = zod.object({
