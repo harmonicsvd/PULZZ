@@ -2,7 +2,7 @@
 
 ![Pulzz landing page](./pulzz.png)
 
-> **The Problem:** Streaming platforms are a crowded jungle where every new song has to fight for attention against bigger, more popular artists. Great songs often disappear before they can find early listeners, because they lack buzz, fans waiting on release day, and a place to be discovered first. Listeners also lose access to promising new artist talent, because the most exciting unreleased songs can be drowned out before they ever get a chance.
+> **The Problem:** Streaming platforms are a crowded jungle where every new song has to fight for attention against bigger, more popular artists. Great songs often disappear before they can find early listeners, because they lack buzz, fans waiting on release day, and a place to be discovered first. Listeners also lose access to promising new talent, because great songs — and the artists who make them — get buried in the streaming jungle before listeners ever find them.
 >
 > **The Solution:** Pulzz creates a space *before* release day where emerging artists can build their first audience, and music lovers can discover the next great song before everyone else finds it.
 
