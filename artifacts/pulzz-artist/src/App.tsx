@@ -102,12 +102,15 @@ const clerkAppearance = {
 };
 
 // Clickable Pulzz wordmark shown above the auth card. The landing page is a
-// SEPARATE artifact mounted at the origin root ("/"), so this is a plain anchor
-// (full browser navigation) rather than an in-app SPA link.
+// SEPARATE artifact mounted at the site root ("/"), so this is a plain anchor
+// doing a full browser navigation (relative "/" — same pattern proven to work
+// in the dashboard sidebar), not an in-app SPA link.
+const LANDING_URL = import.meta.env.VITE_LANDING_URL ?? "/";
+
 function BrandHome() {
   return (
     <a
-      href={`${window.location.origin}/`}
+      href={LANDING_URL}
       className="mb-8 inline-flex items-center transition-opacity hover:opacity-80"
       aria-label="Back to Pulzz home"
     >
