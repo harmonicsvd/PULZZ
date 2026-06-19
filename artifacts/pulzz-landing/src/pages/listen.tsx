@@ -2,6 +2,7 @@ import { type ReactNode, useEffect, useState } from "react";
 import { Link } from "wouter";
 import { QRCodeSVG } from "qrcode.react";
 import { Wordmark } from "@/components/Wordmark";
+import { Logo } from "@/components/Logo";
 
 const LISTENER_PATH = "/pulzz-listener/";
 
@@ -52,7 +53,7 @@ export default function ListenGuide() {
             className="transition-opacity hover:opacity-80"
             aria-label="Back to the Pulzz home page"
           >
-            <Wordmark className="text-2xl" />
+            <Logo />
           </Link>
           <Link
             href="/"

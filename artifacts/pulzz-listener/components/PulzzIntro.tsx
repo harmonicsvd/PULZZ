@@ -169,17 +169,43 @@ export function PulzzIntro({ size = 64, onDone }: PulzzIntroProps) {
     });
   }, [reduceMotionResolved, rowWidth, measuredCount, translateX, opacity, finish]);
 
+  const cubeSize = Math.round(size * 0.82);
+  const cubeDotSize = Math.round(size * 0.26);
+
   return (
     <View
       style={[styles.root, { backgroundColor: colors.background }]}
       accessibilityRole="image"
       accessibilityLabel="Pulzz"
     >
-      <View
-        style={styles.row}
-        onLayout={(e) => setRowWidth(e.nativeEvent.layout.width)}
-      >
-        {LETTERS.map((l, i) => (
+      <View style={styles.lockup}>
+        <Animated.View
+          style={[
+            styles.cube,
+            {
+              width: cubeSize,
+              height: cubeSize,
+              borderRadius: Math.round(cubeSize * 0.26),
+              backgroundColor: colors.coral,
+              marginRight: Math.round(size * 0.18),
+              opacity: opacity[0],
+            },
+          ]}
+        >
+          <View
+            style={{
+              width: cubeDotSize,
+              height: cubeDotSize,
+              borderRadius: cubeDotSize / 2,
+              backgroundColor: colors.background,
+            }}
+          />
+        </Animated.View>
+        <View
+          style={styles.row}
+          onLayout={(e) => setRowWidth(e.nativeEvent.layout.width)}
+        >
+          {LETTERS.map((l, i) => (
           <Animated.Text
             key={i}
             onLayout={(e) => onLetterLayout(i, e.nativeEvent.layout)}
@@ -195,7 +221,8 @@ export function PulzzIntro({ size = 64, onDone }: PulzzIntroProps) {
           >
             {l.ch}
           </Animated.Text>
-        ))}
+          ))}
+        </View>
       </View>
     </View>
   );
@@ -208,6 +235,14 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     zIndex: 9999,
     elevation: 9999,
+  },
+  lockup: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  cube: {
+    alignItems: "center",
+    justifyContent: "center",
   },
   row: {
     flexDirection: "row",
