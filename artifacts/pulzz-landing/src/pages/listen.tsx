@@ -75,7 +75,7 @@ export default function ListenGuide() {
           <div className="animate-float-up">
             <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-1.5 text-xs font-medium text-muted-foreground">
               <span className="h-2 w-2 rounded-full bg-primary" />
-              For Musicathon judges
+              Pre-release music discovery
             </span>
           </div>
           <h1
@@ -88,9 +88,10 @@ export default function ListenGuide() {
             className="animate-float-up mx-auto mt-5 max-w-xl text-lg text-muted-foreground"
             style={{ animationDelay: "0.12s" }}
           >
-            <Wordmark className="text-foreground" /> is a mobile app. Install the
-            free <span className="font-semibold text-foreground">Expo Go</span>{" "}
-            app, scan the code below, and <Wordmark className="text-foreground" />{" "}
+            <Wordmark className="text-foreground" /> is a mobile app. Install
+            the free{" "}
+            <span className="font-semibold text-foreground">Expo Go</span> app,
+            scan the code below, and <Wordmark className="text-foreground" />{" "}
             opens on your phone in seconds — no purchase, no sign-up.
           </p>
         </div>
@@ -121,9 +122,6 @@ export default function ListenGuide() {
             </div>
 
             <div className="mt-8 rounded-2xl border border-border bg-background p-5">
-              <p className="text-sm font-semibold text-foreground">
-                Step 1 — get Expo Go free
-              </p>
               <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
                 Expo Go is Expo&rsquo;s free companion app for previewing mobile
                 apps. Install it once, then scan the code to open{" "}
@@ -178,10 +176,10 @@ export default function ListenGuide() {
         </div>
 
         <p className="mx-auto mt-10 max-w-xl text-center text-sm text-muted-foreground">
-          Built for Musicathon 2026 · The <Wordmark className="text-foreground" />{" "}
-          listener runs free in Expo Go on any modern phone. For the smoothest
-          scan, open this page from the published <Wordmark className="text-foreground" />{" "}
-          link.
+          Built for Musicathon 2026 · The{" "}
+          <Wordmark className="text-foreground" /> listener runs free in Expo Go
+          on any modern phone. For the smoothest scan, open this page from the
+          published <Wordmark className="text-foreground" /> link.
         </p>
       </section>
     </div>

@@ -60,6 +60,49 @@ export default function ListenScreen() {
   const sheetAnim = useRef(new Animated.Value(0)).current;
   const storyAnim = useRef(new Animated.Value(0)).current;
   const waveWidth = useRef(0);
+
+  // Smooth progress: the audio status callback only fires intermittently, so
+  // we drive the bar with a requestAnimationFrame loop that estimates the
+  // current position between callbacks. `posAnchor` is the last known truth
+  // (position + the wall-clock time we learned it) and whether playback is
+  // advancing; each frame extrapolates from it for buttery 60fps motion.
+  const progressAnim = useRef(new Animated.Value(0)).current;
+  const progressWidth = useRef(
+    progressAnim.interpolate({ inputRange: [0, 1], outputRange: ["0%", "100%"] })
+  ).current;
+  const durationRef = useRef(0);
+  const posAnchor = useRef({ positionMillis: 0, atTimestamp: 0, isPlaying: false });
+
+  // Wall-clock estimate of the current playback position (ms), extrapolated
+  // from the last status callback when audio is advancing.
+  const estimatePosition = useCallback(() => {
+    const a = posAnchor.current;
+    return a.isPlaying
+      ? a.positionMillis + (Date.now() - a.atTimestamp)
+      : a.positionMillis;
+  }, []);
+
+  // Re-anchor the smooth-progress estimate to a known position.
+  const setAnchor = useCallback(
+    (positionMillis: number, isPlaying: boolean) => {
+      posAnchor.current = { positionMillis, atTimestamp: Date.now(), isPlaying };
+    },
+    []
+  );
+
+  // 60fps progress driver — runs for the life of the screen, holding still
+  // while paused and extrapolating while playing.
+  useEffect(() => {
+    let raf: number;
+    const tick = () => {
+      const dur = durationRef.current;
+      const est = Math.max(0, Math.min(estimatePosition(), dur));
+      progressAnim.setValue(dur > 0 ? est / dur : 0);
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [estimatePosition, progressAnim]);
   const lyricScrollRef = useRef<ScrollView | null>(null);
   const lyricYs = useRef<Record<number, number>>({});
   const lyricHeights = useRef<Record<number, number>>({});
@@ -132,6 +175,13 @@ export default function ListenScreen() {
 
   async function loadAudio() {
     if (!song) return;
+    // Reset the smooth-progress estimate so a track switch never flashes the
+    // previous song's position before the first status callback arrives.
+    durationRef.current = 0;
+    setAnchor(0, false);
+    progressAnim.setValue(0);
+    setPosition(0);
+    setDuration(0);
     try {
       await Audio.setAudioModeAsync({
         playsInSilentModeIOS: true,
@@ -143,6 +193,9 @@ export default function ListenScreen() {
         onPlaybackStatusUpdate
       );
       soundRef.current = sound;
+      // Tighter status cadence keeps the time readout and the smooth-progress
+      // anchor in close sync with real playback.
+      await sound.setProgressUpdateIntervalAsync(250);
       setIsLoading(false);
       setIsPlaying(true);
     } catch {
@@ -152,8 +205,12 @@ export default function ListenScreen() {
 
   function onPlaybackStatusUpdate(status: AVPlaybackStatus) {
     if (!status.isLoaded) return;
-    setPosition(status.positionMillis ?? 0);
-    setDuration(status.durationMillis ?? (song?.durationSeconds ?? 0) * 1000);
+    const pos = status.positionMillis ?? 0;
+    const dur = status.durationMillis ?? (song?.durationSeconds ?? 0) * 1000;
+    durationRef.current = dur;
+    setAnchor(pos, status.isPlaying);
+    setPosition(pos);
+    setDuration(dur);
     setIsPlaying(status.isPlaying);
     if (status.didJustFinish) setFinished(true);
   }
@@ -161,13 +218,21 @@ export default function ListenScreen() {
   async function togglePlayPause() {
     if (!soundRef.current) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    if (isPlaying) await soundRef.current.pauseAsync();
-    else await soundRef.current.playAsync();
+    if (isPlaying) {
+      // Freeze the estimate at the current spot immediately so the bar doesn't
+      // keep creeping for a frame after the tap.
+      setAnchor(estimatePosition(), false);
+      await soundRef.current.pauseAsync();
+    } else {
+      setAnchor(estimatePosition(), true);
+      await soundRef.current.playAsync();
+    }
   }
 
   async function restart() {
     if (!soundRef.current) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setAnchor(0, true);
     await soundRef.current.setPositionAsync(0);
     await soundRef.current.playAsync();
   }
@@ -176,7 +241,12 @@ export default function ListenScreen() {
     if (!soundRef.current || !duration || waveWidth.current <= 0) return;
     const x = e.nativeEvent.locationX;
     const fraction = Math.max(0, Math.min(1, x / waveWidth.current));
-    await soundRef.current.setPositionAsync(fraction * duration);
+    const target = fraction * duration;
+    // Update the estimate first so the bar jumps to the tapped spot instantly,
+    // rather than waiting for the next status callback.
+    setAnchor(target, posAnchor.current.isPlaying);
+    setPosition(target);
+    await soundRef.current.setPositionAsync(target);
   }
 
   async function handleMomentMark() {
@@ -300,8 +370,6 @@ export default function ListenScreen() {
     const s = secs % 60;
     return `${m}:${s.toString().padStart(2, "0")}`;
   }
-
-  const progress = duration > 0 ? position / duration : 0;
 
   if (!song) {
     return (
@@ -432,11 +500,11 @@ export default function ListenScreen() {
             onPress={seekTo}
           >
             <View style={[styles.progressTrack, { backgroundColor: colors.blueGrey }]}>
-              <View
+              <Animated.View
                 style={[
                   styles.progressFill,
                   {
-                    width: `${Math.min(100, progress * 100)}%`,
+                    width: progressWidth,
                     backgroundColor: colors.coral,
                   },
                 ]}
@@ -460,12 +528,12 @@ export default function ListenScreen() {
             </View>
 
             {/* Draggable-looking thumb at the current position */}
-            <View
+            <Animated.View
               pointerEvents="none"
               style={[
                 styles.progressThumb,
                 {
-                  left: `${Math.min(100, progress * 100)}%`,
+                  left: progressWidth,
                   backgroundColor: colors.coral,
                 },
               ]}
