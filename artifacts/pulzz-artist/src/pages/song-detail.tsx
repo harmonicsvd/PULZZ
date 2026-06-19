@@ -74,37 +74,38 @@ export default function SongDetailPage({ id }: Props) {
 
   return (
     <AppLayout>
-      <div className="p-8 max-w-6xl mx-auto space-y-8">
-        <header className="flex items-center gap-3">
+      <div className="p-4 sm:p-8 max-w-6xl mx-auto space-y-6 sm:space-y-8">
+        <header className="flex items-start gap-3">
           <Link href="/songs">
-            <div className="w-8 h-8 rounded-md bg-secondary hover:bg-secondary/80 flex items-center justify-center cursor-pointer transition-colors">
+            <div className="w-8 h-8 rounded-md bg-secondary hover:bg-secondary/80 flex items-center justify-center cursor-pointer transition-colors flex-shrink-0">
               <ArrowLeft className="w-4 h-4" />
             </div>
           </Link>
           {song && (
-            <div className="flex items-center gap-4 flex-1">
+            <div className="flex flex-wrap items-center gap-3 sm:gap-4 flex-1 min-w-0">
               <div
                 className="w-12 h-12 rounded-lg flex-shrink-0"
                 style={{ backgroundColor: song.coverColor }}
               />
-              <div>
+              <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
-                  <h1 className="text-2xl font-bold tracking-tight">
+                  <h1 className="text-xl sm:text-2xl font-bold tracking-tight truncate min-w-0">
                     {song.title}
                   </h1>
-                  <Badge variant="secondary">
+                  <Badge variant="secondary" className="flex-shrink-0">
                     {isReleased ? "Released" : "Active"}
                   </Badge>
                 </div>
-                <p className="text-muted-foreground text-sm">
+                <p className="text-muted-foreground text-sm truncate">
                   {song.artistName} · {song.genre}
                 </p>
               </div>
-              <div className="ml-auto">
+              <div className="w-full sm:w-auto sm:ml-auto">
                 <Button
                   onClick={handleRelease}
                   disabled={isReleasing}
                   variant={isReleased ? "outline" : "default"}
+                  className="w-full sm:w-auto"
                 >
                   {isReleasing ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
