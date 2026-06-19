@@ -77,7 +77,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
           </Link>
           <button
             type="button"
-            onClick={() => signOut({ redirectUrl: basePath || "/" })}
+            onClick={() => signOut({ redirectUrl: `${basePath}/sign-in` })}
             className="w-full flex items-center gap-3 text-sm text-muted-foreground px-3 py-2 cursor-pointer hover:text-foreground transition-colors mt-1"
           >
             <LogOut className="w-4 h-4" />
