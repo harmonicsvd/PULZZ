@@ -57,14 +57,6 @@ if (!clerkPubKey) {
 const clerkAppearance = {
   theme: shadcn,
   cssLayerName: "clerk",
-  options: {
-    logoPlacement: "inside" as const,
-    // Clicking the Pulzz logo on the sign-in/sign-up pages returns to the
-    // public landing page (separate artifact mounted at the origin root),
-    // not the artist app home at basePath.
-    logoLinkUrl: "/",
-    logoImageUrl: `${window.location.origin}${basePath}/logo.svg`,
-  },
   variables: {
     colorPrimary: "hsl(6 100% 64%)",
     colorForeground: "hsl(221 45% 20%)",
@@ -109,9 +101,25 @@ const clerkAppearance = {
   },
 };
 
+// Clickable Pulzz wordmark shown above the auth card. The landing page is a
+// SEPARATE artifact mounted at the origin root ("/"), so this is a plain anchor
+// (full browser navigation) rather than an in-app SPA link.
+function BrandHome() {
+  return (
+    <a
+      href={`${window.location.origin}/`}
+      className="mb-8 inline-flex items-center transition-opacity hover:opacity-80"
+      aria-label="Back to Pulzz home"
+    >
+      <img src={`${basePath}/logo.svg`} alt="Pulzz" className="h-8 w-auto" />
+    </a>
+  );
+}
+
 function SignInPage() {
   return (
-    <div className="flex min-h-[100dvh] items-center justify-center bg-background px-4">
+    <div className="flex min-h-[100dvh] flex-col items-center justify-center bg-background px-4">
+      <BrandHome />
       <SignIn
         routing="path"
         path={`${basePath}/sign-in`}
@@ -123,7 +131,8 @@ function SignInPage() {
 
 function SignUpPage() {
   return (
-    <div className="flex min-h-[100dvh] items-center justify-center bg-background px-4">
+    <div className="flex min-h-[100dvh] flex-col items-center justify-center bg-background px-4">
+      <BrandHome />
       <SignUp
         routing="path"
         path={`${basePath}/sign-up`}
