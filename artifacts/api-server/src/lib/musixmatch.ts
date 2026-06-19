@@ -209,7 +209,7 @@ export async function getAnalysis(trackId: number): Promise<MxmAnalysis> {
   };
 }
 
-function detectLanguage(text: string): string | null {
+export function detectLanguage(text: string): string | null {
   const trimmed = text.trim();
   if (!trimmed) return null;
   if (/[\u3040-\u30ff]/.test(trimmed)) return "ja";
