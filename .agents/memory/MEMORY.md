@@ -13,3 +13,4 @@
 - [Orval pattern regex mangling](orval-pattern-regex.md) — OpenAPI string `pattern` is emitted as a broken RegExp; verify generated regex and add explicit guards for security-relevant validation
 - [Artifact re-registration](artifact-reregistration.md) — deleting artifacts/<slug>/ deregisters it; re-register via verifyAndReplaceArtifactToml (not createArtifact). .gitignore/.replit are guarded from raw rm/cp
 - [Artist auth + ownership](artist-auth-ownership.md) — artist app uses Clerk; /artists/me JIT-provisions by clerkUserId (email fallback); all artist routes reject non-owned records; listener/landing read endpoints stay public
+- [Artist-overall streaming stats demo](artist-streaming-stats-demo.md) — dashboard "Artist overall" tab is intentional deterministic demo data (labelled), NOT real Songstats; don't "fix" it — real integration is the "Your songs" tab only

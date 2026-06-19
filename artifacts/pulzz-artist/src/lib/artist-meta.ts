@@ -85,15 +85,67 @@ export const STREAMING_PLATFORMS: { key: LinkKey; label: string; metric: string 
   { key: "tiktok", label: "TikTok", metric: "followers" },
 ];
 
+/** Stable FNV-1a-style hash so demo figures never flicker between renders. */
+function hash(seed: number, key: string): number {
+  let h = ((seed + 1) * 2654435761) >>> 0;
+  for (let i = 0; i < key.length; i++) {
+    h = ((h ^ key.charCodeAt(i)) * 16777619) >>> 0;
+  }
+  return h >>> 0;
+}
+
 /**
  * Deterministic placeholder audience size for an artist on a given platform.
  * Static demo data only — real figures will come from the streaming partners
  * later. Stable across renders/sessions so the numbers don't flicker.
  */
 export function placeholderFollowerCount(seed: number, key: string): number {
-  let h = ((seed + 1) * 2654435761) >>> 0;
-  for (let i = 0; i < key.length; i++) {
-    h = ((h ^ key.charCodeAt(i)) * 16777619) >>> 0;
-  }
-  return 5000 + (h % 95000);
+  return 5000 + (hash(seed, key) % 95000);
+}
+
+export interface DemoPlatformStat {
+  key: string;
+  label: string;
+  metric: string;
+  streams: number;
+  audience: number;
+  playlistReach: number;
+  charts: number;
+}
+
+export interface DemoArtistStreamingStats {
+  platforms: DemoPlatformStat[];
+  totals: { streams: number; audience: number; playlistReach: number; charts: number };
+}
+
+/**
+ * Deterministic, artist-wide streaming figures for the "Artist Overall" demo
+ * view. Unlike the per-song Songstats data, these represent an artist's whole
+ * catalogue across platforms. Demo data only (clearly labelled in the UI) and
+ * stable per artist id so the numbers stay consistent across sessions.
+ */
+export function demoArtistStreamingStats(
+  artistId: number
+): DemoArtistStreamingStats {
+  const platforms: DemoPlatformStat[] = STREAMING_PLATFORMS.map((p) => ({
+    key: p.key,
+    label: p.label,
+    metric: p.metric,
+    streams: 120_000 + (hash(artistId, `${p.key}:streams`) % 4_800_000),
+    audience: placeholderFollowerCount(artistId, p.key),
+    playlistReach: 8_000 + (hash(artistId, `${p.key}:reach`) % 720_000),
+    charts: hash(artistId, `${p.key}:charts`) % 6,
+  }));
+
+  const totals = platforms.reduce(
+    (acc, p) => ({
+      streams: acc.streams + p.streams,
+      audience: acc.audience + p.audience,
+      playlistReach: acc.playlistReach + p.playlistReach,
+      charts: acc.charts + p.charts,
+    }),
+    { streams: 0, audience: 0, playlistReach: 0, charts: 0 }
+  );
+
+  return { platforms, totals };
 }
