@@ -44,6 +44,23 @@ vi.mock("@workspace/db", () => {
   };
 });
 
+// These routes are guarded by Clerk-backed auth middleware. Stub it so the tests
+// exercise the handler logic directly: requireArtist injects the caller, and
+// requireSongOwnership passes through (each handler still does its own
+// existence/404 check via the mocked db).
+vi.mock("../middlewares/auth", () => ({
+  requireArtist: (
+    req: { artist?: unknown },
+    _res: unknown,
+    next: () => void,
+  ) => {
+    req.artist = { id: 1 };
+    next();
+  },
+  requireSongOwnership: () => (_req: unknown, _res: unknown, next: () => void) =>
+    next(),
+}));
+
 let app: Express;
 
 beforeEach(async () => {

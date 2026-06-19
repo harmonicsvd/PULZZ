@@ -60,6 +60,22 @@ vi.mock("../lib/musixmatch", () => ({
   analyzeLyrics: (...args: unknown[]) => analyzeLyrics(...args),
 }));
 
+// POST /songs is guarded by Clerk-backed auth middleware. Stub it so the tests
+// exercise the handler logic directly: requireArtist injects the caller (the
+// handler reads req.artist!.id for the song's owner).
+vi.mock("../middlewares/auth", () => ({
+  requireArtist: (
+    req: { artist?: unknown },
+    _res: unknown,
+    next: () => void,
+  ) => {
+    req.artist = { id: 1 };
+    next();
+  },
+  requireSongOwnership: () => (_req: unknown, _res: unknown, next: () => void) =>
+    next(),
+}));
+
 let app: Express;
 
 function submitBody(overrides: Record<string, unknown> = {}) {
