@@ -2,7 +2,15 @@ import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { useSignIn } from "@clerk/react";
 import { useCreateDemoSession } from "@workspace/api-client-react";
-import { ArrowRight, BarChart3, Eye, Loader2, Music, Trophy } from "lucide-react";
+import {
+  ArrowRight,
+  BarChart3,
+  Eye,
+  Loader2,
+  Music,
+  Trophy,
+  Users,
+} from "lucide-react";
 import { SUBMISSION_RULES } from "@/lib/artist-meta";
 
 const features = [
@@ -20,6 +28,11 @@ const features = [
     icon: Trophy,
     title: "See your wall",
     body: "Celebrate the listeners who discovered your music before release day.",
+  },
+  {
+    icon: Users,
+    title: "Find collaborators",
+    body: "Match with artists whose skills complement yours and start making music together.",
   },
 ];
 
@@ -134,7 +147,7 @@ export default function Welcome() {
           )}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-16 w-full text-left">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-16 w-full text-left">
           {features.map((f) => (
             <div
               key={f.title}
