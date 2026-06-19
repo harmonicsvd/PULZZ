@@ -25,7 +25,7 @@ export default function ProfileScreen() {
   const {
     profile,
     discoveries,
-    listenedSongIds,
+    momentMarks,
     getDiscoveryPoints,
     releaseNotificationsEnabled,
     setReleaseNotificationsEnabled,
@@ -78,7 +78,7 @@ export default function ProfileScreen() {
 
   const info = personalityInfo[profile.discoveryPersonality];
   const points = getDiscoveryPoints();
-  const skipCount = listenedSongIds.length - discoveries.length;
+  const momentCount = momentMarks.length;
   const discoveredArtists = Array.from(
     new Set(discoveries.map((d) => d.artist).filter(Boolean))
   );
@@ -157,11 +157,11 @@ export default function ProfileScreen() {
             { backgroundColor: colors.card, borderColor: colors.border },
           ]}
         >
-          <Text style={[styles.statValue, { color: colors.mutedForeground }]}>
-            {skipCount}
+          <Text style={[styles.statValue, { color: colors.foreground }]}>
+            {momentCount}
           </Text>
           <Text style={[styles.statName, { color: colors.mutedForeground }]}>
-            Skipped
+            Moments
           </Text>
         </View>
       </View>
