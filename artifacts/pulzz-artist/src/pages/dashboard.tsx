@@ -1,18 +1,8 @@
 import { AppLayout } from "@/components/layout/app-layout";
 import { useGetArtistDashboard } from "@workspace/api-client-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import {
-  Play,
-  SkipForward,
-  Users,
-  Activity,
-  Loader2,
-  Sparkles,
-  ArrowRight,
-} from "lucide-react";
+import { Play, SkipForward, Users, Activity, Loader2 } from "lucide-react";
 import { Link } from "wouter";
-import { SoundDna } from "@/components/sound-dna";
 
 export default function Dashboard() {
   const { data: dashboard, isLoading } = useGetArtistDashboard(1, { query: { enabled: true, queryKey: ["dashboard", 1] } });
@@ -69,76 +59,6 @@ export default function Dashboard() {
                 </CardContent>
               </Card>
             </div>
-
-            {dashboard.recentSongs && dashboard.recentSongs.length > 0 && (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h2 className="text-xl font-bold tracking-tight flex items-center gap-2">
-                      <Sparkles className="w-5 h-5 text-primary" />
-                      Sound &amp; Lyrics Intelligence
-                    </h2>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      Every track in your pool ships with an AI sound profile and
-                      a lyric read — the depth listeners feel before release day.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <div className="text-xs uppercase tracking-wide text-muted-foreground">
-                      Featured · {dashboard.recentSongs[0].title}
-                    </div>
-                    <SoundDna songId={dashboard.recentSongs[0].id} />
-                  </div>
-
-                  <Card className="bg-card border-border">
-                    <CardHeader>
-                      <CardTitle className="text-base">
-                        Lyric Analysis Across Your Catalog
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      {dashboard.recentSongs.map((song) => {
-                        const moods = song.analysis?.mood ?? [];
-                        const themes = song.analysis?.themes ?? [];
-                        return (
-                          <Link key={song.id} href={`/songs/${song.id}`}>
-                            <div className="group rounded-lg border border-border bg-background/40 p-3 hover:bg-secondary/50 transition-colors cursor-pointer">
-                              <div className="flex items-center justify-between">
-                                <span className="font-medium text-sm">
-                                  {song.title}
-                                </span>
-                                <ArrowRight className="w-3.5 h-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-                              </div>
-                              {moods.length > 0 || themes.length > 0 ? (
-                                <div className="flex flex-wrap gap-1.5 mt-2">
-                                  {moods.map((m) => (
-                                    <Badge key={`m-${m}`} variant="secondary">
-                                      {m}
-                                    </Badge>
-                                  ))}
-                                  {themes.map((t) => (
-                                    <Badge key={`t-${t}`} variant="outline">
-                                      {t}
-                                    </Badge>
-                                  ))}
-                                </div>
-                              ) : (
-                                <p className="text-xs text-muted-foreground mt-1">
-                                  No lyric analysis yet.
-                                </p>
-                              )}
-                            </div>
-                          </Link>
-                        );
-                      })}
-                    </CardContent>
-                  </Card>
-                </div>
-              </div>
-            )}
 
             <div className="space-y-4">
               <h2 className="text-xl font-bold tracking-tight">Recent Activity</h2>
