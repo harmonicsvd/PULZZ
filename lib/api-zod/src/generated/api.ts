@@ -453,6 +453,7 @@ export const ListArtistsResponseItem = zod.object({
   "topMoods": zod.array(zod.string()),
   "vector": zod.array(zod.number()).describe('Deterministically-ordered feature vector for cosine similarity.')
 }).describe('Normalized sound fingerprint derived from Cyanite analysis, used for sound-similarity ranking. Null when a recording yields no usable tonal signal.'),zod.null()]).optional(),
+  "featuredSongId": zod.number().nullish(),
   "createdAt": zod.string()
 })
 export const ListArtistsResponse = zod.array(ListArtistsResponseItem)
@@ -530,6 +531,7 @@ export const GetArtistResponse = zod.object({
   "topMoods": zod.array(zod.string()),
   "vector": zod.array(zod.number()).describe('Deterministically-ordered feature vector for cosine similarity.')
 }).describe('Normalized sound fingerprint derived from Cyanite analysis, used for sound-similarity ranking. Null when a recording yields no usable tonal signal.'),zod.null()]).optional(),
+  "featuredSongId": zod.number().nullish(),
   "createdAt": zod.string()
 })
 
@@ -564,7 +566,8 @@ export const UpdateArtistBody = zod.object({
   "soundcloud": zod.string().regex(updateArtistBodyLinksSoundcloudRegExp).optional(),
   "youtube": zod.string().regex(updateArtistBodyLinksYoutubeRegExp).optional(),
   "tiktok": zod.string().regex(updateArtistBodyLinksTiktokRegExp).optional()
-}).optional()
+}).optional(),
+  "featuredSongId": zod.number().nullish()
 })
 
 export const updateArtistResponseLinksOneWebsiteRegExp = new RegExp('^https?:\/');
@@ -601,6 +604,7 @@ export const UpdateArtistResponse = zod.object({
   "topMoods": zod.array(zod.string()),
   "vector": zod.array(zod.number()).describe('Deterministically-ordered feature vector for cosine similarity.')
 }).describe('Normalized sound fingerprint derived from Cyanite analysis, used for sound-similarity ranking. Null when a recording yields no usable tonal signal.'),zod.null()]).optional(),
+  "featuredSongId": zod.number().nullish(),
   "createdAt": zod.string()
 })
 
@@ -664,6 +668,7 @@ export const GetArtistDashboardResponse = zod.object({
   "totalDiscovered": zod.number(),
   "totalSkipped": zod.number(),
   "totalMomentMarks": zod.number(),
+  "featuredSongId": zod.number().nullish(),
   "recentSongs": zod.array(zod.object({
   "id": zod.number(),
   "title": zod.string(),

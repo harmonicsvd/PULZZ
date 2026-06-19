@@ -22,5 +22,7 @@ export interface Artist {
   roles?: string[] | null;
   links?: ArtistLinks | null;
   soundProfile?: SoundProfile | null;
+  /** @nullable */
+  featuredSongId?: number | null;
   createdAt: string;
 }

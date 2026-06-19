@@ -1479,6 +1479,8 @@ components:
           oneOf:
             - $ref: "#/components/schemas/SoundProfile"
             - type: "null"
+        featuredSongId:
+          type: ["integer", "null"]
         createdAt:
           type: string
 
@@ -1520,6 +1522,8 @@ components:
             type: string
         links:
           $ref: "#/components/schemas/ArtistLinks"
+        featuredSongId:
+          type: ["integer", "null"]
 
     ArtistDashboard:
       type: object
@@ -1539,6 +1543,8 @@ components:
           type: integer
         totalMomentMarks:
           type: integer
+        featuredSongId:
+          type: ["integer", "null"]
         recentSongs:
           type: array
           items:

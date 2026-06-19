@@ -84,6 +84,7 @@ router.get("/artists", async (_req, res): Promise<void> => {
         ...a,
         createdAt: a.createdAt.toISOString(),
         soundProfile: profiles.get(a.id) ?? null,
+        featuredSongId: a.featuredSongId,
       }))
     )
   );
@@ -124,6 +125,7 @@ router.post("/artists", async (req, res): Promise<void> => {
     GetArtistResponse.parse({
       ...artist,
       createdAt: artist.createdAt.toISOString(),
+      featuredSongId: artist.featuredSongId,
     })
   );
 });
@@ -149,6 +151,7 @@ router.get("/artists/:id", async (req, res): Promise<void> => {
     GetArtistResponse.parse({
       ...artist,
       createdAt: artist.createdAt.toISOString(),
+      featuredSongId: artist.featuredSongId,
     })
   );
 });
@@ -184,6 +187,9 @@ router.put("/artists/:id", async (req, res): Promise<void> => {
         : {}),
       ...(body.data.roles !== undefined ? { roles: body.data.roles } : {}),
       ...(body.data.links !== undefined ? { links: body.data.links } : {}),
+      ...(body.data.featuredSongId !== undefined
+        ? { featuredSongId: body.data.featuredSongId }
+        : {}),
     })
     .where(eq(artistsTable.id, params.data.id))
     .returning();
@@ -197,6 +203,7 @@ router.put("/artists/:id", async (req, res): Promise<void> => {
     UpdateArtistResponse.parse({
       ...updated[0],
       createdAt: updated[0].createdAt.toISOString(),
+      featuredSongId: updated[0].featuredSongId,
     })
   );
 });
@@ -252,6 +259,11 @@ router.get("/artists/:id/dashboard", async (req, res): Promise<void> => {
     res.status(400).json({ error: params.error.message });
     return;
   }
+
+  const [artist] = await db
+    .select({ featuredSongId: artistsTable.featuredSongId })
+    .from(artistsTable)
+    .where(eq(artistsTable.id, params.data.id));
 
   const artistSongs = await db
     .select({ id: songsTable.id, status: songsTable.status })
@@ -327,6 +339,7 @@ router.get("/artists/:id/dashboard", async (req, res): Promise<void> => {
       totalDiscovered,
       totalSkipped,
       totalMomentMarks,
+      featuredSongId: artist?.featuredSongId ?? null,
       recentSongs: recentSongs.map((s) => ({
         ...s,
         daysUntilRelease: Math.max(

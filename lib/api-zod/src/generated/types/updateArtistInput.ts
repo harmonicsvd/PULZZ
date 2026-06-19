@@ -14,4 +14,6 @@ export interface UpdateArtistInput {
   distributor?: string;
   roles?: string[];
   links?: ArtistLinks;
+  /** @nullable */
+  featuredSongId?: number | null;
 }

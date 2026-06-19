@@ -1,4 +1,11 @@
-import { jsonb, pgTable, serial, text, timestamp } from "drizzle-orm/pg-core";
+import {
+  integer,
+  jsonb,
+  pgTable,
+  serial,
+  text,
+  timestamp,
+} from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 
@@ -36,6 +43,10 @@ export const artistsTable = pgTable("artists", {
   distributor: text("distributor"),
   roles: text("roles").array().default([]),
   links: jsonb("links").$type<ArtistLinks>(),
+  // Song the artist has chosen to spotlight in the dashboard's featured Sound
+  // DNA slot. Plain integer (no FK) to avoid a circular schema import; stale
+  // ids fall back to the most recent song at the read site.
+  featuredSongId: integer("featured_song_id"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 

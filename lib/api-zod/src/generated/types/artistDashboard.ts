@@ -15,5 +15,7 @@ export interface ArtistDashboard {
   totalDiscovered: number;
   totalSkipped: number;
   totalMomentMarks: number;
+  /** @nullable */
+  featuredSongId?: number | null;
   recentSongs?: Song[];
 }
