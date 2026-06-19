@@ -199,7 +199,7 @@ export default function Landing() {
               href={ARTIST_URL}
               className="w-full rounded-full border border-border bg-card px-7 py-3.5 text-base font-semibold text-foreground shadow-sm transition-transform hover:-translate-y-0.5 sm:w-auto"
             >
-              Open the artist dashboard
+              Discover as an Artist
             </a>
           </div>
           <div
