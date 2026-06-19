@@ -72,15 +72,35 @@ This changes everything:
 
 ## Partners & Integrations
 
-Pulzz is built on top of the music industry's most relevant data APIs to deliver rich discovery and insight:
+Pulzz is built directly on top of three music-industry partner APIs. Each one powers a specific, working feature in the product — not a logo on a slide. Here's exactly how we use each.
 
-**Musixmatch** — Core lyrics, metadata, and music intelligence. Artists and listeners access synced lyrics, genre classifications, and emotional tagging.
+### Cyanite — AI audio analysis (the "Song DNA" engine)
 
-**Cyanite** — AI-powered mood, genre, energy, and similarity analysis. Powers matching between listener taste and unreleased songs.
+When an artist submits a track, Pulzz streams the audio to **Cyanite's** GraphQL API (`audioAnalysisV6`) and stores the returned profile: genre and mood distributions, BPM, musical key, energy level and dynamics, valence (positivity) and arousal (intensity), plus an AI caption and musical era. We use this in two places:
 
-**Songstats** — Post-release analytics and performance tracking. Closes the loop by showing artists how their songs perform after discovery.
+- **Song DNA** — every song's detail page in the artist dashboard renders this profile so artists see how their unreleased track actually sounds to a machine listener.
+- **Taste-matched discovery & collaboration** — Pulzz turns each Cyanite profile into a normalized sound vector and ranks the listener's Discover feed by cosine similarity to their taste. The same similarity surfaces "similar artists" so creators can find collaborators whose sound fits theirs.
 
-Pulzz also uses Replit object storage for uploaded audio, artwork, and delivery of public assets.
+Results land asynchronously: we kick off analysis in the background and let Cyanite's webhook (plus a lazy re-fetch) fill in the finished profile.
+
+### Musixmatch — lyrics, taste profiling & lyric intelligence
+
+We use **Musixmatch's** API for three distinct jobs:
+
+- **Onboarding taste capture** — the listener onboarding pulls Musixmatch's genre catalog and track search so new listeners pick real songs and genres they love, seeding their taste profile.
+- **Synced lyrics in the player** — we fetch LRC subtitles and display them line-by-line, in sync with playback, while a song streams.
+- **Lyric mood / theme / language** — each submitted song's lyrics get a mood, theme, and language read from Musixmatch's lyrics analysis (with a lightweight script-based language fallback), stored and shown alongside the track.
+
+### Songstats — post-release performance (closing the loop)
+
+An artist attaches an ISRC or Spotify link to a released song, and Pulzz queries **Songstats'** enterprise stats API to surface total and recent streams, playlist reach, playlist counts, and chart activity aggregated across platforms. Pre-release songs are deliberately gated so they never show live numbers — connecting pre-release discovery to real post-release performance once a song goes live.
+
+### Supporting data & assets
+
+- **Internet Archive** — the demo catalog uses real public-domain recordings (audio and cover art) so the experience is populated with genuine music, legally.
+- **Replit object storage** — stores and delivers artist-uploaded audio and artwork.
+
+Every integration degrades gracefully: if a partner key is absent or a lookup has no data, the corresponding feature shows a tasteful fallback instead of breaking.
 
 ---
 
