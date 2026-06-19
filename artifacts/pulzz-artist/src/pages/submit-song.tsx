@@ -250,7 +250,7 @@ export default function SubmitSongPage() {
           setSubmitted(true);
           setTimeout(() => navigate("/songs"), 1800);
         },
-      }
+      },
     );
   }
 
@@ -322,7 +322,9 @@ export default function SubmitSongPage() {
                     <p className="text-sm font-medium text-foreground">
                       Click to upload audio
                     </p>
-                    <p className="text-xs mt-0.5">MP3, WAV, FLAC, AAC — max 500 MB</p>
+                    <p className="text-xs mt-0.5">
+                      MP3, WAV, FLAC, AAC — max 500 MB
+                    </p>
                   </div>
                 </button>
               ) : (
@@ -332,11 +334,16 @@ export default function SubmitSongPage() {
                       <Music className="w-5 h-5 text-primary" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">{audioFile.name}</p>
+                      <p className="text-sm font-medium truncate">
+                        {audioFile.name}
+                      </p>
                       <p className="text-xs text-muted-foreground">
                         {formatBytes(audioFile.size)}
                         {form.durationSeconds && (
-                          <> · {formatDuration(parseInt(form.durationSeconds))}</>
+                          <>
+                            {" "}
+                            · {formatDuration(parseInt(form.durationSeconds))}
+                          </>
                         )}
                       </p>
                     </div>
@@ -414,7 +421,10 @@ export default function SubmitSongPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <Label>Genre *</Label>
-                  <Select value={form.genre} onValueChange={(v) => update("genre", v)}>
+                  <Select
+                    value={form.genre}
+                    onValueChange={(v) => update("genre", v)}
+                  >
                     <SelectTrigger className="bg-background">
                       <SelectValue placeholder="Select genre" />
                     </SelectTrigger>
@@ -445,7 +455,9 @@ export default function SubmitSongPage() {
           {/* Release & Distribution */}
           <Card className="bg-card border-border">
             <CardHeader className="pb-4">
-              <CardTitle className="text-base">Release & Distribution</CardTitle>
+              <CardTitle className="text-base">
+                Release & Distribution
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-xs text-muted-foreground">
@@ -477,9 +489,9 @@ export default function SubmitSongPage() {
               </div>
               {form.releaseDate && !releaseDateValid && (
                 <p className="text-xs text-destructive">
-                  Pick a release date at least {MIN_RELEASE_LEAD_DAYS} days out —
-                  songs must be submitted about a week and a half before release
-                  so listeners have time to discover them first.
+                  Pick a release date at least {MIN_RELEASE_LEAD_DAYS} days out
+                  — songs must be submitted about a week and a half before
+                  release so listeners have time to discover them first.
                 </p>
               )}
               <div className="space-y-1.5">
@@ -501,7 +513,7 @@ export default function SubmitSongPage() {
                 </Select>
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="streamingId">ISRC</Label>
+                <Label htmlFor="streamingId">ISRC (optional)</Label>
                 <Input
                   id="streamingId"
                   placeholder="e.g. USRC17607839"
@@ -511,7 +523,7 @@ export default function SubmitSongPage() {
                 />
                 <p className="text-xs text-muted-foreground">
                   Optional — once released, this pulls real post-release stats
-                  from Songstats into the song's dashboard.
+                  from Songstats into your song's dashboard.
                 </p>
               </div>
             </CardContent>
