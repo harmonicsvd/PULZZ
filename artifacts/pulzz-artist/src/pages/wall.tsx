@@ -4,8 +4,18 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, User, Star, Zap } from "lucide-react";
 
+const ARTIST_ID = 1;
+
 export default function WallPage() {
-  const { data: entries, isLoading } = useGetWall({ query: { enabled: true, queryKey: getGetWallQueryKey() } });
+  const { data: entries, isLoading } = useGetWall(
+    { artistId: ARTIST_ID },
+    {
+      query: {
+        enabled: true,
+        queryKey: getGetWallQueryKey({ artistId: ARTIST_ID }),
+      },
+    }
+  );
 
   return (
     <AppLayout>
@@ -13,7 +23,7 @@ export default function WallPage() {
         <header>
           <h1 className="text-3xl font-bold tracking-tight">Discovery Wall</h1>
           <p className="text-muted-foreground mt-1">
-            Top listeners who discovered songs in the pool this week.
+            Top listeners who discovered your songs in the pool this week.
           </p>
         </header>
 

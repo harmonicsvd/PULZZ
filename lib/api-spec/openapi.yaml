@@ -224,6 +224,31 @@ paths:
                 $ref: "#/components/schemas/SoundAnalysisResult"
         "404":
           description: Not found
+    put:
+      operationId: updateSongSoundAnalysis
+      tags: [songs]
+      summary: Save artist edits to a song's Sound DNA (overrides the AI-derived analysis)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateSoundAnalysis"
+      responses:
+        "200":
+          description: Saved sound-analysis state
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SoundAnalysisResult"
+        "404":
+          description: Not found
 
   /songs/{id}/analyze:
     post:
@@ -356,6 +381,12 @@ paths:
       operationId: getWall
       tags: [wall]
       summary: Get Discovery Wall leaderboard
+      parameters:
+        - name: artistId
+          in: query
+          description: When provided, ranks only listeners who discovered this artist's songs (per-artist discovery counts and points). When omitted, ranks all listeners by their global points.
+          schema:
+            type: integer
       responses:
         "200":
           description: Leaderboard entries
@@ -1007,6 +1038,36 @@ components:
         streamingId:
           type: string
           description: ISRC, Spotify track id, or Spotify track URL. Empty string clears it.
+
+    UpdateSoundAnalysis:
+      type: object
+      required: [genreTags, moodTags]
+      description: Artist-supplied overrides for a song's Sound DNA. Genre/mood distributions are preserved server-side; only these scalar/tag fields are editable.
+      properties:
+        genreTags:
+          type: array
+          items:
+            type: string
+        moodTags:
+          type: array
+          items:
+            type: string
+        bpm:
+          type: ["integer", "null"]
+        musicalKey:
+          type: ["string", "null"]
+        energyLevel:
+          type: ["string", "null"]
+        energyDynamics:
+          type: ["string", "null"]
+        valence:
+          type: ["number", "null"]
+        arousal:
+          type: ["number", "null"]
+        caption:
+          type: ["string", "null"]
+        era:
+          type: ["string", "null"]
 
     UpdateStreamingIdResult:
       type: object

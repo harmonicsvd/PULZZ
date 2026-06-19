@@ -26,10 +26,13 @@ import {
   GetSongSongstatsResponse,
   GetSongSoundAnalysisParams,
   GetSongSoundAnalysisResponse,
+  UpdateSongSoundAnalysisParams,
+  UpdateSongSoundAnalysisBody,
+  UpdateSongSoundAnalysisResponse,
   AnalyzeSongParams,
   AnalyzeSongResponse,
 } from "@workspace/api-zod";
-import type { SongAnalysis } from "@workspace/db";
+import type { SongAnalysis, CyaniteAnalysis } from "@workspace/db";
 import { analyzeLyrics } from "../lib/musixmatch";
 import { getTrackStats } from "../lib/songstats";
 import { isConfigured } from "../lib/cyanite";
@@ -419,6 +422,68 @@ router.get("/songs/:id/sound-analysis", async (req, res): Promise<void> => {
 
   const state = await syncSong(params.data.id);
   res.json(GetSongSoundAnalysisResponse.parse(state));
+});
+
+router.put("/songs/:id/sound-analysis", async (req, res): Promise<void> => {
+  const params = UpdateSongSoundAnalysisParams.safeParse(req.params);
+  if (!params.success) {
+    res.status(400).json({ error: params.error.message });
+    return;
+  }
+  const body = UpdateSongSoundAnalysisBody.safeParse(req.body);
+  if (!body.success) {
+    res.status(400).json({ error: body.error.message });
+    return;
+  }
+
+  const [song] = await db
+    .select({
+      id: songsTable.id,
+      cyaniteAnalysis: songsTable.cyaniteAnalysis,
+    })
+    .from(songsTable)
+    .where(eq(songsTable.id, params.data.id));
+  if (!song) {
+    res.status(404).json({ error: "Song not found" });
+    return;
+  }
+
+  // Merge the artist's edits OVER the existing analysis: a field that is omitted
+  // (undefined) keeps its current value, while an explicit null clears it. This
+  // keeps partial payloads safe from silently erasing untouched fields. The
+  // AI-derived genre/mood distributions are always preserved; the artist only
+  // edits the scalar tiles and tag lists. analyzedAt is bumped on every edit.
+  const existing = song.cyaniteAnalysis;
+  const merge = <T>(incoming: T | null | undefined, current: T | null): T | null =>
+    incoming === undefined ? current : incoming;
+  const analysis: CyaniteAnalysis = {
+    genreTags: body.data.genreTags ?? existing?.genreTags ?? [],
+    moodTags: body.data.moodTags ?? existing?.moodTags ?? [],
+    bpm: merge(body.data.bpm, existing?.bpm ?? null),
+    musicalKey: merge(body.data.musicalKey, existing?.musicalKey ?? null),
+    energyLevel: merge(body.data.energyLevel, existing?.energyLevel ?? null),
+    energyDynamics: merge(body.data.energyDynamics, existing?.energyDynamics ?? null),
+    valence: merge(body.data.valence, existing?.valence ?? null),
+    arousal: merge(body.data.arousal, existing?.arousal ?? null),
+    caption: merge(body.data.caption, existing?.caption ?? null),
+    era: merge(body.data.era, existing?.era ?? null),
+    genre: existing?.genre ?? {},
+    mood: existing?.mood ?? {},
+    analyzedAt: new Date().toISOString(),
+  };
+
+  await db
+    .update(songsTable)
+    .set({ cyaniteStatus: "finished", cyaniteAnalysis: analysis })
+    .where(eq(songsTable.id, params.data.id));
+
+  res.json(
+    UpdateSongSoundAnalysisResponse.parse({
+      status: "finished",
+      trackId: null,
+      analysis,
+    })
+  );
 });
 
 router.post("/songs/:id/analyze", async (req, res): Promise<void> => {

@@ -149,12 +149,6 @@ export default function Landing() {
             <span className="hidden rounded-full border border-border bg-card px-3 py-1 text-xs font-medium text-muted-foreground sm:inline-block">
               Musicathon 2026 · June 15–21
             </span>
-            <Link
-              href={LISTEN_GUIDE_URL}
-              className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm transition-opacity hover:opacity-90"
-            >
-              Open the app
-            </Link>
           </div>
         </div>
       </header>

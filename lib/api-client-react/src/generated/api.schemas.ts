@@ -184,6 +184,30 @@ export interface UpdateStreamingId {
   streamingId: string;
 }
 
+/**
+ * Artist-supplied overrides for a song's Sound DNA. Genre/mood distributions are preserved server-side; only these scalar/tag fields are editable.
+ */
+export interface UpdateSoundAnalysis {
+  genreTags: string[];
+  moodTags: string[];
+  /** @nullable */
+  bpm?: number | null;
+  /** @nullable */
+  musicalKey?: string | null;
+  /** @nullable */
+  energyLevel?: string | null;
+  /** @nullable */
+  energyDynamics?: string | null;
+  /** @nullable */
+  valence?: number | null;
+  /** @nullable */
+  arousal?: number | null;
+  /** @nullable */
+  caption?: string | null;
+  /** @nullable */
+  era?: string | null;
+}
+
 export interface UpdateStreamingIdResult {
   ok: boolean;
   /** @nullable */
@@ -612,6 +636,13 @@ export const ListSongsStatus = {
   active: 'active',
   released: 'released',
 } as const;
+
+export type GetWallParams = {
+/**
+ * When provided, ranks only listeners who discovered this artist's songs (per-artist discovery counts and points). When omitted, ranks all listeners by their global points.
+ */
+artistId?: number;
+};
 
 export type SearchMusixmatchTracksParams = {
 q: string;

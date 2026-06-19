@@ -29,6 +29,7 @@ import type {
   ErrorEnvelope,
   GetMusixmatchAnalysisParams,
   GetMusixmatchSubtitleParams,
+  GetWallParams,
   HealthStatus,
   ListSongsParams,
   Listener,
@@ -59,6 +60,7 @@ import type {
   UpdateSongAnalysisResult,
   UpdateSongLyrics,
   UpdateSongLyricsResult,
+  UpdateSoundAnalysis,
   UpdateStreamingId,
   UpdateStreamingIdResult,
   UploadUrlRequest,
@@ -757,6 +759,78 @@ export function useGetSongSoundAnalysis<TData = Awaited<ReturnType<typeof getSon
 
 
 
+export const getUpdateSongSoundAnalysisUrl = (id: number,) => {
+
+
+
+
+  return `/api/songs/${id}/sound-analysis`
+}
+
+/**
+ * @summary Save artist edits to a song's Sound DNA (overrides the AI-derived analysis)
+ */
+export const updateSongSoundAnalysis = async (id: number,
+    updateSoundAnalysis: UpdateSoundAnalysis, options?: RequestInit): Promise<SoundAnalysisResult> => {
+
+  return customFetch<SoundAnalysisResult>(getUpdateSongSoundAnalysisUrl(id),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateSoundAnalysis,)
+  }
+);}
+
+
+
+
+export const getUpdateSongSoundAnalysisMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateSongSoundAnalysis>>, TError,{id: number;data: BodyType<UpdateSoundAnalysis>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateSongSoundAnalysis>>, TError,{id: number;data: BodyType<UpdateSoundAnalysis>}, TContext> => {
+
+const mutationKey = ['updateSongSoundAnalysis'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateSongSoundAnalysis>>, {id: number;data: BodyType<UpdateSoundAnalysis>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateSongSoundAnalysis(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateSongSoundAnalysisMutationResult = NonNullable<Awaited<ReturnType<typeof updateSongSoundAnalysis>>>
+    export type UpdateSongSoundAnalysisMutationBody = BodyType<UpdateSoundAnalysis>
+    export type UpdateSongSoundAnalysisMutationError = ErrorType<void>
+
+    /**
+ * @summary Save artist edits to a song's Sound DNA (overrides the AI-derived analysis)
+ */
+export const useUpdateSongSoundAnalysis = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateSongSoundAnalysis>>, TError,{id: number;data: BodyType<UpdateSoundAnalysis>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateSongSoundAnalysis>>,
+        TError,
+        {id: number;data: BodyType<UpdateSoundAnalysis>},
+        TContext
+      > => {
+      return useMutation(getUpdateSongSoundAnalysisMutationOptions(options));
+    }
+
 export const getAnalyzeSongUrl = (id: number,) => {
 
 
@@ -1195,20 +1269,27 @@ export const useCreateMomentMark = <TError = ErrorType<unknown>,
       return useMutation(getCreateMomentMarkMutationOptions(options));
     }
 
-export const getGetWallUrl = () => {
+export const getGetWallUrl = (params?: GetWallParams,) => {
+  const normalizedParams = new URLSearchParams();
 
+  Object.entries(params || {}).forEach(([key, value]) => {
 
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
 
+  const stringifiedParams = normalizedParams.toString();
 
-  return `/api/wall`
+  return stringifiedParams.length > 0 ? `/api/wall?${stringifiedParams}` : `/api/wall`
 }
 
 /**
  * @summary Get Discovery Wall leaderboard
  */
-export const getWall = async ( options?: RequestInit): Promise<WallEntry[]> => {
+export const getWall = async (params?: GetWallParams, options?: RequestInit): Promise<WallEntry[]> => {
 
-  return customFetch<WallEntry[]>(getGetWallUrl(),
+  return customFetch<WallEntry[]>(getGetWallUrl(params),
   {
     ...options,
     method: 'GET'
@@ -1221,23 +1302,23 @@ export const getWall = async ( options?: RequestInit): Promise<WallEntry[]> => {
 
 
 
-export const getGetWallQueryKey = () => {
+export const getGetWallQueryKey = (params?: GetWallParams,) => {
     return [
-    `/api/wall`
+    `/api/wall`, ...(params ? [params] : [])
     ] as const;
     }
 
 
-export const getGetWallQueryOptions = <TData = Awaited<ReturnType<typeof getWall>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getWall>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+export const getGetWallQueryOptions = <TData = Awaited<ReturnType<typeof getWall>>, TError = ErrorType<unknown>>(params?: GetWallParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getWall>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getGetWallQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getGetWallQueryKey(params);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getWall>>> = ({ signal }) => getWall({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getWall>>> = ({ signal }) => getWall(params, { signal, ...requestOptions });
 
 
 
@@ -1255,11 +1336,11 @@ export type GetWallQueryError = ErrorType<unknown>
  */
 
 export function useGetWall<TData = Awaited<ReturnType<typeof getWall>>, TError = ErrorType<unknown>>(
-  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getWall>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+ params?: GetWallParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getWall>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
-  const queryOptions = getGetWallQueryOptions(options)
+  const queryOptions = getGetWallQueryOptions(params,options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 

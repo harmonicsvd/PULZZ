@@ -271,6 +271,47 @@ export const GetSongSoundAnalysisResponse = zod.object({
 
 
 /**
+ * @summary Save artist edits to a song's Sound DNA (overrides the AI-derived analysis)
+ */
+export const UpdateSongSoundAnalysisParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const UpdateSongSoundAnalysisBody = zod.object({
+  "genreTags": zod.array(zod.string()),
+  "moodTags": zod.array(zod.string()),
+  "bpm": zod.number().nullish(),
+  "musicalKey": zod.string().nullish(),
+  "energyLevel": zod.string().nullish(),
+  "energyDynamics": zod.string().nullish(),
+  "valence": zod.number().nullish(),
+  "arousal": zod.number().nullish(),
+  "caption": zod.string().nullish(),
+  "era": zod.string().nullish()
+}).describe('Artist-supplied overrides for a song\'s Sound DNA. Genre\/mood distributions are preserved server-side; only these scalar\/tag fields are editable.')
+
+export const UpdateSongSoundAnalysisResponse = zod.object({
+  "status": zod.enum(['not_started', 'unconfigured', 'processing', 'finished', 'failed', 'not_found', 'error']),
+  "trackId": zod.string().nullable(),
+  "analysis": zod.union([zod.object({
+  "genreTags": zod.array(zod.string()),
+  "moodTags": zod.array(zod.string()),
+  "bpm": zod.number().nullish(),
+  "musicalKey": zod.string().nullish(),
+  "energyLevel": zod.string().nullish(),
+  "energyDynamics": zod.string().nullish(),
+  "valence": zod.number().nullish(),
+  "arousal": zod.number().nullish(),
+  "caption": zod.string().nullish(),
+  "era": zod.string().nullish(),
+  "genre": zod.record(zod.string(), zod.number()),
+  "mood": zod.record(zod.string(), zod.number()),
+  "analyzedAt": zod.string()
+}),zod.null()])
+})
+
+
+/**
  * @summary Trigger (or re-trigger) Cyanite sound analysis for a song
  */
 export const AnalyzeSongParams = zod.object({
@@ -360,6 +401,10 @@ export const CreateMomentMarkBody = zod.object({
 /**
  * @summary Get Discovery Wall leaderboard
  */
+export const GetWallQueryParams = zod.object({
+  "artistId": zod.coerce.number().optional().describe('When provided, ranks only listeners who discovered this artist\'s songs (per-artist discovery counts and points). When omitted, ranks all listeners by their global points.')
+})
+
 export const GetWallResponseItem = zod.object({
   "rank": zod.number(),
   "listenerId": zod.number(),

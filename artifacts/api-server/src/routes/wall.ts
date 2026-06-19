@@ -1,11 +1,66 @@
 import { Router, type IRouter } from "express";
-import { db, listenersTable } from "@workspace/db";
-import { desc } from "drizzle-orm";
-import { GetWallResponse } from "@workspace/api-zod";
+import {
+  db,
+  listenersTable,
+  reactionsTable,
+  songsTable,
+} from "@workspace/db";
+import { and, count, desc, eq, sql } from "drizzle-orm";
+import { GetWallResponse, GetWallQueryParams } from "@workspace/api-zod";
 
 const router: IRouter = Router();
 
-router.get("/wall", async (_req, res): Promise<void> => {
+const POINTS_PER_DISCOVERY = 100;
+
+router.get("/wall", async (req, res): Promise<void> => {
+  const query = GetWallQueryParams.safeParse(req.query);
+  if (!query.success) {
+    res.status(400).json({ error: query.error.message });
+    return;
+  }
+
+  // Per-artist leaderboard: rank only listeners who have discovered one of this
+  // artist's songs, scored by how many of them they discovered.
+  if (query.data.artistId !== undefined) {
+    const rows = await db
+      .select({
+        listenerId: reactionsTable.listenerId,
+        listenerName: listenersTable.name,
+        discoveryCount: count(),
+      })
+      .from(reactionsTable)
+      .innerJoin(songsTable, eq(reactionsTable.songId, songsTable.id))
+      .innerJoin(
+        listenersTable,
+        eq(reactionsTable.listenerId, listenersTable.id)
+      )
+      .where(
+        and(
+          eq(reactionsTable.type, "discovered"),
+          eq(songsTable.artistId, query.data.artistId)
+        )
+      )
+      .groupBy(reactionsTable.listenerId, listenersTable.name)
+      .orderBy(desc(count()))
+      .limit(50);
+
+    const result = rows.map((r, i) => {
+      const points = r.discoveryCount * POINTS_PER_DISCOVERY;
+      return {
+        rank: i + 1,
+        listenerId: r.listenerId,
+        listenerName: r.listenerName,
+        discoveryCount: r.discoveryCount,
+        points,
+        badges: getBadges(r.discoveryCount, points),
+      };
+    });
+
+    res.json(GetWallResponse.parse(result));
+    return;
+  }
+
+  // Global leaderboard: all listeners ranked by lifetime points.
   const listeners = await db
     .select()
     .from(listenersTable)
