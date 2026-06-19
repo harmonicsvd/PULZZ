@@ -96,11 +96,6 @@ export default function Welcome() {
             Artist
           </span>
         </a>
-        <Link href="/sign-in">
-          <div className="text-sm font-semibold px-4 py-2 rounded-md border border-border hover:bg-secondary transition-colors cursor-pointer">
-            Sign In
-          </div>
-        </Link>
       </header>
 
       <main className="flex-1 flex flex-col items-center justify-center px-6 text-center max-w-3xl mx-auto w-full">
@@ -116,6 +111,11 @@ export default function Welcome() {
             <div className="flex items-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 py-3 px-6 rounded-md text-sm font-semibold transition-colors cursor-pointer shadow-md">
               Get started
               <ArrowRight className="w-4 h-4" />
+            </div>
+          </Link>
+          <Link href="/sign-in">
+            <div className="py-3 px-6 rounded-md text-sm font-semibold border border-border hover:bg-secondary transition-colors cursor-pointer">
+              Sign in
             </div>
           </Link>
         </div>
