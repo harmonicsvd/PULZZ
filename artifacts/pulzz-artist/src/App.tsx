@@ -101,18 +101,16 @@ const clerkAppearance = {
   },
 };
 
-// Clickable Pulzz wordmark shown above the auth card. The landing page is a
-// SEPARATE artifact mounted at the site root ("/"), so this is a plain anchor
-// doing a full browser navigation (relative "/" — same pattern proven to work
-// in the dashboard sidebar), not an in-app SPA link.
-const LANDING_URL = import.meta.env.VITE_LANDING_URL ?? "/";
-
+// Clickable Pulzz wordmark above the sign-in/sign-up card. It steps BACK one
+// level — to the artist welcome page (the "View demo dashboard" page at the
+// artist app root), not all the way to the public landing page. From that
+// welcome page, its own logo then goes to the landing page.
 function BrandHome() {
   return (
     <a
-      href={LANDING_URL}
+      href={`${basePath}/`}
       className="mb-8 inline-flex items-center transition-opacity hover:opacity-80"
-      aria-label="Back to Pulzz home"
+      aria-label="Back to the Pulzz artist welcome page"
     >
       <img src={`${basePath}/logo.svg`} alt="Pulzz" className="h-8 w-auto" />
     </a>

@@ -65,7 +65,13 @@ export default function Welcome() {
   return (
     <div className="min-h-[100dvh] bg-background text-foreground flex flex-col">
       <header className="px-6 py-5 flex items-center justify-between max-w-6xl mx-auto w-full">
-        <div className="flex items-center gap-2.5">
+        {/* Logo links back to the public landing page (separate artifact at
+            the site root "/"). */}
+        <a
+          href="/"
+          className="flex items-center gap-2.5 transition-opacity hover:opacity-80"
+          aria-label="Back to Pulzz home"
+        >
           <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center shadow-sm">
             <div className="w-2.5 h-2.5 bg-background rounded-full" />
           </div>
@@ -75,7 +81,7 @@ export default function Welcome() {
           <span className="text-muted-foreground font-medium text-xs tracking-[0.18em] uppercase mt-0.5">
             Artist
           </span>
-        </div>
+        </a>
         <Link href="/sign-in">
           <div className="text-sm font-semibold px-4 py-2 rounded-md border border-border hover:bg-secondary transition-colors cursor-pointer">
             Sign In
