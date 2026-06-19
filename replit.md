@@ -12,6 +12,7 @@ Pre-release music discovery platform for Musicathon 2026 (June 15–21). Listene
 - `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
 - `pnpm --filter @workspace/api-server run seed` — reseed the 5 artists + 5 real songs (UPSERT in place by id; safe to re-run, preserves reactions/moments)
 - Required env: `DATABASE_URL` — Postgres connection string
+- Optional env: `SONGSTATS_API_KEY` — Songstats Enterprise API key for post-release streaming stats (feature degrades to a tasteful fallback when unset); `CYANITE_API_KEY`/`CYANITE_WEBHOOK_SECRET` (audio analysis), `MUSIXMATCH_API_KEY` (lyrics/taste)
 
 ## Stack
 
@@ -42,6 +43,18 @@ Pre-release music discovery platform for Musicathon 2026 (June 15–21). Listene
 - Artist dashboard uses Clerk auth (cookie-based, default skill). The signed-in artist is resolved via `GET /artists/me`, which JIT-provisions an artist row keyed by Clerk user id (linking by matching email when present). All artist-scoped routes (dashboard, own songs, wall, profile + song mutations) require auth and reject access to records the requester doesn't own. Public read endpoints (GET /songs, /songs/:id, reactions/moments, GET /artists list + profile) stay open for the listener/landing apps.
 - All routes prefixed with `/api` — services must handle their full base path
 - After any schema change in `lib/*`: run `pnpm run typecheck:libs` before artifact typechecks or you'll get "no exported member" errors
+
+## Integrations
+
+### Songstats — post-release streaming stats
+
+- **What it does:** once a song is released, Pulzz pulls real cross-platform performance (total + recent streams, playlist reach, playlist counts, chart activity) so artists see how their track does after launch — closing the loop from pre-release discovery to live numbers.
+- **Where it lives:** `artifacts/api-server/src/lib/songstats.ts` (all Songstats logic). Exposed as `GET /api/songs/:id/songstats` (per song) and `GET /api/artists/:id/songstats` (aggregated across an artist's released songs). Rendered in the artist dashboard by `post-release-stats.tsx` and `streaming-stats.tsx`.
+- **API:** Songstats Enterprise REST, `GET https://api.songstats.com/enterprise/v1/tracks/stats`, authenticated with the `apikey` header from `SONGSTATS_API_KEY`.
+- **Identifier:** the artist supplies an ISRC or Spotify track link/URI/id on the song; `resolveIdentifier()` normalizes it to an `isrc` or `spotify_track_id` query param. As of the submit-form change, **ISRC is a required field**, so released songs reliably carry a Songstats-resolvable identifier.
+- **Graceful by design:** every lookup returns a normalized result with a `status` (`ok` | `pre_release` | `no_identifier` | `not_found` | `unconfigured` | `error`). Missing key → `unconfigured`; the UI shows a tasteful fallback instead of breaking.
+- **Pre-release gating:** unreleased songs are passed `released: false` and always return `pre_release` — they never show live numbers even if an identifier was attached early.
+- **Performance/limits:** successful lookups are cached in memory for 10 minutes (keyed by resolved identifier) and each request has a 9s timeout, to respect Songstats rate limits.
 
 ## Product
 
