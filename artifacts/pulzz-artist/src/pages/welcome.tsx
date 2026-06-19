@@ -90,7 +90,7 @@ export default function Welcome() {
             <div className="w-2.5 h-2.5 bg-background rounded-full" />
           </div>
           <span className="font-display font-bold text-2xl tracking-tight leading-none">
-            PULZZ
+            PUL<span className="text-primary">ZZ</span>
           </span>
           <span className="text-muted-foreground font-medium text-xs tracking-[0.18em] uppercase mt-0.5">
             Artist
