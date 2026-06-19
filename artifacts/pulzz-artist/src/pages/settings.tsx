@@ -114,12 +114,7 @@ export default function SettingsPage() {
     );
   }
 
-  const connectedPlatforms = STREAMING_PLATFORMS.filter((p) =>
-    links[p.key]?.trim()
-  ).map((p) => ({
-    ...p,
-    count: placeholderFollowerCount(artist.id, p.key),
-  }));
+  const streamingMeta = new Map(STREAMING_PLATFORMS.map((p) => [p.key, p]));
 
   return (
     <AppLayout>
@@ -223,56 +218,37 @@ export default function SettingsPage() {
                 <CardTitle className="text-base">Where to find you</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {LINK_FIELDS.map((field) => (
-                  <div key={field.key} className="space-y-1.5">
-                    <Label htmlFor={`link-${field.key}`}>{field.label}</Label>
-                    <Input
-                      id={`link-${field.key}`}
-                      placeholder={field.placeholder}
-                      value={links[field.key] ?? ""}
-                      onChange={(e) => setLink(field.key, e.target.value)}
-                      className="bg-background"
-                    />
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-
-            <Card className="bg-card border-border">
-              <CardHeader className="pb-4">
-                <CardTitle className="text-base">Streaming Presence</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-xs text-muted-foreground mb-4">
-                  Your reach across platforms, shown on your profile. Just add
-                  your links above — we handle the rest automatically.{" "}
-                  <span className="italic">Demo figures for now.</span>
+                <p className="text-xs text-muted-foreground -mt-1">
+                  Add a streaming link and we'll show your reach on your profile
+                  automatically. <span className="italic">Demo figures for now.</span>
                 </p>
-                {connectedPlatforms.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">
-                    Add your streaming and social links above to show your
-                    audience here.
-                  </p>
-                ) : (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                    {connectedPlatforms.map((p) => (
-                      <div
-                        key={p.key}
-                        className="rounded-lg border border-border bg-background p-3"
-                      >
-                        <div className="text-xs text-muted-foreground">
-                          {p.label}
-                        </div>
-                        <div className="text-lg font-bold tracking-tight">
-                          {p.count.toLocaleString()}
-                        </div>
-                        <div className="text-[11px] text-muted-foreground">
-                          {p.metric}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                {LINK_FIELDS.map((field) => {
+                  const meta = streamingMeta.get(field.key);
+                  const hasLink = !!links[field.key]?.trim();
+                  return (
+                    <div key={field.key} className="space-y-1.5">
+                      <Label htmlFor={`link-${field.key}`}>{field.label}</Label>
+                      <Input
+                        id={`link-${field.key}`}
+                        placeholder={field.placeholder}
+                        value={links[field.key] ?? ""}
+                        onChange={(e) => setLink(field.key, e.target.value)}
+                        className="bg-background"
+                      />
+                      {meta && hasLink && (
+                        <p className="text-xs text-muted-foreground">
+                          <span className="font-semibold text-foreground">
+                            {placeholderFollowerCount(
+                              artist.id,
+                              field.key
+                            ).toLocaleString()}
+                          </span>{" "}
+                          {meta.metric}
+                        </p>
+                      )}
+                    </div>
+                  );
+                })}
               </CardContent>
             </Card>
 
