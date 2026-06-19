@@ -1,14 +1,20 @@
 import { AppLayout } from "@/components/layout/app-layout";
-import { useGetArtistDashboard, getGetArtistDashboardQueryKey } from "@workspace/api-client-react";
+import {
+  useGetArtistDashboard,
+  getGetArtistDashboardQueryKey,
+} from "@workspace/api-client-react";
+import { useCurrentArtist } from "@/lib/current-artist";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Play, SkipForward, Users, Activity, Loader2 } from "lucide-react";
 import { Link } from "wouter";
 
-const ARTIST_ID = 1;
-
 export default function Dashboard() {
-  const { data: dashboard, isLoading } = useGetArtistDashboard(ARTIST_ID, {
-    query: { enabled: true, queryKey: getGetArtistDashboardQueryKey(ARTIST_ID) },
+  const artist = useCurrentArtist();
+  const { data: dashboard, isLoading } = useGetArtistDashboard(artist.id, {
+    query: {
+      enabled: true,
+      queryKey: getGetArtistDashboardQueryKey(artist.id),
+    },
   });
 
   return (

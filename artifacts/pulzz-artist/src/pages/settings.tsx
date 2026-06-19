@@ -1,9 +1,10 @@
 import { AppLayout } from "@/components/layout/app-layout";
 import {
-  useGetArtist,
   useUpdateArtist,
   getGetArtistQueryKey,
+  getGetCurrentArtistQueryKey,
 } from "@workspace/api-client-react";
+import { useCurrentArtist } from "@/lib/current-artist";
 import { useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -27,16 +28,12 @@ import {
   LINK_FIELDS,
 } from "@/lib/artist-meta";
 
-const ARTIST_ID = 1;
-
 type LinkKey = (typeof LINK_FIELDS)[number]["key"];
 
 export default function SettingsPage() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
-  const { data: artist, isLoading } = useGetArtist(ARTIST_ID, {
-    query: { queryKey: getGetArtistQueryKey(ARTIST_ID) },
-  });
+  const artist = useCurrentArtist();
   const { mutate: updateArtist, isPending } = useUpdateArtist();
 
   const [name, setName] = useState("");
@@ -81,7 +78,7 @@ export default function SettingsPage() {
 
     updateArtist(
       {
-        id: ARTIST_ID,
+        id: artist.id,
         data: {
           name: name.trim(),
           bio: bio.trim(),
@@ -94,7 +91,10 @@ export default function SettingsPage() {
       {
         onSuccess: () => {
           queryClient.invalidateQueries({
-            queryKey: getGetArtistQueryKey(ARTIST_ID),
+            queryKey: getGetArtistQueryKey(artist.id),
+          });
+          queryClient.invalidateQueries({
+            queryKey: getGetCurrentArtistQueryKey(),
           });
           toast({
             title: "Profile saved",
@@ -123,11 +123,7 @@ export default function SettingsPage() {
           </p>
         </header>
 
-        {isLoading ? (
-          <div className="flex items-center justify-center h-64">
-            <Loader2 className="w-8 h-8 animate-spin text-primary" />
-          </div>
-        ) : (
+        {(
           <form onSubmit={handleSave} className="space-y-6">
             <Card className="bg-card border-border">
               <CardHeader className="pb-4">

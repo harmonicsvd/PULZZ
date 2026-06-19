@@ -1,0 +1,87 @@
+import { Link } from "wouter";
+import { ArrowRight, BarChart3, Music, Trophy } from "lucide-react";
+
+const features = [
+  {
+    icon: Music,
+    title: "Submit your songs",
+    body: "Add unreleased tracks to the discovery pool and let listeners find them first.",
+  },
+  {
+    icon: BarChart3,
+    title: "Track discovery",
+    body: "Watch reactions and marked moments roll in with real-time analytics.",
+  },
+  {
+    icon: Trophy,
+    title: "See your wall",
+    body: "Celebrate the listeners who discovered your music before release day.",
+  },
+];
+
+export default function Welcome() {
+  return (
+    <div className="min-h-[100dvh] bg-background text-foreground flex flex-col">
+      <header className="px-6 py-5 flex items-center justify-between max-w-6xl mx-auto w-full">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center shadow-sm">
+            <div className="w-2.5 h-2.5 bg-background rounded-full" />
+          </div>
+          <span className="font-display font-bold text-2xl tracking-tight leading-none">
+            PULZZ
+          </span>
+          <span className="text-muted-foreground font-medium text-xs tracking-[0.18em] uppercase mt-0.5">
+            Artist
+          </span>
+        </div>
+        <Link href="/sign-in">
+          <div className="text-sm font-semibold px-4 py-2 rounded-md border border-border hover:bg-secondary transition-colors cursor-pointer">
+            Sign In
+          </div>
+        </Link>
+      </header>
+
+      <main className="flex-1 flex flex-col items-center justify-center px-6 text-center max-w-3xl mx-auto w-full">
+        <h1 className="font-display font-bold text-4xl md:text-5xl tracking-tight leading-[1.05]">
+          Your music, discovered before release day.
+        </h1>
+        <p className="text-muted-foreground mt-4 text-lg max-w-xl">
+          The Pulzz Artist dashboard lets you submit unreleased songs, track how
+          listeners react, and see who discovered you first.
+        </p>
+        <div className="mt-8 flex items-center gap-3">
+          <Link href="/sign-up">
+            <div className="flex items-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 py-3 px-6 rounded-md text-sm font-semibold transition-colors cursor-pointer shadow-md">
+              Get started
+              <ArrowRight className="w-4 h-4" />
+            </div>
+          </Link>
+          <Link href="/sign-in">
+            <div className="py-3 px-6 rounded-md text-sm font-semibold border border-border hover:bg-secondary transition-colors cursor-pointer">
+              Sign in
+            </div>
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-16 w-full text-left">
+          {features.map((f) => (
+            <div
+              key={f.title}
+              className="rounded-xl border border-border bg-card p-5"
+            >
+              <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center mb-3">
+                <f.icon className="w-4 h-4 text-primary" />
+              </div>
+              <p className="font-semibold">{f.title}</p>
+              <p className="text-sm text-muted-foreground mt-1">{f.body}</p>
+            </div>
+          ))}
+        </div>
+      </main>
+
+      <footer className="px-6 py-6 text-center text-xs text-muted-foreground">
+        Pulzz — pre-release music discovery
+      </footer>
+    </div>
+  );
+}

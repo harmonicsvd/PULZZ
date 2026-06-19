@@ -429,6 +429,21 @@ paths:
               schema:
                 $ref: "#/components/schemas/Artist"
 
+  /artists/me:
+    get:
+      operationId: getCurrentArtist
+      tags: [artists]
+      summary: Get the signed-in artist's profile (provisions on first sign-in)
+      responses:
+        "200":
+          description: Current artist profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Artist"
+        "401":
+          description: Not authenticated
+
   /artists/{id}:
     get:
       operationId: getArtist

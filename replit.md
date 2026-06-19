@@ -39,7 +39,7 @@ Pre-release music discovery platform for Musicathon 2026 (June 15–21). Listene
 
 - Listener app is local-first (AsyncStorage) but syncs reactions + moment marks to the API via a backend `listenerId` (created at onboarding, backfilled on launch if missing). Unsent events queue in a local outbox (`pulzz_pending_reactions`/`pulzz_pending_moments`) and flush on launch — so the artist dashboard reflects real listener activity. Reaction scoring is transition-based to stay idempotent under retries.
 - Generated hooks require explicit `queryKey` via the exported `get*QueryKey()` helpers — always pass it in the `query` option
-- Artist dashboard is hardcoded to artistId=1 for MVP (Luna Voss)
+- Artist dashboard uses Clerk auth (cookie-based, default skill). The signed-in artist is resolved via `GET /artists/me`, which JIT-provisions an artist row keyed by Clerk user id (linking by matching email when present). All artist-scoped routes (dashboard, own songs, wall, profile + song mutations) require auth and reject access to records the requester doesn't own. Public read endpoints (GET /songs, /songs/:id, reactions/moments, GET /artists list + profile) stay open for the listener/landing apps.
 - All routes prefixed with `/api` — services must handle their full base path
 - After any schema change in `lib/*`: run `pnpm run typecheck:libs` before artifact typechecks or you'll get "no exported member" errors
 

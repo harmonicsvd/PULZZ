@@ -13,6 +13,7 @@ import {
   meanProfile,
   type SoundProfile,
 } from "../lib/soundVector";
+import { requireArtist } from "../middlewares/auth";
 import {
   CreateArtistBody,
   GetArtistDashboardParams,
@@ -130,6 +131,18 @@ router.post("/artists", async (req, res): Promise<void> => {
   );
 });
 
+router.get("/artists/me", requireArtist, async (req, res): Promise<void> => {
+  const artist = req.artist!;
+  const profiles = await soundProfilesByArtist();
+  res.json(
+    GetArtistResponse.parse({
+      ...artist,
+      createdAt: artist.createdAt.toISOString(),
+      soundProfile: profiles.get(artist.id) ?? null,
+    })
+  );
+});
+
 router.get("/artists/:id", async (req, res): Promise<void> => {
   const params = GetArtistParams.safeParse(req.params);
   if (!params.success) {
@@ -156,10 +169,14 @@ router.get("/artists/:id", async (req, res): Promise<void> => {
   );
 });
 
-router.put("/artists/:id", async (req, res): Promise<void> => {
+router.put("/artists/:id", requireArtist, async (req, res): Promise<void> => {
   const params = UpdateArtistParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
+    return;
+  }
+  if (params.data.id !== req.artist!.id) {
+    res.status(403).json({ error: "You can only edit your own profile" });
     return;
   }
   const body = UpdateArtistBody.safeParse(req.body);
@@ -208,12 +225,19 @@ router.put("/artists/:id", async (req, res): Promise<void> => {
   );
 });
 
-router.get("/artists/:id/songs", async (req, res): Promise<void> => {
-  const params = GetArtistSongsParams.safeParse(req.params);
-  if (!params.success) {
-    res.status(400).json({ error: params.error.message });
-    return;
-  }
+router.get(
+  "/artists/:id/songs",
+  requireArtist,
+  async (req, res): Promise<void> => {
+    const params = GetArtistSongsParams.safeParse(req.params);
+    if (!params.success) {
+      res.status(400).json({ error: params.error.message });
+      return;
+    }
+    if (params.data.id !== req.artist!.id) {
+      res.status(403).json({ error: "You can only view your own songs" });
+      return;
+    }
 
   const songs = await db
     .select({
@@ -253,12 +277,19 @@ router.get("/artists/:id/songs", async (req, res): Promise<void> => {
   res.json(GetArtistSongsResponse.parse(result));
 });
 
-router.get("/artists/:id/dashboard", async (req, res): Promise<void> => {
-  const params = GetArtistDashboardParams.safeParse(req.params);
-  if (!params.success) {
-    res.status(400).json({ error: params.error.message });
-    return;
-  }
+router.get(
+  "/artists/:id/dashboard",
+  requireArtist,
+  async (req, res): Promise<void> => {
+    const params = GetArtistDashboardParams.safeParse(req.params);
+    if (!params.success) {
+      res.status(400).json({ error: params.error.message });
+      return;
+    }
+    if (params.data.id !== req.artist!.id) {
+      res.status(403).json({ error: "You can only view your own dashboard" });
+      return;
+    }
 
   const [artist] = await db
     .select({ featuredSongId: artistsTable.featuredSongId })

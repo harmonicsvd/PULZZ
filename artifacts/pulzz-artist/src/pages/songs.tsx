@@ -1,13 +1,18 @@
 import { AppLayout } from "@/components/layout/app-layout";
 import { useGetArtistSongs, getGetArtistSongsQueryKey } from "@workspace/api-client-react";
+import { useCurrentArtist } from "@/lib/current-artist";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Clock, ChevronRight, Music, Plus } from "lucide-react";
 import { Link } from "wouter";
 
 export default function SongsPage() {
-  const { data: songs, isLoading } = useGetArtistSongs(1, {
-    query: { enabled: true, queryKey: getGetArtistSongsQueryKey(1) },
+  const artist = useCurrentArtist();
+  const { data: songs, isLoading } = useGetArtistSongs(artist.id, {
+    query: {
+      enabled: true,
+      queryKey: getGetArtistSongsQueryKey(artist.id),
+    },
   });
 
   return (

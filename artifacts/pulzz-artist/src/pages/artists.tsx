@@ -5,6 +5,7 @@ import {
   getListArtistsQueryKey,
   type Artist,
 } from "@workspace/api-client-react";
+import { useCurrentArtist } from "@/lib/current-artist";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -30,8 +31,6 @@ import {
   Copy,
   Check,
 } from "lucide-react";
-
-const CURRENT_ARTIST_ID = 1;
 
 const ROLE_LABELS: Record<string, string> = {
   singer: "Singer",
@@ -126,6 +125,7 @@ function complementaryRoles(me: Artist, other: Artist): string[] {
 }
 
 export default function ArtistsPage() {
+  const currentArtist = useCurrentArtist();
   const { data: artists, isLoading } = useListArtists({
     query: { enabled: true, queryKey: getListArtistsQueryKey() },
   });
@@ -135,13 +135,13 @@ export default function ArtistsPage() {
   const [contactArtist, setContactArtist] = useState<Artist | null>(null);
 
   const me = useMemo(
-    () => artists?.find((a) => a.id === CURRENT_ARTIST_ID) ?? null,
-    [artists]
+    () => artists?.find((a) => a.id === currentArtist.id) ?? null,
+    [artists, currentArtist.id]
   );
 
   const others = useMemo(
-    () => (artists ?? []).filter((a) => a.id !== CURRENT_ARTIST_ID),
-    [artists]
+    () => (artists ?? []).filter((a) => a.id !== currentArtist.id),
+    [artists, currentArtist.id]
   );
 
   const suggestions = useMemo(() => {

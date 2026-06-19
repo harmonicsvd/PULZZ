@@ -1,12 +1,15 @@
 import { ReactNode } from "react";
 import { Link, useLocation } from "wouter";
 import { LayoutDashboard, Music, Trophy, Users, Settings, LogOut, Plus } from "lucide-react";
+import { useClerk } from "@clerk/react";
 import { cn } from "@/lib/utils";
 
 const LANDING_URL = import.meta.env.VITE_LANDING_URL ?? "/";
+const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
 
 export function AppLayout({ children }: { children: ReactNode }) {
   const [location] = useLocation();
+  const { signOut } = useClerk();
 
   const navItems = [
     { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
@@ -72,13 +75,14 @@ export function AppLayout({ children }: { children: ReactNode }) {
               Settings
             </div>
           </Link>
-          <a
-            href={LANDING_URL}
-            className="flex items-center gap-3 text-sm text-muted-foreground px-3 py-2 cursor-pointer hover:text-foreground transition-colors mt-1"
+          <button
+            type="button"
+            onClick={() => signOut({ redirectUrl: basePath || "/" })}
+            className="w-full flex items-center gap-3 text-sm text-muted-foreground px-3 py-2 cursor-pointer hover:text-foreground transition-colors mt-1"
           >
             <LogOut className="w-4 h-4" />
             Sign Out
-          </a>
+          </button>
         </div>
       </aside>
 

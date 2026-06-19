@@ -7,15 +7,26 @@ import {
 } from "@workspace/db";
 import { and, count, desc, eq, sql } from "drizzle-orm";
 import { GetWallResponse, GetWallQueryParams } from "@workspace/api-zod";
+import { requireArtist } from "../middlewares/auth";
 
 const router: IRouter = Router();
 
 const POINTS_PER_DISCOVERY = 100;
 
-router.get("/wall", async (req, res): Promise<void> => {
+router.get("/wall", requireArtist, async (req, res): Promise<void> => {
   const query = GetWallQueryParams.safeParse(req.query);
   if (!query.success) {
     res.status(400).json({ error: query.error.message });
+    return;
+  }
+
+  // An authenticated artist may only request the leaderboard scoped to their
+  // own songs.
+  if (
+    query.data.artistId !== undefined &&
+    query.data.artistId !== req.artist!.id
+  ) {
+    res.status(403).json({ error: "You can only view your own wall" });
     return;
   }
 

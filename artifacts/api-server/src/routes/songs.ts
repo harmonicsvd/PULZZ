@@ -38,6 +38,7 @@ import { getTrackStats } from "../lib/songstats";
 import { isConfigured } from "../lib/cyanite";
 import { startSongAnalysis, syncSong } from "../lib/cyaniteSync";
 import { toSoundProfile } from "../lib/soundVector";
+import { requireArtist, requireSongOwnership } from "../middlewares/auth";
 
 const router: IRouter = Router();
 
@@ -94,14 +95,17 @@ router.get("/songs", async (req, res): Promise<void> => {
   res.json(ListSongsResponse.parse(result));
 });
 
-router.post("/songs", async (req, res): Promise<void> => {
+router.post("/songs", requireArtist, async (req, res): Promise<void> => {
   const parsed = SubmitSongBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });
     return;
   }
 
-  const { artistId, releaseDate, audioUrl, ...rest } = parsed.data;
+  // Ignore any client-supplied artistId — a song always belongs to the
+  // authenticated artist submitting it.
+  const { artistId: _ignored, releaseDate, audioUrl, ...rest } = parsed.data;
+  const artistId = req.artist!.id;
 
   let analysis: SongAnalysis | null = null;
   if (rest.lyrics && rest.lyrics.trim().length > 0) {
@@ -235,7 +239,7 @@ router.get("/songs/:id", async (req, res): Promise<void> => {
   );
 });
 
-router.put("/songs/:id/lyrics", async (req, res): Promise<void> => {
+router.put("/songs/:id/lyrics", requireArtist, requireSongOwnership(), async (req, res): Promise<void> => {
   const params = UpdateSongLyricsParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
@@ -263,7 +267,7 @@ router.put("/songs/:id/lyrics", async (req, res): Promise<void> => {
   );
 });
 
-router.put("/songs/:id/analysis", async (req, res): Promise<void> => {
+router.put("/songs/:id/analysis", requireArtist, requireSongOwnership(), async (req, res): Promise<void> => {
   const params = UpdateSongAnalysisParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
@@ -301,7 +305,7 @@ router.put("/songs/:id/analysis", async (req, res): Promise<void> => {
   );
 });
 
-router.put("/songs/:id/streaming-id", async (req, res): Promise<void> => {
+router.put("/songs/:id/streaming-id", requireArtist, requireSongOwnership(), async (req, res): Promise<void> => {
   const params = UpdateSongStreamingIdParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
@@ -335,7 +339,7 @@ router.put("/songs/:id/streaming-id", async (req, res): Promise<void> => {
   );
 });
 
-router.put("/songs/:id/release", async (req, res): Promise<void> => {
+router.put("/songs/:id/release", requireArtist, requireSongOwnership(), async (req, res): Promise<void> => {
   const params = SetSongReleaseParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
@@ -424,7 +428,7 @@ router.get("/songs/:id/sound-analysis", async (req, res): Promise<void> => {
   res.json(GetSongSoundAnalysisResponse.parse(state));
 });
 
-router.put("/songs/:id/sound-analysis", async (req, res): Promise<void> => {
+router.put("/songs/:id/sound-analysis", requireArtist, requireSongOwnership(), async (req, res): Promise<void> => {
   const params = UpdateSongSoundAnalysisParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
@@ -486,7 +490,7 @@ router.put("/songs/:id/sound-analysis", async (req, res): Promise<void> => {
   );
 });
 
-router.post("/songs/:id/analyze", async (req, res): Promise<void> => {
+router.post("/songs/:id/analyze", requireArtist, requireSongOwnership(), async (req, res): Promise<void> => {
   const params = AnalyzeSongParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });

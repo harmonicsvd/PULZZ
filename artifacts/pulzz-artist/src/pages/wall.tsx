@@ -3,16 +3,16 @@ import { useGetWall, getGetWallQueryKey } from "@workspace/api-client-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, User, Star, Zap } from "lucide-react";
-
-const ARTIST_ID = 1;
+import { useCurrentArtist } from "@/lib/current-artist";
 
 export default function WallPage() {
+  const artist = useCurrentArtist();
   const { data: entries, isLoading } = useGetWall(
-    { artistId: ARTIST_ID },
+    { artistId: artist.id },
     {
       query: {
         enabled: true,
-        queryKey: getGetWallQueryKey({ artistId: ARTIST_ID }),
+        queryKey: getGetWallQueryKey({ artistId: artist.id }),
       },
     }
   );

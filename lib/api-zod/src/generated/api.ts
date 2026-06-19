@@ -491,6 +491,47 @@ export const CreateArtistBody = zod.object({
 
 
 /**
+ * @summary Get the signed-in artist's profile (provisions on first sign-in)
+ */
+export const getCurrentArtistResponseLinksOneWebsiteRegExp = new RegExp('^https?:\/');
+export const getCurrentArtistResponseLinksOneSpotifyRegExp = new RegExp('^https?:\/');
+export const getCurrentArtistResponseLinksOneAppleMusicRegExp = new RegExp('^https?:\/');
+export const getCurrentArtistResponseLinksOneInstagramRegExp = new RegExp('^https?:\/');
+export const getCurrentArtistResponseLinksOneSoundcloudRegExp = new RegExp('^https?:\/');
+export const getCurrentArtistResponseLinksOneYoutubeRegExp = new RegExp('^https?:\/');
+export const getCurrentArtistResponseLinksOneTiktokRegExp = new RegExp('^https?:\/');
+
+
+export const GetCurrentArtistResponse = zod.object({
+  "id": zod.number(),
+  "name": zod.string(),
+  "email": zod.string(),
+  "bio": zod.string().nullish(),
+  "genre": zod.string().nullish(),
+  "distributor": zod.string().nullish(),
+  "roles": zod.array(zod.string()).nullish(),
+  "links": zod.union([zod.object({
+  "website": zod.string().regex(getCurrentArtistResponseLinksOneWebsiteRegExp).optional(),
+  "spotify": zod.string().regex(getCurrentArtistResponseLinksOneSpotifyRegExp).optional(),
+  "appleMusic": zod.string().regex(getCurrentArtistResponseLinksOneAppleMusicRegExp).optional(),
+  "instagram": zod.string().regex(getCurrentArtistResponseLinksOneInstagramRegExp).optional(),
+  "soundcloud": zod.string().regex(getCurrentArtistResponseLinksOneSoundcloudRegExp).optional(),
+  "youtube": zod.string().regex(getCurrentArtistResponseLinksOneYoutubeRegExp).optional(),
+  "tiktok": zod.string().regex(getCurrentArtistResponseLinksOneTiktokRegExp).optional()
+}),zod.null()]).optional(),
+  "soundProfile": zod.union([zod.object({
+  "energy": zod.number().describe('0..1'),
+  "valence": zod.number().describe('0..1 (musical positivity)'),
+  "arousal": zod.number().describe('0..1 (intensity)'),
+  "topGenres": zod.array(zod.string()),
+  "topMoods": zod.array(zod.string()),
+  "vector": zod.array(zod.number()).describe('Deterministically-ordered feature vector for cosine similarity.')
+}).describe('Normalized sound fingerprint derived from Cyanite analysis, used for sound-similarity ranking. Null when a recording yields no usable tonal signal.'),zod.null()]).optional(),
+  "createdAt": zod.string()
+})
+
+
+/**
  * @summary Get artist profile
  */
 export const GetArtistParams = zod.object({

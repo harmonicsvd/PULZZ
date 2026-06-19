@@ -12,3 +12,4 @@
 - [Expo web testing target](expo-web-testing.md) — test Expo listener via the Expo dev domain directly, not the proxy path; proxy serves HTML but not the bundle (blank screen)
 - [Orval pattern regex mangling](orval-pattern-regex.md) — OpenAPI string `pattern` is emitted as a broken RegExp; verify generated regex and add explicit guards for security-relevant validation
 - [Artifact re-registration](artifact-reregistration.md) — deleting artifacts/<slug>/ deregisters it; re-register via verifyAndReplaceArtifactToml (not createArtifact). .gitignore/.replit are guarded from raw rm/cp
+- [Artist auth + ownership](artist-auth-ownership.md) — artist app uses Clerk; /artists/me JIT-provisions by clerkUserId (email fallback); all artist routes reject non-owned records; listener/landing read endpoints stay public

@@ -1,11 +1,10 @@
 import { AppLayout } from "@/components/layout/app-layout";
 import {
   useSubmitSong,
-  useGetArtist,
-  getGetArtistQueryKey,
   getGetArtistSongsQueryKey,
   getGetArtistDashboardQueryKey,
 } from "@workspace/api-client-react";
+import { useCurrentArtist } from "@/lib/current-artist";
 import { useUpload } from "@workspace/object-storage-web";
 import { useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -30,8 +29,6 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { GENRES, DISTRIBUTORS, CREDIT_FIELDS } from "@/lib/artist-meta";
-
-const ARTIST_ID = 1;
 
 type Credits = {
   lyricist: string;
@@ -66,9 +63,7 @@ export default function SubmitSongPage() {
   const [, navigate] = useLocation();
   const queryClient = useQueryClient();
   const { mutate: submitSong, isPending } = useSubmitSong();
-  const { data: artist } = useGetArtist(ARTIST_ID, {
-    query: { queryKey: getGetArtistQueryKey(ARTIST_ID) },
-  });
+  const artist = useCurrentArtist();
   const [submitted, setSubmitted] = useState(false);
   const [prefilled, setPrefilled] = useState(false);
 
@@ -185,7 +180,7 @@ export default function SubmitSongPage() {
       {
         data: {
           title: form.title.trim(),
-          artistId: ARTIST_ID,
+          artistId: artist.id,
           genre: form.genre,
           releaseDate: form.releaseDate,
           releaseTime: form.releaseTime || undefined,
@@ -207,10 +202,10 @@ export default function SubmitSongPage() {
       {
         onSuccess: () => {
           queryClient.invalidateQueries({
-            queryKey: getGetArtistSongsQueryKey(ARTIST_ID),
+            queryKey: getGetArtistSongsQueryKey(artist.id),
           });
           queryClient.invalidateQueries({
-            queryKey: getGetArtistDashboardQueryKey(ARTIST_ID),
+            queryKey: getGetArtistDashboardQueryKey(artist.id),
           });
           setSubmitted(true);
           setTimeout(() => navigate("/songs"), 1800);

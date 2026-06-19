@@ -36,6 +36,7 @@ export interface ArtistLinks {
 
 export const artistsTable = pgTable("artists", {
   id: serial("id").primaryKey(),
+  clerkUserId: text("clerk_user_id").unique(),
   name: text("name").notNull(),
   email: text("email").notNull().unique(),
   bio: text("bio"),

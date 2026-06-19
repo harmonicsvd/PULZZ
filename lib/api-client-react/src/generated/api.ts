@@ -1501,6 +1501,83 @@ export const useCreateArtist = <TError = ErrorType<unknown>,
       return useMutation(getCreateArtistMutationOptions(options));
     }
 
+export const getGetCurrentArtistUrl = () => {
+
+
+
+
+  return `/api/artists/me`
+}
+
+/**
+ * @summary Get the signed-in artist's profile (provisions on first sign-in)
+ */
+export const getCurrentArtist = async ( options?: RequestInit): Promise<Artist> => {
+
+  return customFetch<Artist>(getGetCurrentArtistUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetCurrentArtistQueryKey = () => {
+    return [
+    `/api/artists/me`
+    ] as const;
+    }
+
+
+export const getGetCurrentArtistQueryOptions = <TData = Awaited<ReturnType<typeof getCurrentArtist>>, TError = ErrorType<void>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getCurrentArtist>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetCurrentArtistQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getCurrentArtist>>> = ({ signal }) => getCurrentArtist({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getCurrentArtist>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetCurrentArtistQueryResult = NonNullable<Awaited<ReturnType<typeof getCurrentArtist>>>
+export type GetCurrentArtistQueryError = ErrorType<void>
+
+
+/**
+ * @summary Get the signed-in artist's profile (provisions on first sign-in)
+ */
+
+export function useGetCurrentArtist<TData = Awaited<ReturnType<typeof getCurrentArtist>>, TError = ErrorType<void>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getCurrentArtist>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetCurrentArtistQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
 export const getGetArtistUrl = (id: number,) => {
 
 
