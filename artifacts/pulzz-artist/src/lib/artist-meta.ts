@@ -103,3 +103,49 @@ export function placeholderFollowerCount(seed: number, key: string): number {
   return 5000 + (hash(seed, key) % 95000);
 }
 
+export interface DemoPlatformStat {
+  key: string;
+  label: string;
+  metric: string;
+  streams: number;
+  audience: number;
+  playlistReach: number;
+  charts: number;
+}
+
+export interface DemoArtistStreamingStats {
+  platforms: DemoPlatformStat[];
+  totals: { streams: number; audience: number; playlistReach: number; charts: number };
+}
+
+/**
+ * Deterministic, artist-wide streaming figures for the "Artist Overall" demo
+ * view. Unlike the per-song Songstats data, these represent an artist's whole
+ * catalogue across platforms. Demo data only (clearly labelled in the UI) and
+ * stable per artist id so the numbers stay consistent across sessions.
+ */
+export function demoArtistStreamingStats(
+  artistId: number
+): DemoArtistStreamingStats {
+  const platforms: DemoPlatformStat[] = STREAMING_PLATFORMS.map((p) => ({
+    key: p.key,
+    label: p.label,
+    metric: p.metric,
+    streams: 120_000 + (hash(artistId, `${p.key}:streams`) % 4_800_000),
+    audience: placeholderFollowerCount(artistId, p.key),
+    playlistReach: 8_000 + (hash(artistId, `${p.key}:reach`) % 720_000),
+    charts: hash(artistId, `${p.key}:charts`) % 6,
+  }));
+
+  const totals = platforms.reduce(
+    (acc, p) => ({
+      streams: acc.streams + p.streams,
+      audience: acc.audience + p.audience,
+      playlistReach: acc.playlistReach + p.playlistReach,
+      charts: acc.charts + p.charts,
+    }),
+    { streams: 0, audience: 0, playlistReach: 0, charts: 0 }
+  );
+
+  return { platforms, totals };
+}

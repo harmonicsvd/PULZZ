@@ -11,10 +11,12 @@ import {
   ListMusic,
   Radio,
   TrendingUp,
+  Users,
   Loader2,
 } from "lucide-react";
 import { Link } from "wouter";
 import { useState } from "react";
+import { demoArtistStreamingStats } from "@/lib/artist-meta";
 
 interface Props {
   artistId: number;
@@ -63,9 +65,10 @@ export function StreamingStats({ artistId }: Props) {
   });
 
   const liveSongs = data?.songs.filter((s) => s.available) ?? [];
+  const hasLiveData = data?.status === "ok" && liveSongs.length > 0;
 
   const [tab, setTab] = useState<string | undefined>(undefined);
-  const activeTab = tab ?? "songs";
+  const activeTab = tab ?? (hasLiveData ? "songs" : "artist");
 
   return (
     <Card className="bg-card border-border">
@@ -75,7 +78,7 @@ export function StreamingStats({ artistId }: Props) {
           <BarChart3 className="w-4 h-4 text-primary" />
         </div>
         <span className="text-xs text-muted-foreground">
-          Powered by Songstats
+          {activeTab === "songs" ? "Powered by Songstats" : "Showcase demo data"}
         </span>
       </CardHeader>
       <CardContent>
@@ -95,7 +98,7 @@ export function StreamingStats({ artistId }: Props) {
             </TabsContent>
 
             <TabsContent value="artist" className="space-y-5">
-              <ArtistOverallView data={data} />
+              <ArtistOverallView artistId={artistId} />
             </TabsContent>
           </Tabs>
         )}
@@ -120,73 +123,6 @@ function SongsView({
       <p className="text-xs text-muted-foreground">
         Live across {data.songsWithStats} released song
         {data.songsWithStats !== 1 ? "s" : ""} · real numbers from Songstats
-      </p>
-
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <StatTile
-          icon={<TrendingUp className="w-4 h-4 text-chart-3" />}
-          label="Total Streams"
-          value={formatNumber(data.streamsTotal)}
-        />
-        <StatTile
-          icon={<ListMusic className="w-4 h-4 text-primary" />}
-          label="Playlist Reach"
-          value={formatNumber(data.playlistReachTotal)}
-        />
-        <StatTile
-          icon={<ListMusic className="w-4 h-4 text-chart-4" />}
-          label="Playlists"
-          value={formatNumber(data.playlistsTotal)}
-        />
-        <StatTile
-          icon={<Radio className="w-4 h-4 text-chart-2" />}
-          label="Chart Entries"
-          value={formatNumber(data.chartsTotal)}
-        />
-      </div>
-
-      {liveSongs.length > 0 && (
-        <div className="space-y-2">
-          <div className="text-xs uppercase tracking-wide text-muted-foreground">
-            By Song
-          </div>
-          <div className="divide-y divide-border rounded-lg border border-border overflow-hidden">
-            {liveSongs.map((s) => (
-              <Link key={s.id} href={`/songs/${s.id}`}>
-                <div className="flex items-center justify-between gap-4 px-4 py-2.5 text-sm hover:bg-secondary/50 transition-colors cursor-pointer">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div
-                      className="w-7 h-7 rounded-md flex-shrink-0"
-                      style={{ backgroundColor: s.coverColor ?? "#FF5C49" }}
-                    />
-                    <span className="font-medium truncate">{s.title}</span>
-                  </div>
-                  <span className="text-muted-foreground flex-shrink-0">
-                    <span className="font-semibold text-foreground">
-                      {formatNumber(s.streamsTotal)}
-                    </span>{" "}
-                    streams
-                  </span>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      )}
-    </>
-  );
-}
-
-function ArtistOverallView({ data }: { data: ArtistSongstats | undefined }) {
-  if (!data || data.status !== "ok") {
-    return <EmptyState status={data?.status} configured={data?.configured} />;
-  }
-
-  return (
-    <>
-      <p className="text-xs text-muted-foreground">
-        Across all your released songs, summed by streaming platform · real
-        numbers from Songstats
       </p>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -250,6 +186,107 @@ function ArtistOverallView({ data }: { data: ArtistSongstats | undefined }) {
           </div>
         </div>
       )}
+
+      {liveSongs.length > 0 && (
+        <div className="space-y-2">
+          <div className="text-xs uppercase tracking-wide text-muted-foreground">
+            By Song
+          </div>
+          <div className="divide-y divide-border rounded-lg border border-border overflow-hidden">
+            {liveSongs.map((s) => (
+              <Link key={s.id} href={`/songs/${s.id}`}>
+                <div className="flex items-center justify-between gap-4 px-4 py-2.5 text-sm hover:bg-secondary/50 transition-colors cursor-pointer">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div
+                      className="w-7 h-7 rounded-md flex-shrink-0"
+                      style={{ backgroundColor: s.coverColor ?? "#FF5C49" }}
+                    />
+                    <span className="font-medium truncate">{s.title}</span>
+                  </div>
+                  <span className="text-muted-foreground flex-shrink-0">
+                    <span className="font-semibold text-foreground">
+                      {formatNumber(s.streamsTotal)}
+                    </span>{" "}
+                    streams
+                  </span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+function ArtistOverallView({ artistId }: { artistId: number }) {
+  const stats = demoArtistStreamingStats(artistId);
+
+  return (
+    <>
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <p className="text-xs text-muted-foreground">
+          Your whole catalogue across every platform.
+        </p>
+        <Badge variant="outline" className="text-xs">
+          Demo figures
+        </Badge>
+      </div>
+
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <StatTile
+          icon={<TrendingUp className="w-4 h-4 text-chart-3" />}
+          label="Total Streams"
+          value={formatNumber(stats.totals.streams)}
+        />
+        <StatTile
+          icon={<Users className="w-4 h-4 text-primary" />}
+          label="Audience"
+          value={formatNumber(stats.totals.audience)}
+        />
+        <StatTile
+          icon={<ListMusic className="w-4 h-4 text-chart-4" />}
+          label="Playlist Reach"
+          value={formatNumber(stats.totals.playlistReach)}
+        />
+        <StatTile
+          icon={<Radio className="w-4 h-4 text-chart-2" />}
+          label="Chart Entries"
+          value={formatNumber(stats.totals.charts)}
+        />
+      </div>
+
+      <div className="space-y-2">
+        <div className="text-xs uppercase tracking-wide text-muted-foreground">
+          By Platform
+        </div>
+        <div className="divide-y divide-border rounded-lg border border-border overflow-hidden">
+          {stats.platforms.map((p) => (
+            <div
+              key={p.key}
+              className="flex items-center justify-between gap-4 px-4 py-2.5 text-sm"
+            >
+              <span className="font-medium">{p.label}</span>
+              <div className="flex items-center gap-4 text-muted-foreground">
+                <span>
+                  <span className="font-semibold text-foreground">
+                    {formatNumber(p.streams)}
+                  </span>{" "}
+                  streams
+                </span>
+                <span className="hidden sm:inline">
+                  {formatNumber(p.audience)} {p.metric}
+                </span>
+                {p.charts > 0 && (
+                  <Badge variant="outline" className="text-xs">
+                    {p.charts} chart{p.charts !== 1 ? "s" : ""}
+                  </Badge>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     </>
   );
 }
