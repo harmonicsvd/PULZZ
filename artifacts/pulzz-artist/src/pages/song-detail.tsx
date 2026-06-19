@@ -272,7 +272,7 @@ export default function SongDetailPage({ id }: Props) {
                     <CardTitle className="text-base">Lyrics</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <pre className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap font-sans">
+                    <pre className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap break-words font-sans">
                       {song.lyrics}
                     </pre>
                   </CardContent>

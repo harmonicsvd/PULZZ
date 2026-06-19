@@ -114,7 +114,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
       </Sheet>
 
       {/* Main Content */}
-      <main className="flex-1 md:ml-64 relative">
+      <main className="flex-1 min-w-0 md:ml-64 relative">
         {/* Mobile top bar */}
         <header className="md:hidden sticky top-0 z-20 flex items-center gap-3 px-4 h-14 border-b border-border bg-card/95 backdrop-blur">
           <button
