@@ -91,9 +91,14 @@ We use **Musixmatch's** API for three distinct jobs:
 - **Synced lyrics in the player** — we fetch LRC subtitles and display them line-by-line, in sync with playback, while a song streams.
 - **Lyric mood / theme / language** — each submitted song's lyrics get a mood, theme, and language read from Musixmatch's lyrics analysis (with a lightweight script-based language fallback), stored and shown alongside the track.
 
-### Songstats — post-release performance (closing the loop)
+### Songstats — cross-platform performance (closing the loop)
 
-An artist attaches an ISRC or Spotify link to a released song, and Pulzz queries **Songstats'** enterprise stats API to surface total and recent streams, playlist reach, playlist counts, and chart activity aggregated across platforms. Pre-release songs are deliberately gated so they never show live numbers — connecting pre-release discovery to real post-release performance once a song goes live.
+An artist attaches an ISRC or Spotify link to a released song, and Pulzz queries **Songstats'** enterprise stats API to surface real cross-platform performance. We use it at two levels:
+
+- **Per song** — total and recent streams, playlist reach, playlist counts, and chart activity for an individual released track.
+- **Artist-wide rollup** — those numbers are aggregated across all of an artist's released songs and broken down **by streaming platform** (Spotify, Apple Music, Amazon Music, Deezer, YouTube, Shazam, and more) as well as by song, so an artist sees their overall reach across the streaming ecosystem in one place.
+
+Pre-release songs are deliberately gated so they never show live numbers — connecting pre-release discovery to real post-release performance once a song goes live.
 
 ### Supporting data & assets
 

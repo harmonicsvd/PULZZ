@@ -1,0 +1,76 @@
+Pulzz landing page
+The Problem: Streaming platforms are a crowded jungle where every new song has to fight for attention against bigger, more popular artists. Great songs often disappear before they can find early listeners, because they lack buzz, fans waiting on release day, and a place to be discovered first. Listeners also lose access to promising new artist talent, because the most exciting unreleased songs can be drowned out before they ever get a chance.
+
+The Solution: Pulzz creates a space before release day where emerging artists can build their first audience, and music lovers can discover the next great song before everyone else finds it.
+The Opportunity
+
+Why This Moment Matters
+
+Artists face a harsh reality: streaming platforms are crowded, algorithms are unpredictable, and a song can disappear hours after it releases. The deciding factor is often not quality—it's whether listeners are already waiting.
+
+Musicians don't just need distribution. They need fair exposure before release day. They need real listeners who connect with the music, talk about it, and commit to following the song when it officially launches.
+
+Listeners face a parallel problem: they want to discover music before it becomes mainstream, to feel like they found something special before everyone else did.
+
+Pulzz bridges this gap. It creates a discovery platform where unreleased songs find their early audience, and listeners become part of the song's story before it enters the streaming world.
+
+How It Works
+
+For Listeners: Discover Before Release
+
+Listeners enter a mobile-first app where unreleased songs are presented as an active, participatory experience:
+
+Discover — Browse unreleased tracks submitted by emerging artists
+React — Mark songs as Discovered (will follow on release) or Skip (not for me)
+Mark Moments — Tap to mark the exact seconds that moved them—a vocal peak, a beat drop, a lyric that hits
+Earn Recognition — Discover points reward early-finder behavior
+Build a Profile — Their discovery journey and taste become visible over time
+Return on Release Day — Tap to stream the song directly when it officially launches
+The listener doesn't passively consume. They become the first audience, and the artist sees exactly which moments resonated.
+
+For Artists: Build Buzz Before Launch
+
+Artists use a web dashboard to transform pre-release time into momentum-building:
+
+Submit a Song — Upload unreleased tracks with release date, story, lyrics, credits, and artwork
+Watch in Real-Time — See how many listeners are discovering vs. skipping the track
+Analyze Moments — Review which exact seconds listeners marked—revealing what worked
+Meet Early Listeners — Build a group of supporters before the streaming release
+Find Collaborators — Discover similar artists and request collaborations on a shared collaboration wall
+Make Decisions — See whether a song is ready for release, or what might need rethinking
+Instead of hoping for algorithm luck after release, artists now have signal before they release—and listeners who are already invested.
+
+Why Pulzz Is Different
+
+Most music platforms optimize for what happens after a song is public.
+
+Pulzz optimizes for what happens before release—the fragile, high-value moment when a song is finished but its audience hasn't been found yet.
+
+This changes everything:
+
+Aspect	Traditional Platforms	Pulzz
+Listener Role	Passive consumer	Active first-audience member
+Artist Focus	After release (algorithm luck)	Before release (building anticipation)
+Analytics	Vanity metrics	Release-readiness signal
+App Experience	Endless feed scroll	Intentional reaction loop with moment marking
+Release Day	Starting from zero	Starting with waiting listeners
+Partners & Integrations
+
+Pulzz is built directly on top of three music-industry partner APIs. Each one powers a specific, working feature in the product — not a logo on a slide. Here's exactly how we use each.
+
+Cyanite — AI audio analysis (the "Song DNA" engine)
+
+When an artist submits a track, Pulzz streams the audio to Cyanite's GraphQL API (audioAnalysisV6) and stores the returned profile: genre and mood distributions, BPM, musical key, energy level and dynamics, valence (positivity) and arousal (intensity), plus an AI caption and musical era. We use this in two places:
+
+Song DNA — every song's detail page in the artist dashboard renders this profile so artists see how their unreleased track actually sounds to a machine listener.
+Taste-matched discovery & collaboration — Pulzz turns each Cyanite profile into a normalized sound vector and ranks the listener's Discover feed by cosine similarity to their taste. The same similarity surfaces "similar artists" so creators can find collaborators whose sound fits theirs.
+Results land asynchronously: we kick off analysis in the background and let Cyanite's webhook (plus a lazy re-fetch) fill in the finished profile.
+
+Musixmatch — lyrics, taste profiling & lyric intelligence
+
+We use Musixmatch's API for three distinct jobs:
+
+Onboarding taste capture — the listener onboarding pulls Musixmatch's genre catalog and track search so new listeners pick real songs and genres they love, seeding their taste profile.
+Synced lyrics in the player — we fetch LRC subtitles and display them line-by-line, in sync with playback, while a song streams.
+Lyric mood / theme / language — each submitted song's lyrics get a mood, theme, and language read from Musixmatch's lyrics analysis (with a lightweight script-based language fallback), stored and shown alongside the track.
+Songstats — post-release performance (closing the loop)
