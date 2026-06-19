@@ -513,7 +513,7 @@ export default function SubmitSongPage() {
                 </Select>
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="streamingId">ISRC (optional)</Label>
+                <Label htmlFor="streamingId">ISRC</Label>
                 <Input
                   id="streamingId"
                   placeholder="e.g. USRC17607839"
@@ -522,8 +522,7 @@ export default function SubmitSongPage() {
                   className="bg-background"
                 />
                 <p className="text-xs text-muted-foreground">
-                  Optional — once released, this pulls real post-release stats
-                  from Songstats into your song's dashboard.
+                  Important — this confirms your song is already distributed.
                 </p>
               </div>
             </CardContent>
