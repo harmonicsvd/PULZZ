@@ -118,11 +118,6 @@ export default function Welcome() {
               <ArrowRight className="w-4 h-4" />
             </div>
           </Link>
-          <Link href="/sign-in">
-            <div className="py-3 px-6 rounded-md text-sm font-semibold border border-border hover:bg-secondary transition-colors cursor-pointer">
-              Sign in
-            </div>
-          </Link>
         </div>
 
         <div className="mt-5 flex flex-col items-center gap-2">
