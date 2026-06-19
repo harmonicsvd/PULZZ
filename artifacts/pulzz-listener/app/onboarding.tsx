@@ -16,7 +16,6 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { PulzzWordmark } from "@/components/PulzzWordmark";
 import { fontFor } from "@/constants/fonts";
 import { useColors } from "@/hooks/useColors";
 import { useApp } from "@/contexts/AppContext";
@@ -289,10 +288,6 @@ export default function OnboardingScreen() {
         },
       ]}
     >
-      <View style={styles.brandHeader}>
-        <PulzzWordmark size={34} />
-      </View>
-
       <View style={styles.progressBar}>
         {[0, 1, 2, 3].map((i) => (
           <View
@@ -768,10 +763,6 @@ const styles = StyleSheet.create({
     fontFamily: fontFor("700"),
     letterSpacing: 1,
     marginBottom: 10,
-  },
-  brandHeader: {
-    alignItems: "center",
-    marginBottom: 20,
   },
   searchBar: {
     flexDirection: "row",

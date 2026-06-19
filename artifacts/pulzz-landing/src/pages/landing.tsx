@@ -2,7 +2,7 @@ import { Link } from "wouter";
 import { Wordmark } from "@/components/Wordmark";
 
 const LISTEN_GUIDE_URL = "/listen";
-const ARTIST_URL = "/artist/";
+const ARTIST_URL = import.meta.env.VITE_ARTIST_URL ?? "/artist/";
 
 function PulseBars() {
   const bars = [0.5, 0.9, 0.3, 0.7, 1, 0.45, 0.8, 0.6, 0.95, 0.4, 0.75, 0.55];

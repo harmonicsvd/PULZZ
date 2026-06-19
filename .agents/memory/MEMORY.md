@@ -11,3 +11,4 @@
 - [Brand asset generation](brand-asset-generation.md) — render Pulzz icon/splash/favicon from the wordmark via resvg + bundled Inter ExtraBold; no paid generation, keep wordmark in icon center for Android safe zone
 - [Expo web testing target](expo-web-testing.md) — test Expo listener via the Expo dev domain directly, not the proxy path; proxy serves HTML but not the bundle (blank screen)
 - [Orval pattern regex mangling](orval-pattern-regex.md) — OpenAPI string `pattern` is emitted as a broken RegExp; verify generated regex and add explicit guards for security-relevant validation
+- [Artifact re-registration](artifact-reregistration.md) — deleting artifacts/<slug>/ deregisters it; re-register via verifyAndReplaceArtifactToml (not createArtifact). .gitignore/.replit are guarded from raw rm/cp

@@ -206,7 +206,8 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     alignItems: "center",
     justifyContent: "center",
-    zIndex: 100,
+    zIndex: 9999,
+    elevation: 9999,
   },
   row: {
     flexDirection: "row",

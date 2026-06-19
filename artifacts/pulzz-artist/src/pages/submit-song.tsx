@@ -6,6 +6,7 @@ import {
   getGetArtistSongsQueryKey,
   getGetArtistDashboardQueryKey,
 } from "@workspace/api-client-react";
+import { useUpload } from "@workspace/object-storage-web";
 import { useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -18,8 +19,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2, ArrowLeft, CheckCircle } from "lucide-react";
-import { useEffect, useState } from "react";
+import {
+  Loader2,
+  ArrowLeft,
+  CheckCircle,
+  Upload,
+  Music,
+  X,
+} from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { GENRES, DISTRIBUTORS, CREDIT_FIELDS } from "@/lib/artist-meta";
 
@@ -42,6 +50,17 @@ const EMPTY_CREDITS: Credits = {
   masteringEngineer: "",
   producer: "",
 };
+
+function formatBytes(bytes: number) {
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function formatDuration(seconds: number) {
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return `${m}:${s.toString().padStart(2, "0")}`;
+}
 
 export default function SubmitSongPage() {
   const [, navigate] = useLocation();
@@ -67,7 +86,22 @@ export default function SubmitSongPage() {
   });
   const [credits, setCredits] = useState<Credits>(EMPTY_CREDITS);
 
-  // Pre-fill known values from the artist profile once it loads.
+  const [audioFile, setAudioFile] = useState<File | null>(null);
+  const [audioObjectPath, setAudioObjectPath] = useState<string | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const { uploadFile, isUploading, progress } = useUpload({
+    basePath: "/api/storage",
+    onSuccess: (response) => {
+      setAudioObjectPath(response.objectPath);
+      setUploadError(null);
+    },
+    onError: (err) => {
+      setUploadError(err.message || "Upload failed. Please try again.");
+    },
+  });
+
   useEffect(() => {
     if (artist && !prefilled) {
       setForm((prev) => ({
@@ -92,10 +126,48 @@ export default function SubmitSongPage() {
     setCredits((prev) => ({ ...prev, [key]: value }));
   }
 
-  const canSubmit =
-    form.title.trim() && form.genre && form.releaseDate && form.story.trim();
+  async function handleAudioChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-  function handleSubmit(e: React.FormEvent) {
+    setAudioFile(file);
+    setAudioObjectPath(null);
+    setUploadError(null);
+
+    const audioDuration = await getAudioDuration(file);
+    if (audioDuration && !form.durationSeconds) {
+      update("durationSeconds", String(Math.round(audioDuration)));
+    }
+
+    await uploadFile(file);
+  }
+
+  function getAudioDuration(file: File): Promise<number | null> {
+    return new Promise((resolve) => {
+      const url = URL.createObjectURL(file);
+      const audio = new Audio(url);
+      audio.addEventListener("loadedmetadata", () => {
+        URL.revokeObjectURL(url);
+        resolve(audio.duration);
+      });
+      audio.addEventListener("error", () => {
+        URL.revokeObjectURL(url);
+        resolve(null);
+      });
+    });
+  }
+
+  function removeAudio() {
+    setAudioFile(null);
+    setAudioObjectPath(null);
+    setUploadError(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  }
+
+  const canSubmit =
+    form.title.trim() && form.genre && form.releaseDate && form.story.trim() && !isUploading;
+
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!canSubmit) return;
 
@@ -104,6 +176,10 @@ export default function SubmitSongPage() {
       const v = credits[k].trim();
       if (v) cleanedCredits[k] = v;
     });
+
+    const audioUrl = audioObjectPath
+      ? `/api/storage${audioObjectPath}`
+      : undefined;
 
     submitSong(
       {
@@ -125,6 +201,7 @@ export default function SubmitSongPage() {
             ? parseInt(form.durationSeconds)
             : undefined,
           instruments: [],
+          audioUrl,
         },
       },
       {
@@ -178,6 +255,111 @@ export default function SubmitSongPage() {
         </header>
 
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Audio Upload */}
+          <Card className="bg-card border-border">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-base">Audio Track</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <p className="text-xs text-muted-foreground">
+                Upload your track file. We accept MP3, WAV, FLAC, and AAC.
+                Duration will be auto-detected.
+              </p>
+
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="audio/mpeg,audio/wav,audio/flac,audio/aac,audio/mp4,audio/x-m4a,.mp3,.wav,.flac,.aac,.m4a"
+                className="hidden"
+                onChange={handleAudioChange}
+              />
+
+              {!audioFile ? (
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="w-full flex flex-col items-center justify-center gap-3 border-2 border-dashed border-border rounded-lg py-10 px-6 text-muted-foreground hover:border-primary/50 hover:text-foreground transition-colors cursor-pointer bg-background"
+                >
+                  <div className="w-12 h-12 rounded-full bg-secondary flex items-center justify-center">
+                    <Upload className="w-5 h-5" />
+                  </div>
+                  <div className="text-center">
+                    <p className="text-sm font-medium text-foreground">
+                      Click to upload audio
+                    </p>
+                    <p className="text-xs mt-0.5">MP3, WAV, FLAC, AAC — max 500 MB</p>
+                  </div>
+                </button>
+              ) : (
+                <div className="rounded-lg border border-border bg-background p-4 space-y-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-md bg-primary/10 flex items-center justify-center shrink-0">
+                      <Music className="w-5 h-5 text-primary" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium truncate">{audioFile.name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {formatBytes(audioFile.size)}
+                        {form.durationSeconds && (
+                          <> · {formatDuration(parseInt(form.durationSeconds))}</>
+                        )}
+                      </p>
+                    </div>
+                    {!isUploading && (
+                      <button
+                        type="button"
+                        onClick={removeAudio}
+                        className="w-7 h-7 rounded-md hover:bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+
+                  {isUploading && (
+                    <div className="space-y-1.5">
+                      <div className="flex items-center justify-between text-xs text-muted-foreground">
+                        <span className="flex items-center gap-1.5">
+                          <Loader2 className="w-3 h-3 animate-spin" />
+                          Uploading...
+                        </span>
+                        <span>{progress}%</span>
+                      </div>
+                      <div className="h-1.5 rounded-full bg-secondary overflow-hidden">
+                        <div
+                          className="h-full bg-primary rounded-full transition-all duration-300"
+                          style={{ width: `${progress}%` }}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {!isUploading && audioObjectPath && (
+                    <div className="flex items-center gap-1.5 text-xs text-emerald-600">
+                      <CheckCircle className="w-3.5 h-3.5" />
+                      <span>Upload complete</span>
+                    </div>
+                  )}
+
+                  {uploadError && (
+                    <p className="text-xs text-destructive">{uploadError}</p>
+                  )}
+
+                  {!isUploading && !audioObjectPath && !uploadError && (
+                    <button
+                      type="button"
+                      onClick={() => uploadFile(audioFile)}
+                      className="text-xs text-primary hover:underline"
+                    >
+                      Retry upload
+                    </button>
+                  )}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Track Details */}
           <Card className="bg-card border-border">
             <CardHeader className="pb-4">
               <CardTitle className="text-base">Track Details</CardTitle>
@@ -225,6 +407,7 @@ export default function SubmitSongPage() {
             </CardContent>
           </Card>
 
+          {/* Release & Distribution */}
           <Card className="bg-card border-border">
             <CardHeader className="pb-4">
               <CardTitle className="text-base">Release & Distribution</CardTitle>
@@ -275,10 +458,10 @@ export default function SubmitSongPage() {
                 </Select>
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="streamingId">Streaming Link / ISRC</Label>
+                <Label htmlFor="streamingId">ISRC</Label>
                 <Input
                   id="streamingId"
-                  placeholder="ISRC or https://open.spotify.com/track/…"
+                  placeholder="e.g. USRC17607839"
                   value={form.streamingId}
                   onChange={(e) => update("streamingId", e.target.value)}
                   className="bg-background"
@@ -291,6 +474,7 @@ export default function SubmitSongPage() {
             </CardContent>
           </Card>
 
+          {/* Credits */}
           <Card className="bg-card border-border">
             <CardHeader className="pb-4">
               <CardTitle className="text-base">Credits</CardTitle>
@@ -318,6 +502,7 @@ export default function SubmitSongPage() {
             </CardContent>
           </Card>
 
+          {/* Artist Note & Lyrics */}
           <Card className="bg-card border-border">
             <CardHeader className="pb-4">
               <CardTitle className="text-base">Artist Note & Lyrics</CardTitle>
@@ -345,6 +530,12 @@ export default function SubmitSongPage() {
               </div>
             </CardContent>
           </Card>
+
+          {isUploading && (
+            <p className="text-xs text-center text-muted-foreground">
+              Please wait for the audio upload to finish before submitting.
+            </p>
+          )}
 
           <button
             type="submit"

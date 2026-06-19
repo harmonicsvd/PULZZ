@@ -49,18 +49,19 @@ interface MxmResponse<T> {
   };
 }
 
-function apiKey(): string {
-  const key = process.env.MUSIXMATCH_API_KEY;
-  if (!key) throw new Error("MUSIXMATCH_API_KEY is not configured");
-  return key;
+function apiKey(): string | null {
+  return process.env.MUSIXMATCH_API_KEY ?? null;
 }
+
 
 const REQUEST_TIMEOUT_MS = 8000;
 
 async function call<T>(method: string, params: Record<string, string | number>): Promise<{ statusCode: number; body: T | null }> {
+  const key = apiKey();
+  if (!key) return { statusCode: 401, body: null };
   const url = new URL(`${BASE}/${method}`);
   for (const [k, v] of Object.entries(params)) url.searchParams.set(k, String(v));
-  url.searchParams.set("apikey", apiKey());
+  url.searchParams.set("apikey", key);
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
   try {

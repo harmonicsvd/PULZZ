@@ -24,6 +24,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={Dashboard} />
+      <Route path="/dashboard" component={Dashboard} />
       <Route path="/songs/new" component={SubmitSongPage} />
       <Route path="/songs/:id">
         {(params) => <SongDetailPage id={params.id} />}

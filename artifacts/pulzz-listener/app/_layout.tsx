@@ -80,11 +80,11 @@ export default function RootLayout() {
               <KeyboardProvider>
                 <RootLayoutNav />
               </KeyboardProvider>
+              {!introDone && <PulzzIntro onDone={handleIntroDone} />}
             </GestureHandlerRootView>
           </AppProvider>
         </QueryClientProvider>
       </ErrorBoundary>
-      {!introDone && <PulzzIntro onDone={handleIntroDone} />}
     </SafeAreaProvider>
   );
 }

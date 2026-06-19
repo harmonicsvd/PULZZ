@@ -8,6 +8,7 @@ import artistsRouter from "./artists";
 import listenersRouter from "./listeners";
 import musixmatchRouter from "./musixmatch";
 import cyaniteRouter from "./cyanite";
+import storageRouter from "./storage";
 
 const router: IRouter = Router();
 
@@ -20,5 +21,6 @@ router.use(artistsRouter);
 router.use(listenersRouter);
 router.use(musixmatchRouter);
 router.use(cyaniteRouter);
+router.use(storageRouter);
 
 export default router;
