@@ -210,12 +210,20 @@ export default function SubmitSongPage() {
     return `${d.getFullYear()}-${month}-${day}`;
   })();
 
+  const creditsComplete = (Object.keys(credits) as (keyof Credits)[]).every(
+    (k) => credits[k].trim(),
+  );
+
   const canSubmit =
     form.title.trim() &&
     form.genre &&
     form.releaseDate &&
     releaseDateValid &&
+    form.distributor &&
+    form.streamingId.trim() &&
+    creditsComplete &&
     form.story.trim() &&
+    form.lyrics.trim() &&
     confirmRights &&
     confirmDistributor &&
     !isUploading;
@@ -517,7 +525,7 @@ export default function SubmitSongPage() {
                 </p>
               )}
               <div className="space-y-1.5">
-                <Label>Distributor</Label>
+                <Label>Distributor *</Label>
                 <Select
                   value={form.distributor}
                   onValueChange={(v) => update("distributor", v)}
@@ -535,7 +543,7 @@ export default function SubmitSongPage() {
                 </Select>
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="streamingId">ISRC</Label>
+                <Label htmlFor="streamingId">ISRC *</Label>
                 <Input
                   id="streamingId"
                   placeholder="e.g. USRC17607839"
@@ -562,7 +570,7 @@ export default function SubmitSongPage() {
               <div className="grid grid-cols-2 gap-4">
                 {CREDIT_FIELDS.map((field) => (
                   <div key={field.key} className="space-y-1.5">
-                    <Label htmlFor={`credit-${field.key}`}>{field.label}</Label>
+                    <Label htmlFor={`credit-${field.key}`}>{field.label} *</Label>
                     <Input
                       id={`credit-${field.key}`}
                       placeholder={field.label}
@@ -595,10 +603,10 @@ export default function SubmitSongPage() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="lyrics">Lyrics</Label>
+                <Label htmlFor="lyrics">Lyrics *</Label>
                 <Textarea
                   id="lyrics"
-                  placeholder="Optional — add lyrics for the listen screen"
+                  placeholder="Add lyrics for the listen screen"
                   value={form.lyrics}
                   onChange={(e) => update("lyrics", e.target.value)}
                   className="bg-background resize-none min-h-[100px]"
