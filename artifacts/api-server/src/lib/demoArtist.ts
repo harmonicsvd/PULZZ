@@ -1,3 +1,4 @@
+import { randomBytes } from "node:crypto";
 import { eq } from "drizzle-orm";
 import { db, artistsTable } from "@workspace/db";
 
@@ -65,9 +66,16 @@ async function provisionDemoUserId(): Promise<string> {
 
   if (!userId) {
     try {
+      // The production Clerk instance enforces a password requirement on
+      // created users, so supply a strong random one. It's never surfaced or
+      // used by anyone — the demo signs in exclusively via the short-lived
+      // ticket strategy — it only exists to satisfy create-user validation.
       const created = await clerk<{ id: string }>(`/users`, {
         method: "POST",
-        body: JSON.stringify({ email_address: [DEMO_EMAIL] }),
+        body: JSON.stringify({
+          email_address: [DEMO_EMAIL],
+          password: randomBytes(24).toString("base64url"),
+        }),
       });
       userId = created.id;
     } catch (err) {
