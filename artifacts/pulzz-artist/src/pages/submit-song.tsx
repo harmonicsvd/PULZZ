@@ -65,6 +65,23 @@ function formatDuration(seconds: number) {
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
+/** Turns a failed song submission into a clear, non-technical message. */
+function submitErrorMessage(err: unknown): string {
+  const e = err as { status?: number; data?: { error?: string } | null };
+  const serverMsg = e?.data?.error;
+  // A 403 on POST /songs only happens for the shared, read-only demo account.
+  if (e?.status === 403) {
+    return "You're viewing the demo dashboard, which is read-only. Sign in with your own artist account to submit a song.";
+  }
+  if (e?.status === 401) {
+    return "Please sign in as an artist to submit a song.";
+  }
+  return (
+    serverMsg ??
+    "Something went wrong submitting your song. Please try again."
+  );
+}
+
 /** Whole days from today (local midnight) until the given yyyy-mm-dd date. */
 function daysUntilDate(dateStr: string): number | null {
   if (!dateStr) return null;
@@ -81,6 +98,7 @@ export default function SubmitSongPage() {
   const { mutate: submitSong, isPending } = useSubmitSong();
   const artist = useCurrentArtist();
   const [submitted, setSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [prefilled, setPrefilled] = useState(false);
   const [confirmRights, setConfirmRights] = useState(false);
   const [confirmDistributor, setConfirmDistributor] = useState(false);
@@ -205,6 +223,7 @@ export default function SubmitSongPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!canSubmit) return;
+    setSubmitError(null);
 
     const cleanedCredits: Record<string, string> = {};
     (Object.keys(credits) as (keyof Credits)[]).forEach((k) => {
@@ -249,6 +268,9 @@ export default function SubmitSongPage() {
           });
           setSubmitted(true);
           setTimeout(() => navigate("/songs"), 1800);
+        },
+        onError: (err) => {
+          setSubmitError(submitErrorMessage(err));
         },
       },
     );
@@ -623,6 +645,12 @@ export default function SubmitSongPage() {
             <p className="text-xs text-center text-muted-foreground">
               Please wait for the audio upload to finish before submitting.
             </p>
+          )}
+
+          {submitError && (
+            <div className="rounded-md border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+              {submitError}
+            </div>
           )}
 
           <button
