@@ -17,6 +17,7 @@ export * from './artistLinks';
 export * from './cyaniteAnalysis';
 export * from './cyaniteAnalysisGenre';
 export * from './cyaniteAnalysisMood';
+export * from './demoSession';
 export * from './errorEnvelope';
 export * from './getMusixmatchAnalysisParams';
 export * from './getMusixmatchSubtitleParams';

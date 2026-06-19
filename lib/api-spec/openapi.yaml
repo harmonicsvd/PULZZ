@@ -528,6 +528,26 @@ paths:
               schema:
                 $ref: "#/components/schemas/ArtistDashboard"
 
+  /demo-session:
+    post:
+      operationId: createDemoSession
+      tags: [artists]
+      summary: Mint a one-click sign-in ticket for the shared public demo artist
+      description: >
+        Provisions (find-or-create) the shared demo artist account and returns a
+        short-lived Clerk sign-in ticket so visitors can preview the dashboard
+        without creating an account. The client exchanges the ticket via Clerk's
+        `ticket` sign-in strategy.
+      responses:
+        "201":
+          description: Sign-in ticket for the demo artist
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DemoSession"
+        "503":
+          description: Demo sign-in is not available
+
   /listeners:
     post:
       operationId: createListener
@@ -1498,6 +1518,14 @@ components:
           type: ["integer", "null"]
         createdAt:
           type: string
+
+    DemoSession:
+      type: object
+      required: [ticket]
+      properties:
+        ticket:
+          type: string
+          description: Short-lived Clerk sign-in ticket for the demo artist.
 
     ArtistInput:
       type: object

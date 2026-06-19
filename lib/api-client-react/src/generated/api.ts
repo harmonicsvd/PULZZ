@@ -26,6 +26,7 @@ import type {
   Artist,
   ArtistDashboard,
   ArtistInput,
+  DemoSession,
   ErrorEnvelope,
   GetMusixmatchAnalysisParams,
   GetMusixmatchSubtitleParams,
@@ -1880,6 +1881,78 @@ export function useGetArtistDashboard<TData = Awaited<ReturnType<typeof getArtis
 
 
 
+
+export const getCreateDemoSessionUrl = () => {
+
+
+
+
+  return `/api/demo-session`
+}
+
+/**
+ * Provisions (find-or-create) the shared demo artist account and returns a short-lived Clerk sign-in ticket so visitors can preview the dashboard without creating an account. The client exchanges the ticket via Clerk's `ticket` sign-in strategy.
+
+ * @summary Mint a one-click sign-in ticket for the shared public demo artist
+ */
+export const createDemoSession = async ( options?: RequestInit): Promise<DemoSession> => {
+
+  return customFetch<DemoSession>(getCreateDemoSessionUrl(),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+export const getCreateDemoSessionMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createDemoSession>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createDemoSession>>, TError,void, TContext> => {
+
+const mutationKey = ['createDemoSession'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createDemoSession>>, void> = () => {
+
+
+          return  createDemoSession(requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateDemoSessionMutationResult = NonNullable<Awaited<ReturnType<typeof createDemoSession>>>
+
+    export type CreateDemoSessionMutationError = ErrorType<void>
+
+    /**
+ * @summary Mint a one-click sign-in ticket for the shared public demo artist
+ */
+export const useCreateDemoSession = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createDemoSession>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createDemoSession>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getCreateDemoSessionMutationOptions(options));
+    }
 
 export const getCreateListenerUrl = () => {
 

@@ -2,6 +2,9 @@ import type { Request, Response, NextFunction } from "express";
 import { getAuth, clerkClient } from "@clerk/express";
 import { db, artistsTable, songsTable, type Artist } from "@workspace/db";
 import { eq } from "drizzle-orm";
+import { DEMO_ARTIST_ID } from "../lib/demoArtist";
+
+const READ_METHODS = new Set(["GET", "HEAD", "OPTIONS"]);
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -62,6 +65,14 @@ export async function requireArtist(
         })
         .returning();
       artist = inserted[0];
+    }
+
+    // The shared public demo artist is preview-only: anyone can sign in as it
+    // via the one-click demo button, so block any mutation to prevent vandalism
+    // or data poisoning of the dashboard everyone sees. Reads still work.
+    if (artist.id === DEMO_ARTIST_ID && !READ_METHODS.has(req.method)) {
+      res.status(403).json({ error: "The demo account is read-only." });
+      return;
     }
 
     req.artist = artist;

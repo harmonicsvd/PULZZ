@@ -1,5 +1,8 @@
-import { Link } from "wouter";
-import { ArrowRight, BarChart3, Music, Trophy } from "lucide-react";
+import { useState } from "react";
+import { Link, useLocation } from "wouter";
+import { useSignIn } from "@clerk/react";
+import { useCreateDemoSession } from "@workspace/api-client-react";
+import { ArrowRight, BarChart3, Eye, Loader2, Music, Trophy } from "lucide-react";
 
 const features = [
   {
@@ -20,6 +23,45 @@ const features = [
 ];
 
 export default function Welcome() {
+  const { signIn } = useSignIn();
+  const [, setLocation] = useLocation();
+  const createDemoSession = useCreateDemoSession();
+  const [demoLoading, setDemoLoading] = useState(false);
+  const [demoError, setDemoError] = useState<string | null>(null);
+
+  // One-click demo: the backend mints a short-lived Clerk sign-in ticket for the
+  // shared demo artist, then we exchange it via Clerk's `ticket` strategy. This
+  // avoids passwords entirely so it works regardless of the instance's enabled
+  // sign-in methods.
+  async function handleDemo() {
+    if (!signIn || demoLoading) return;
+    setDemoError(null);
+    setDemoLoading(true);
+    try {
+      const { ticket } = await createDemoSession.mutateAsync();
+
+      const { error: createError } = await signIn.create({
+        strategy: "ticket",
+        ticket,
+      });
+      if (createError) {
+        setDemoError("The demo isn't available right now. Please try again.");
+        return;
+      }
+
+      const { error: finalizeError } = await signIn.finalize();
+      if (finalizeError) {
+        setDemoError("Couldn't open the demo. Please try again.");
+        return;
+      }
+      setLocation("/dashboard");
+    } catch {
+      setDemoError("The demo isn't available right now. Please try again.");
+    } finally {
+      setDemoLoading(false);
+    }
+  }
+
   return (
     <div className="min-h-[100dvh] bg-background text-foreground flex flex-col">
       <header className="px-6 py-5 flex items-center justify-between max-w-6xl mx-auto w-full">
@@ -49,7 +91,7 @@ export default function Welcome() {
           The Pulzz Artist dashboard lets you submit unreleased songs, track how
           listeners react, and see who discovered you first.
         </p>
-        <div className="mt-8 flex items-center gap-3">
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
           <Link href="/sign-up">
             <div className="flex items-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 py-3 px-6 rounded-md text-sm font-semibold transition-colors cursor-pointer shadow-md">
               Get started
@@ -61,6 +103,28 @@ export default function Welcome() {
               Sign in
             </div>
           </Link>
+        </div>
+
+        <div className="mt-5 flex flex-col items-center gap-2">
+          <button
+            type="button"
+            onClick={handleDemo}
+            disabled={!signIn || demoLoading}
+            className="flex items-center gap-2 py-2.5 px-5 rounded-md text-sm font-semibold bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            {demoLoading ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Eye className="w-4 h-4" />
+            )}
+            {demoLoading ? "Opening demo…" : "View demo dashboard"}
+          </button>
+          <p className="text-xs text-muted-foreground">
+            No sign-up needed — explore a sample artist's dashboard.
+          </p>
+          {demoError && (
+            <p className="text-xs text-destructive">{demoError}</p>
+          )}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-16 w-full text-left">

@@ -504,6 +504,11 @@ export interface Artist {
   createdAt: string;
 }
 
+export interface DemoSession {
+  /** Short-lived Clerk sign-in ticket for the demo artist. */
+  ticket: string;
+}
+
 export interface ArtistInput {
   name: string;
   email: string;

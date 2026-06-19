@@ -527,6 +527,7 @@ export const GetCurrentArtistResponse = zod.object({
   "topMoods": zod.array(zod.string()),
   "vector": zod.array(zod.number()).describe('Deterministically-ordered feature vector for cosine similarity.')
 }).describe('Normalized sound fingerprint derived from Cyanite analysis, used for sound-similarity ranking. Null when a recording yields no usable tonal signal.'),zod.null()]).optional(),
+  "featuredSongId": zod.number().nullish(),
   "createdAt": zod.string()
 })
 
