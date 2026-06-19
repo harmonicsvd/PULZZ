@@ -59,7 +59,10 @@ const clerkAppearance = {
   cssLayerName: "clerk",
   options: {
     logoPlacement: "inside" as const,
-    logoLinkUrl: basePath || "/",
+    // Clicking the Pulzz logo on the sign-in/sign-up pages returns to the
+    // public landing page (separate artifact mounted at the origin root),
+    // not the artist app home at basePath.
+    logoLinkUrl: "/",
     logoImageUrl: `${window.location.origin}${basePath}/logo.svg`,
   },
   variables: {
