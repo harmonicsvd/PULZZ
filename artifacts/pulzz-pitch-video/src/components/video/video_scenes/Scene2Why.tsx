@@ -2,14 +2,25 @@ import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { Zap, BarChart2, Star, Users } from 'lucide-react';
 
+// Matches the listener app PulzzIntro: letters spring from center outward
+// Each letter has an estimated x-offset from the word's center (in vw)
+const PULZZ_LETTERS = [
+  { ch: 'P', accent: false, fromX:  '5.2vw' },
+  { ch: 'u', accent: false, fromX:  '2.6vw' },
+  { ch: 'l', accent: false, fromX:  '0.5vw' },
+  { ch: 'z', accent: true,  fromX: '-1.8vw' },
+  { ch: 'z', accent: true,  fromX: '-4.2vw' },
+];
+
 export function Scene2Why() {
   const [phase, setPhase] = useState(0);
 
   useEffect(() => {
     const timers = [
-      setTimeout(() => setPhase(1), 500),  // Big Pulzz reveal — ~2.5s alone
-      setTimeout(() => setPhase(2), 3000), // Cards in
-      setTimeout(() => setPhase(3), 8500), // Badges
+      setTimeout(() => setPhase(1), 400),  // "Introducing" label + logo spring-in
+      setTimeout(() => setPhase(2), 3200), // subtitle fades in
+      setTimeout(() => setPhase(3), 5500), // cards slide in
+      setTimeout(() => setPhase(4), 10500),// badges
     ];
     return () => timers.forEach(t => clearTimeout(t));
   }, []);
@@ -32,34 +43,68 @@ export function Scene2Why() {
 
       <div className="absolute inset-0 flex flex-col items-center justify-center px-[8vw]">
 
-        {/* Introducing + big Pulzz wordmark */}
-        <motion.div
-          className="text-center mb-[4vh]"
-          initial={{ opacity: 0, y: 36 }}
-          animate={phase >= 1 ? { opacity: 1, y: 0 } : { opacity: 0, y: 36 }}
-          transition={{ duration: 0.95, ease }}
+        {/* ── "Introducing" eyebrow ── */}
+        <motion.p
+          className="text-[1.1vw] font-bold text-slate-400 uppercase tracking-[0.35em] mb-[1.8vw]"
+          initial={{ opacity: 0, y: 14 }}
+          animate={phase >= 1 ? { opacity: 1, y: 0 } : { opacity: 0, y: 14 }}
+          transition={{ duration: 0.7, ease }}
         >
-          <p className="text-[1.1vw] font-bold text-slate-400 uppercase tracking-[0.35em] mb-[1.2vw]">
-            Introducing
-          </p>
-          <div className="flex items-center justify-center gap-[1.5vw] mb-[1.8vw]">
-            <div className="w-[5vw] h-[5vw] rounded-[1.2vw] bg-[#FF5C49] flex items-center justify-center shadow-[0_12px_32px_rgba(255,92,73,0.35)]">
-              <div className="w-[1.8vw] h-[1.8vw] rounded-full bg-[#FBF8F2]" />
-            </div>
-            <h1 className="text-[7vw] font-black tracking-tight leading-none" style={{ fontFamily: 'var(--font-display)' }}>
-              <span className="text-[#1B2A4A]">Pul</span><span className="text-[#FF5C49]">zz</span>
-            </h1>
-          </div>
-          <p className="text-[2vw] font-black text-[#1B2A4A] tracking-tight leading-tight">
-            A space <span className="text-[#FF5C49]">before release day</span> where emerging artists<br />find their first audience.
-          </p>
-        </motion.div>
+          Introducing
+        </motion.p>
 
-        {/* Two-column cards */}
+        {/* ── Pulzz logo lockup — letters spring from center ── */}
+        <div className="flex items-center justify-center gap-[1.5vw] mb-[1.8vw]">
+          {/* Coral icon */}
+          <motion.div
+            className="w-[5vw] h-[5vw] rounded-[1.2vw] bg-[#FF5C49] flex items-center justify-center shadow-[0_12px_32px_rgba(255,92,73,0.35)] shrink-0"
+            initial={{ scale: 0, opacity: 0 }}
+            animate={phase >= 1 ? { scale: 1, opacity: 1 } : { scale: 0, opacity: 0 }}
+            transition={{ type: 'spring', tension: 60, friction: 9, delay: 0.05 }}
+          >
+            <div className="w-[1.8vw] h-[1.8vw] rounded-full bg-[#FBF8F2]" />
+          </motion.div>
+
+          {/* Letter-by-letter spring (replicates PulzzIntro native animation) */}
+          <div className="flex items-baseline overflow-visible">
+            {PULZZ_LETTERS.map((l, i) => (
+              <motion.span
+                key={i}
+                className="text-[7vw] font-black tracking-tight leading-none"
+                style={{
+                  fontFamily: 'var(--font-display)',
+                  color: l.accent ? '#FF5C49' : '#1B2A4A',
+                }}
+                initial={{ opacity: 0, x: l.fromX }}
+                animate={phase >= 1 ? { opacity: 1, x: 0 } : { opacity: 0, x: l.fromX }}
+                transition={{
+                  type: 'spring',
+                  tension: 60,
+                  friction: 9,
+                  delay: 0.05 + i * 0.075,
+                }}
+              >
+                {l.ch}
+              </motion.span>
+            ))}
+          </div>
+        </div>
+
+        {/* ── Subtitle ── */}
+        <motion.p
+          className="text-[2vw] font-black text-[#1B2A4A] tracking-tight leading-tight text-center mb-[3.5vh]"
+          initial={{ opacity: 0, y: 14 }}
+          animate={phase >= 2 ? { opacity: 1, y: 0 } : { opacity: 0, y: 14 }}
+          transition={{ duration: 0.75, ease }}
+        >
+          A space <span className="text-[#FF5C49]">before release day</span> where emerging artists<br />find their first audience.
+        </motion.p>
+
+        {/* ── Two-column cards ── */}
         <motion.div
           className="flex gap-[2.5vw] w-full max-w-[84vw]"
           initial={{ opacity: 0, y: 24 }}
-          animate={phase >= 2 ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
+          animate={phase >= 3 ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
           transition={{ duration: 0.85, ease }}
         >
           <div className="flex-1 bg-white rounded-2xl shadow-lg border border-[#1B2A4A]/8 p-[1.8vw] text-left">
@@ -107,10 +152,11 @@ export function Scene2Why() {
           </div>
         </motion.div>
 
+        {/* ── Badges ── */}
         <motion.div
           className="mt-[2.5vh] flex items-center gap-[1.5vw]"
           initial={{ opacity: 0, y: 10 }}
-          animate={phase >= 3 ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
+          animate={phase >= 4 ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
           transition={{ duration: 0.6 }}
         >
           <div className="flex items-center gap-[0.5vw] bg-amber-50 border border-amber-200 px-[1.2vw] py-[0.5vw] rounded-full">

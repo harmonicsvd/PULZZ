@@ -10,11 +10,11 @@ import { Scene6Impact } from './video_scenes/Scene6Impact';
 
 export const SCENE_DURATIONS = {
   problem: 17000,
-  why: 13000,
+  why: 14000,
   listener: 29000,
   dashboard: 34000,
   features: 22000,
-  impact: 18000,
+  impact: 17000,
 };
 
 const SCENE_LABELS: Record<string, string> = {

@@ -7,14 +7,14 @@ export function Scene3Listener() {
 
   useEffect(() => {
     const timers = [
-      setTimeout(() => setPhase(1), 500),   // Full-screen tagline (~2.3s)
-      setTimeout(() => setPhase(2), 2800),  // Phone + copy
-      setTimeout(() => setPhase(3), 6500),  // Song playing
-      setTimeout(() => setPhase(4), 10500), // Moment marked
-      setTimeout(() => setPhase(5), 14000), // Reactions unlocked
-      setTimeout(() => setPhase(6), 17000), // Discovered tapped
-      setTimeout(() => setPhase(7), 20500), // Discoveries view
-      setTimeout(() => setPhase(8), 24000), // Notification
+      setTimeout(() => setPhase(1), 500),   // Full-screen tagline — 3.5 s
+      setTimeout(() => setPhase(2), 4000),  // Phone + copy appears
+      setTimeout(() => setPhase(3), 7700),  // Song playing
+      setTimeout(() => setPhase(4), 11700), // Moment marked
+      setTimeout(() => setPhase(5), 15200), // Reactions unlocked
+      setTimeout(() => setPhase(6), 18200), // Discovered tapped
+      setTimeout(() => setPhase(7), 21700), // Discoveries view
+      setTimeout(() => setPhase(8), 25200), // Notification
     ];
     return () => timers.forEach(t => clearTimeout(t));
   }, []);
@@ -102,7 +102,7 @@ export function Scene3Listener() {
               animate={phase >= 7 ? { opacity: 0, scale: 0.92 } : { opacity: 1, scale: 1 }}
               transition={{ duration: 0.4 }}
             >
-              {/* Pulzz header — matched brand format */}
+              {/* Pulzz header — brand colors */}
               <div className="flex flex-col items-center mb-[1.8vw]">
                 <div className="text-[1.1vw] font-black tracking-tight">
                   <span className="text-[#1B2A4A]">PUL</span><span className="text-[#FF5C49]">ZZ</span>

@@ -5,11 +5,12 @@ export function Scene1Problem() {
   const [phase, setPhase] = useState(0);
 
   useEffect(() => {
+    // Even spacing — each line shows for ~3.5 s before the next
     const timers = [
-      setTimeout(() => setPhase(1), 700),   // "Streaming is a crowded jungle." — single line, ~2s
-      setTimeout(() => setPhase(2), 2700),  // "Emerging artists get buried..." — 2 lines, ~3.3s
-      setTimeout(() => setPhase(3), 6000),  // "Listeners miss rising talent..." — 2 lines, ~3.5s
-      setTimeout(() => setPhase(4), 9500),  // "Discovery is broken." — lingers ~7.5s to end
+      setTimeout(() => setPhase(1), 700),   // "Streaming is a crowded jungle."
+      setTimeout(() => setPhase(2), 4200),  // "Emerging artists get buried…"
+      setTimeout(() => setPhase(3), 7700),  // "Listeners miss rising talent…"
+      setTimeout(() => setPhase(4), 11200), // "Discovery is broken." — lingers ~5.8 s
     ];
     return () => timers.forEach(t => clearTimeout(t));
   }, []);
@@ -36,17 +37,17 @@ export function Scene1Problem() {
 
       <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-[10vw]">
 
-        {/* Phase 1 — single line, shorter display */}
+        {/* Phase 1 */}
         <motion.p
           className="absolute text-[5.2vw] font-black text-white/85 leading-tight tracking-tight"
           initial={{ opacity: 0, y: 28 }}
           animate={phase === 1 ? { opacity: 1, y: 0 } : phase >= 2 ? { opacity: 0, y: -28 } : { opacity: 0, y: 28 }}
-          transition={{ duration: 0.75, ease }}
+          transition={{ duration: 0.85, ease }}
         >
           Streaming is a crowded jungle.
         </motion.p>
 
-        {/* Phase 2 — 2 lines */}
+        {/* Phase 2 */}
         <motion.p
           className="absolute text-[4.4vw] font-black text-white/85 leading-tight tracking-tight max-w-[68vw]"
           initial={{ opacity: 0, y: 28 }}
@@ -57,7 +58,7 @@ export function Scene1Problem() {
           no buzz, no early fans, no fair shot.
         </motion.p>
 
-        {/* Phase 3 — 2 lines */}
+        {/* Phase 3 */}
         <motion.p
           className="absolute text-[4.4vw] font-black text-white/85 leading-tight tracking-tight max-w-[68vw]"
           initial={{ opacity: 0, y: 28 }}
@@ -68,7 +69,7 @@ export function Scene1Problem() {
           before it <span className="text-[#3E5C99]">disappears</span>.
         </motion.p>
 
-        {/* Phase 4 — punch line, lingers till end */}
+        {/* Phase 4 — punch line, lingers to scene end */}
         <motion.h2
           className="absolute text-[7.5vw] font-black leading-tight tracking-tight text-[#FF5C49]"
           style={{ fontFamily: 'var(--font-display)' }}

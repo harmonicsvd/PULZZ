@@ -5,12 +5,14 @@ export function Scene6Impact() {
   const [phase, setPhase] = useState(0);
 
   useEffect(() => {
+    // To change timings: edit the ms values below.
+    // Phase 5 controls when partners appear — move it closer to scene end to reduce their screen time.
     const timers = [
-      setTimeout(() => setPhase(1), 600),   // "Discover" appears
-      setTimeout(() => setPhase(2), 1900),  // "new music." completes — full phrase ~2.8s total
-      setTimeout(() => setPhase(3), 5000),  // Cross-fade to Pulzz logo
-      setTimeout(() => setPhase(4), 8800),  // Tagline beneath logo
-      setTimeout(() => setPhase(5), 12500), // Partner footer
+      setTimeout(() => setPhase(1), 600),   // "Discover" — ~1.3 s solo
+      setTimeout(() => setPhase(2), 1900),  // "new music." joins — phrase shows ~3.1 s
+      setTimeout(() => setPhase(3), 5000),  // Pulzz logo springs in
+      setTimeout(() => setPhase(4), 8500),  // Tagline fades in
+      setTimeout(() => setPhase(5), 14500), // Partners — ~2.5 s before scene ends at 17000
     ];
     return () => timers.forEach(t => clearTimeout(t));
   }, []);
@@ -33,7 +35,7 @@ export function Scene6Impact() {
 
       <div className="relative z-10 flex flex-col items-center justify-center text-center px-[10vw]">
 
-        {/* "Discover new music." — phases 1–2, exits at phase 3 */}
+        {/* "Discover new music." — exits at phase 3 */}
         <AnimatePresence mode="popLayout">
           {phase >= 1 && phase < 3 && (
             <motion.div
@@ -84,7 +86,7 @@ export function Scene6Impact() {
               </h1>
             </div>
 
-            {/* Tagline — smaller, below logo */}
+            {/* Tagline — below logo */}
             <motion.p
               className="text-[2vw] font-black text-slate-500 tracking-tight"
               initial={{ opacity: 0, y: 12 }}
@@ -94,7 +96,7 @@ export function Scene6Impact() {
               Catch a song's pulse before the drop.
             </motion.p>
 
-            {/* Partner footer */}
+            {/* Partner footer — appears near end, ~2.5 s before scene ends */}
             <motion.div
               className="flex items-center gap-[2vw] mt-[3vh]"
               initial={{ opacity: 0, y: 10 }}
