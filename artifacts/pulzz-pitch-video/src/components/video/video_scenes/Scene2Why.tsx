@@ -7,9 +7,9 @@ export function Scene2Why() {
 
   useEffect(() => {
     const timers = [
-      setTimeout(() => setPhase(1), 600),
-      setTimeout(() => setPhase(2), 4500),
-      setTimeout(() => setPhase(3), 9500),
+      setTimeout(() => setPhase(1), 500),  // Big Pulzz reveal — ~2.5s alone
+      setTimeout(() => setPhase(2), 3000), // Cards in
+      setTimeout(() => setPhase(3), 8500), // Badges
     ];
     return () => timers.forEach(t => clearTimeout(t));
   }, []);
@@ -32,17 +32,17 @@ export function Scene2Why() {
 
       <div className="absolute inset-0 flex flex-col items-center justify-center px-[8vw]">
 
-        {/* Intro: "Introducing" eyebrow + big PULZZ wordmark */}
+        {/* Introducing + big Pulzz wordmark */}
         <motion.div
           className="text-center mb-[4vh]"
           initial={{ opacity: 0, y: 36 }}
           animate={phase >= 1 ? { opacity: 1, y: 0 } : { opacity: 0, y: 36 }}
-          transition={{ duration: 1.0, ease }}
+          transition={{ duration: 0.95, ease }}
         >
           <p className="text-[1.1vw] font-bold text-slate-400 uppercase tracking-[0.35em] mb-[1.2vw]">
             Introducing
           </p>
-          <div className="flex items-center justify-center gap-[1.5vw] mb-[2vw]">
+          <div className="flex items-center justify-center gap-[1.5vw] mb-[1.8vw]">
             <div className="w-[5vw] h-[5vw] rounded-[1.2vw] bg-[#FF5C49] flex items-center justify-center shadow-[0_12px_32px_rgba(255,92,73,0.35)]">
               <div className="w-[1.8vw] h-[1.8vw] rounded-full bg-[#FBF8F2]" />
             </div>
@@ -60,7 +60,7 @@ export function Scene2Why() {
           className="flex gap-[2.5vw] w-full max-w-[84vw]"
           initial={{ opacity: 0, y: 24 }}
           animate={phase >= 2 ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
-          transition={{ duration: 0.9, ease }}
+          transition={{ duration: 0.85, ease }}
         >
           <div className="flex-1 bg-white rounded-2xl shadow-lg border border-[#1B2A4A]/8 p-[1.8vw] text-left">
             <div className="flex items-center gap-[0.8vw] mb-[1.2vw]">
@@ -111,7 +111,7 @@ export function Scene2Why() {
           className="mt-[2.5vh] flex items-center gap-[1.5vw]"
           initial={{ opacity: 0, y: 10 }}
           animate={phase >= 3 ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
-          transition={{ duration: 0.7 }}
+          transition={{ duration: 0.6 }}
         >
           <div className="flex items-center gap-[0.5vw] bg-amber-50 border border-amber-200 px-[1.2vw] py-[0.5vw] rounded-full">
             <Star className="w-[1vw] h-[1vw] text-amber-500" fill="currentColor" />

@@ -24,7 +24,9 @@ export interface UseVideoPlayerReturn {
   totalScenes: number;
   currentSceneKey: string;
   hasEnded: boolean;
+  paused: boolean;
   jumpToScene: (index: number) => void;
+  togglePause: () => void;
 }
 
 export function useVideoPlayer(options: UseVideoPlayerOptions): UseVideoPlayerReturn {
@@ -37,26 +39,32 @@ export function useVideoPlayer(options: UseVideoPlayerOptions): UseVideoPlayerRe
 
   const [currentScene, setCurrentScene] = useState(0);
   const [hasEnded, setHasEnded] = useState(false);
+  const [paused, setPaused] = useState(false);
 
   const jumpToScene = useCallback((index: number) => {
     const clamped = Math.max(0, Math.min(index, totalScenes - 1));
     setHasEnded(false);
+    setPaused(false);
     setCurrentScene(clamped);
   }, [totalScenes]);
+
+  const togglePause = useCallback(() => {
+    setPaused(p => !p);
+  }, []);
 
   // Start recording on mount
   useEffect(() => {
     window.startRecording?.();
   }, []);
 
-  // Scene advancement -- loops independently of recording
+  // Scene advancement — pauses when paused
   useEffect(() => {
     if (hasEnded && !loop) return;
+    if (paused) return;
 
     const currentDuration = durationsArray[currentScene];
 
     const timer = setTimeout(() => {
-      // Last scene just finished playing
       if (currentScene >= totalScenes - 1) {
         if (!hasEnded) {
           window.stopRecording?.();
@@ -72,14 +80,16 @@ export function useVideoPlayer(options: UseVideoPlayerOptions): UseVideoPlayerRe
     }, currentDuration);
 
     return () => clearTimeout(timer);
-  }, [currentScene, totalScenes, durationsArray, hasEnded, loop, onVideoEnd]);
+  }, [currentScene, totalScenes, durationsArray, hasEnded, loop, onVideoEnd, paused]);
 
   return {
     currentScene,
     totalScenes,
     currentSceneKey: sceneKeys[currentScene],
     hasEnded,
+    paused,
     jumpToScene,
+    togglePause,
   };
 }
 

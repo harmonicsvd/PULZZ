@@ -10,7 +10,7 @@ import { Scene6Impact } from './video_scenes/Scene6Impact';
 
 export const SCENE_DURATIONS = {
   problem: 17000,
-  why: 15000,
+  why: 13000,
   listener: 29000,
   dashboard: 34000,
   features: 22000,
@@ -46,22 +46,38 @@ export default function VideoTemplate({
   loop?: boolean;
   onSceneChange?: (sceneKey: string) => void;
 } = {}) {
-  const { currentScene, currentSceneKey, jumpToScene } = useVideoPlayer({ durations, loop });
+  const { currentScene, currentSceneKey, paused, jumpToScene, togglePause } = useVideoPlayer({ durations, loop });
   const [progress, setProgress] = useState(0);
   const [navVisible, setNavVisible] = useState(true);
   const hideTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const startRef = useRef<number>(Date.now());
+  const pausedElapsedRef = useRef<number>(0);
   const rafRef = useRef<number>(0);
 
   useEffect(() => {
     onSceneChange?.(currentSceneKey);
   }, [currentSceneKey, onSceneChange]);
 
-  // Track progress within current scene
+  // Reset elapsed on scene change
   useEffect(() => {
+    pausedElapsedRef.current = 0;
     startRef.current = Date.now();
     setProgress(0);
+  }, [currentScene]);
+
+  // rAF progress tracker — stops when paused
+  useEffect(() => {
+    cancelAnimationFrame(rafRef.current);
     const sceneDuration = durations[currentSceneKey] ?? 10000;
+
+    if (paused) {
+      // Snapshot how far we got
+      pausedElapsedRef.current = Date.now() - startRef.current;
+      return;
+    }
+
+    // Resume from where we left off
+    startRef.current = Date.now() - pausedElapsedRef.current;
 
     const tick = () => {
       const elapsed = Date.now() - startRef.current;
@@ -72,9 +88,9 @@ export default function VideoTemplate({
     };
     rafRef.current = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(rafRef.current);
-  }, [currentScene, currentSceneKey, durations]);
+  }, [paused, currentScene, currentSceneKey, durations]);
 
-  // Auto-hide nav after 3 s of no mouse movement
+  // Auto-hide nav after 3s of no mouse movement
   useEffect(() => {
     const show = () => {
       setNavVisible(true);
@@ -89,6 +105,26 @@ export default function VideoTemplate({
     };
   }, []);
 
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      // Don't hijack if user is typing in an input
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        jumpToScene(currentScene + 1);
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        jumpToScene(currentScene - 1);
+      } else if (e.key === ' ') {
+        e.preventDefault();
+        togglePause();
+      }
+    };
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, [currentScene, jumpToScene, togglePause]);
+
   const baseSceneKey = currentSceneKey.replace(/_r[12]$/, '') as keyof typeof SCENE_DURATIONS;
   const SceneComponent = SCENE_COMPONENTS[baseSceneKey];
 
@@ -98,13 +134,35 @@ export default function VideoTemplate({
         {SceneComponent && <SceneComponent key={currentSceneKey} />}
       </AnimatePresence>
 
-      {/* Scene Navigator */}
+      {/* Pause overlay */}
+      <AnimatePresence>
+        {paused && (
+          <motion.div
+            className="absolute inset-0 z-40 flex items-center justify-center pointer-events-none"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <div className="bg-black/50 backdrop-blur-sm rounded-full px-[2vw] py-[1vw] flex items-center gap-[0.8vw]">
+              <div className="flex gap-[0.4vw]">
+                <div className="w-[0.5vw] h-[2vw] bg-white rounded-full" />
+                <div className="w-[0.5vw] h-[2vw] bg-white rounded-full" />
+              </div>
+              <span className="text-white text-[1.1vw] font-bold">Paused — Space to resume</span>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Scene Navigator — positioned clear of the bottom edge */}
       <motion.div
-        className="absolute bottom-0 left-0 right-0 z-50 flex justify-center pb-[2vh]"
-        animate={{ opacity: navVisible ? 1 : 0, y: navVisible ? 0 : 12 }}
-        transition={{ duration: 0.4 }}
+        className="absolute left-0 right-0 z-50 flex justify-center"
+        style={{ bottom: '7vh' }}
+        animate={{ opacity: navVisible ? 1 : 0, y: navVisible ? 0 : 10 }}
+        transition={{ duration: 0.35 }}
       >
-        <div className="flex items-center gap-[0.6vw] bg-black/40 backdrop-blur-md px-[1.2vw] py-[0.6vw] rounded-full border border-white/10 shadow-lg">
+        <div className="flex items-center gap-[0.7vw] bg-black/45 backdrop-blur-md px-[1.4vw] py-[0.7vw] rounded-full border border-white/12 shadow-xl">
           {SCENE_KEYS.map((key, i) => {
             const isActive = i === currentScene;
             const isPast = i < currentScene;
@@ -112,29 +170,27 @@ export default function VideoTemplate({
               <button
                 key={key}
                 onClick={() => jumpToScene(i)}
-                className="flex items-center gap-[0.5vw] group"
-                title={SCENE_LABELS[key]}
+                className="flex items-center gap-[0.5vw] cursor-pointer"
+                title={`${SCENE_LABELS[key]} (${i + 1}/${SCENE_KEYS.length})`}
               >
-                {/* Pill */}
-                <div className={`relative flex items-center rounded-full overflow-hidden transition-all duration-300 ${isActive ? 'w-[7vw] bg-white/20' : 'w-[0.6vw] bg-white/25 hover:bg-white/40'} h-[0.6vw]`}>
+                <div
+                  className={`relative rounded-full overflow-hidden transition-all duration-300 h-[0.65vw] ${
+                    isActive ? 'w-[8vw] bg-white/20' : 'w-[0.65vw] hover:bg-white/50'
+                  } ${isPast && !isActive ? 'bg-white/55' : !isActive ? 'bg-white/22' : ''}`}
+                >
                   {isActive && (
-                    <motion.div
-                      className="absolute left-0 top-0 bottom-0 bg-[#FF5C49] rounded-full"
+                    <div
+                      className="absolute left-0 top-0 bottom-0 bg-[#FF5C49] rounded-full transition-none"
                       style={{ width: `${progress * 100}%` }}
                     />
                   )}
-                  {isPast && !isActive && (
-                    <div className="absolute inset-0 bg-white/60 rounded-full" />
-                  )}
                 </div>
-
-                {/* Label — only active */}
                 {isActive && (
                   <motion.span
-                    className="text-[0.7vw] font-bold text-white whitespace-nowrap"
-                    initial={{ opacity: 0, x: -4 }}
+                    className="text-[0.72vw] font-bold text-white/90 whitespace-nowrap select-none"
+                    initial={{ opacity: 0, x: -6 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.3 }}
+                    transition={{ duration: 0.25 }}
                   >
                     {SCENE_LABELS[key]}
                   </motion.span>
@@ -142,6 +198,15 @@ export default function VideoTemplate({
               </button>
             );
           })}
+
+          {/* Keyboard hint */}
+          <div className="ml-[0.4vw] pl-[0.7vw] border-l border-white/15 flex items-center gap-[0.4vw]">
+            {['←', '→', '⎵'].map(k => (
+              <kbd key={k} className="text-[0.6vw] text-white/50 font-mono bg-white/10 px-[0.4vw] py-[0.15vw] rounded">
+                {k}
+              </kbd>
+            ))}
+          </div>
         </div>
       </motion.div>
     </div>

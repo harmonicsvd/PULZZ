@@ -7,14 +7,14 @@ export function Scene3Listener() {
 
   useEffect(() => {
     const timers = [
-      setTimeout(() => setPhase(1), 500),   // Big tagline
-      setTimeout(() => setPhase(2), 3800),  // Phone + copy appears
-      setTimeout(() => setPhase(3), 7500),  // Song playing
-      setTimeout(() => setPhase(4), 11500), // Moment marked
-      setTimeout(() => setPhase(5), 15000), // Reactions unlocked
-      setTimeout(() => setPhase(6), 18000), // Discovered tapped
-      setTimeout(() => setPhase(7), 21500), // Discoveries view
-      setTimeout(() => setPhase(8), 25000), // Notification
+      setTimeout(() => setPhase(1), 500),   // Full-screen tagline (~2.3s)
+      setTimeout(() => setPhase(2), 2800),  // Phone + copy
+      setTimeout(() => setPhase(3), 6500),  // Song playing
+      setTimeout(() => setPhase(4), 10500), // Moment marked
+      setTimeout(() => setPhase(5), 14000), // Reactions unlocked
+      setTimeout(() => setPhase(6), 17000), // Discovered tapped
+      setTimeout(() => setPhase(7), 20500), // Discoveries view
+      setTimeout(() => setPhase(8), 24000), // Notification
     ];
     return () => timers.forEach(t => clearTimeout(t));
   }, []);
@@ -34,13 +34,13 @@ export function Scene3Listener() {
         className="absolute inset-0 flex flex-col items-center justify-center text-center px-[10vw] z-30"
         initial={{ opacity: 0 }}
         animate={phase === 1 ? { opacity: 1 } : { opacity: 0, pointerEvents: 'none' }}
-        transition={{ duration: 0.9, ease }}
+        transition={{ duration: 0.85, ease }}
       >
         <motion.p
           className="text-[1.2vw] font-bold text-slate-400 uppercase tracking-[0.3em] mb-[2vw]"
           initial={{ opacity: 0, y: 16 }}
           animate={phase === 1 ? { opacity: 1, y: 0 } : { opacity: 0, y: -16 }}
-          transition={{ duration: 0.8, ease, delay: 0.2 }}
+          transition={{ duration: 0.75, ease, delay: 0.15 }}
         >
           For Listeners
         </motion.p>
@@ -49,7 +49,7 @@ export function Scene3Listener() {
           style={{ fontFamily: 'var(--font-display)' }}
           initial={{ opacity: 0, y: 24 }}
           animate={phase === 1 ? { opacity: 1, y: 0 } : { opacity: 0, y: -24 }}
-          transition={{ duration: 0.9, ease, delay: 0.35 }}
+          transition={{ duration: 0.85, ease, delay: 0.28 }}
         >
           Catch a song's pulse<br />
           <span className="text-[#FF5C49]">before the drop.</span>
@@ -61,7 +61,7 @@ export function Scene3Listener() {
         className="absolute inset-0 flex px-[10vw]"
         initial={{ opacity: 0 }}
         animate={phase >= 2 ? { opacity: 1 } : { opacity: 0 }}
-        transition={{ duration: 0.8, ease }}
+        transition={{ duration: 0.75, ease }}
       >
         {/* Left copy */}
         <div className="w-[45%] h-full flex flex-col justify-center pr-[4vw] z-20">
@@ -94,7 +94,7 @@ export function Scene3Listener() {
             className="w-[24vw] h-[48vw] bg-[#FBF8F2] rounded-[3vw] border-[0.8vw] border-[#1B2A4A] overflow-hidden relative shadow-[0_30px_60px_rgba(27,42,74,0.2)]"
             initial={{ opacity: 0, y: 80, rotateY: 18 }}
             animate={phase >= 2 ? { opacity: 1, y: 0, rotateY: -12 } : { opacity: 0, y: 80, rotateY: 18 }}
-            transition={{ duration: 1.1, type: 'spring', bounce: 0.18 }}
+            transition={{ duration: 1.05, type: 'spring', bounce: 0.18 }}
           >
             {/* Player screen */}
             <motion.div
@@ -102,10 +102,13 @@ export function Scene3Listener() {
               animate={phase >= 7 ? { opacity: 0, scale: 0.92 } : { opacity: 1, scale: 1 }}
               transition={{ duration: 0.4 }}
             >
+              {/* Pulzz header — matched brand format */}
               <div className="flex flex-col items-center mb-[1.8vw]">
-                <div className="text-[1vw] font-black text-[#1B2A4A]">PULZZ</div>
-                <div className="text-[0.75vw] font-bold text-[#3E5C99] mt-1 tracking-widest">DISCOVERY POOL</div>
-                <div className="text-[0.65vw] text-slate-500 mt-0.5">14 days until release</div>
+                <div className="text-[1.1vw] font-black tracking-tight">
+                  <span className="text-[#1B2A4A]">PUL</span><span className="text-[#FF5C49]">ZZ</span>
+                </div>
+                <div className="text-[0.72vw] font-bold text-[#3E5C99] mt-[0.1vw] tracking-widest">DISCOVERY POOL</div>
+                <div className="text-[0.62vw] text-slate-400 mt-[0.1vw]">14 days until release</div>
               </div>
 
               <div className="w-full aspect-square rounded-[1.5vw] bg-gradient-to-br from-[#FF5C49] to-[#FF8A7A] shadow-[0_15px_30px_rgba(255,92,73,0.3)] mb-[1.5vw] relative overflow-hidden flex items-center justify-center">
@@ -128,7 +131,7 @@ export function Scene3Listener() {
               </div>
 
               <div className="text-[#1B2A4A] text-[1.35vw] font-bold truncate">After You've Gone</div>
-              <div className="text-[#3E5C99] text-[0.95vw] font-semibold mt-0.5 truncate">Marion Harris · Jazz · 1918</div>
+              <div className="text-[#3E5C99] text-[0.95vw] font-semibold mt-[0.1vw] truncate">Marion Harris · Jazz · 1918</div>
 
               {/* Progress bar */}
               <div className="w-full h-[0.4vw] bg-[#1B2A4A]/10 rounded-full mt-[1.4vw] relative overflow-hidden">
