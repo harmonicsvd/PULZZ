@@ -1,186 +1,178 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect, useState } from 'react';
-import { Upload, Sparkles, Hash, Calendar, FileText, AlignLeft, Music } from 'lucide-react';
+import { Sparkles, AlignLeft, BarChart2 } from 'lucide-react';
 
 export function Scene5Features() {
   const [phase, setPhase] = useState(0);
 
   useEffect(() => {
     const timers = [
-      setTimeout(() => setPhase(1), 500),
-      setTimeout(() => setPhase(2), 2000),
-      setTimeout(() => setPhase(3), 7000),
-      setTimeout(() => setPhase(4), 12000),
+      setTimeout(() => setPhase(1), 300),
+      setTimeout(() => setPhase(2), 1600),
+      setTimeout(() => setPhase(3), 5800),
+      setTimeout(() => setPhase(4), 10000),
+      setTimeout(() => setPhase(5), 13500),
     ];
     return () => timers.forEach(t => clearTimeout(t));
   }, []);
+
+  const ease = [0.16, 1, 0.3, 1] as const;
+
+  const apis = [
+    {
+      key: 'cyanite',
+      icon: Sparkles,
+      iconBg: 'bg-blue-50',
+      iconColor: 'text-blue-500',
+      name: 'Cyanite',
+      role: 'Song DNA Engine',
+      description: 'Audio uploaded → Cyanite GraphQL returns mood, genre, BPM, key, energy, valence, arousal & AI caption.',
+      uses: [
+        'Song DNA on every artist detail page',
+        'Cosine similarity powers the Discover feed ranking',
+        'Collaboration Wall matches artists by sound',
+      ],
+      tags: ['Mood', 'Energy', 'BPM', 'Genre', 'Similarity'],
+      tagColor: 'bg-blue-50 text-blue-600',
+    },
+    {
+      key: 'musixmatch',
+      icon: AlignLeft,
+      iconBg: 'bg-rose-50',
+      iconColor: 'text-rose-500',
+      name: 'Musixmatch',
+      role: 'Lyrics & Taste',
+      description: 'Three distinct integrations: onboarding taste seeding, synced LRC lyrics in the player, lyric mood/theme/language analysis.',
+      uses: [
+        'Onboarding: listeners pick songs & genres they love',
+        'Player: lyrics scroll line-by-line in sync',
+        "Each song's lyrics analysed for mood, theme & language",
+      ],
+      tags: ['Synced Lyrics', 'Taste seed', 'Lyric mood'],
+      tagColor: 'bg-rose-50 text-rose-600',
+    },
+    {
+      key: 'songstats',
+      icon: BarChart2,
+      iconBg: 'bg-emerald-50',
+      iconColor: 'text-emerald-600',
+      name: 'Songstats',
+      role: 'Post-Release Performance',
+      description: 'Attach an ISRC or Spotify link → Songstats Enterprise returns cross-platform performance, pre-release songs are gated.',
+      uses: [
+        'Per-song: streams, playlist reach, chart activity',
+        'Artist-wide rollup by platform (Spotify, Apple, Deezer…)',
+        'Closes the loop: pre-release discovery → live numbers',
+      ],
+      tags: ['Streams', 'Playlists', 'Charts', 'ISRC'],
+      tagColor: 'bg-emerald-50 text-emerald-600',
+    },
+  ] as const;
+
+  const currentApi = phase >= 2 && phase <= 4 ? apis[phase - 2] : null;
 
   return (
     <motion.div
       className="absolute inset-0 overflow-hidden bg-[#1B2A4A]"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      exit={{ opacity: 0, x: -100 }}
-      transition={{ duration: 1 }}
+      exit={{ opacity: 0, x: -80 }}
+      transition={{ duration: 0.4 }}
     >
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,_var(--tw-gradient-stops))] from-[#1B2A4A] to-[#0A1122]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,_var(--tw-gradient-stops))] from-[#1B2A4A] to-[#070D1A]" />
 
-      <div className="absolute inset-0 flex flex-col px-[8vw] py-[6vh]">
+      <div className="absolute inset-0 flex flex-col px-[8vw] py-[5vh]">
+
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={phase >= 1 ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-          className="mb-[4vh] text-center"
+          className="text-center mb-[3vh]"
+          initial={{ opacity: 0, y: 24 }}
+          animate={phase >= 1 ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
+          transition={{ duration: 0.55, ease }}
         >
-          <h2 className="text-[4vw] font-black text-white leading-tight tracking-tight" style={{ fontFamily: 'var(--font-display)' }}>
-            Powered by the best partner APIs.
+          <h2 className="text-[3.8vw] font-black text-white leading-tight" style={{ fontFamily: 'var(--font-display)' }}>
+            Built on real partner APIs.
           </h2>
-          <p className="text-[1.4vw] text-slate-400 mt-[1vh]">Musixmatch · Cyanite · Songstats</p>
+          <p className="text-slate-400 text-[1.15vw] mt-[0.5vh]">
+            Every integration powers a working feature — not a logo on a slide.
+          </p>
         </motion.div>
 
-        <div className="flex-1 relative flex items-center justify-center">
+        <div className="flex-1 flex items-center justify-center">
           <AnimatePresence mode="popLayout">
 
-            {/* SUBMIT SONG FORM */}
-            {phase === 2 && (
+            {currentApi && (
               <motion.div
-                key="submit"
-                initial={{ opacity: 0, scale: 0.85 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 1.05, filter: 'blur(8px)' }}
-                className="w-full max-w-[50vw] bg-[#FBF8F2] rounded-3xl p-[3vw] shadow-2xl flex flex-col gap-[1.5vw]"
+                key={currentApi.key}
+                className="w-full max-w-[62vw] bg-white rounded-3xl p-[3vw] shadow-2xl"
+                initial={{ opacity: 0, scale: 0.88, y: 16 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 1.04, y: -16 }}
+                transition={{ duration: 0.45, ease }}
               >
-                <div className="text-[#1B2A4A] text-[2vw] font-bold">Submit Song to Discovery Pool</div>
-                <div className="border-2 border-dashed border-[#3E5C99] bg-[#3E5C99]/5 rounded-xl p-[2vw] flex flex-col items-center justify-center text-[#3E5C99]">
-                  <Upload className="w-[3vw] h-[3vw] mb-[1vw]" />
-                  <span className="font-bold text-[1.2vw]">Audio upload · MP3 / WAV / FLAC</span>
-                </div>
-                <div className="grid grid-cols-2 gap-[1vw]">
-                  <div className="bg-white p-[1vw] rounded-lg border border-slate-200 flex items-center gap-[1vw]">
-                    <Hash className="w-[1.5vw] h-[1.5vw] text-[#FF5C49]" />
-                    <div>
-                      <span className="font-bold text-slate-700 text-[0.9vw] block">ISRC</span>
-                      <span className="text-slate-400 text-[0.75vw]">required for Songstats</span>
-                    </div>
-                  </div>
-                  <div className="bg-white p-[1vw] rounded-lg border border-slate-200 flex items-center gap-[1vw]">
-                    <Calendar className="w-[1.5vw] h-[1.5vw] text-slate-400" />
-                    <span className="font-bold text-slate-600 text-[0.9vw]">Release Date</span>
-                  </div>
-                  <div className="bg-white p-[1vw] rounded-lg border border-slate-200 flex items-center gap-[1vw]">
-                    <FileText className="w-[1.5vw] h-[1.5vw] text-slate-400" />
-                    <span className="font-bold text-slate-600 text-[0.9vw]">Artist Note</span>
-                  </div>
-                  <div className="bg-white p-[1vw] rounded-lg border border-slate-200 flex items-center gap-[1vw]">
-                    <Music className="w-[1.5vw] h-[1.5vw] text-slate-400" />
-                    <span className="font-bold text-slate-600 text-[0.9vw]">Spotify Track / URI</span>
-                  </div>
-                </div>
-                <div className="bg-[#FF5C49] text-white w-full py-[1vw] rounded-xl flex items-center justify-center font-bold text-[1.1vw]">
-                  Submit to Discovery Pool
-                </div>
-              </motion.div>
-            )}
-
-            {/* MUSIXMATCH — LYRICS SYNC */}
-            {phase === 3 && (
-              <motion.div
-                key="musixmatch"
-                initial={{ opacity: 0, scale: 0.85 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 1.05, filter: 'blur(8px)' }}
-                className="w-full max-w-[56vw] bg-[#FBF8F2] rounded-3xl p-[3vw] shadow-2xl flex flex-col gap-[1.5vw]"
-              >
-                <div className="flex items-center gap-[1vw]">
-                  <div className="w-[3.5vw] h-[3.5vw] rounded-full bg-rose-100 flex items-center justify-center">
-                    <AlignLeft className="w-[1.8vw] h-[1.8vw] text-rose-600" />
+                <div className="flex items-start gap-[1.5vw] mb-[2vw]">
+                  <div className={`w-[4.5vw] h-[4.5vw] rounded-2xl ${currentApi.iconBg} flex items-center justify-center shrink-0`}>
+                    <currentApi.icon className={`w-[2.2vw] h-[2.2vw] ${currentApi.iconColor}`} />
                   </div>
                   <div>
-                    <div className="text-[#1B2A4A] font-bold text-[1.6vw]">Musixmatch — Synced Lyrics</div>
-                    <div className="text-slate-500 text-[0.9vw]">LRC timestamps per line, genre classification &amp; taste seeding</div>
+                    <div className="text-[#1B2A4A] font-black text-[2vw] leading-none">{currentApi.name}</div>
+                    <div className="text-slate-500 text-[1vw] mt-[0.3vw]">{currentApi.role}</div>
                   </div>
                 </div>
 
-                <div className="bg-white rounded-xl border border-slate-100 p-[1.5vw] shadow-sm">
-                  <div className="text-[0.85vw] font-bold text-slate-400 uppercase tracking-widest mb-[1vw]">St. Louis Blues · Bessie Smith · 1925</div>
-                  <div className="flex flex-col gap-[0.8vw]">
-                    {[
-                      { time: '0:04', text: "I hate to see that evenin' sun go down", active: false },
-                      { time: '0:12', text: "Hate to see that evenin' sun go down", active: true },
-                      { time: '0:20', text: "Cause my baby, she done left this town", active: false },
-                    ].map((line, i) => (
-                      <motion.div
-                        key={i}
-                        className={`flex items-center gap-[1.5vw] px-[1vw] py-[0.6vw] rounded-lg transition-all ${line.active ? 'bg-rose-50 border border-rose-200' : ''}`}
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: i * 0.15 }}
-                      >
-                        <span className={`font-mono text-[0.8vw] w-[2.5vw] flex-shrink-0 ${line.active ? 'text-rose-500 font-bold' : 'text-slate-400'}`}>{line.time}</span>
-                        <span className={`text-[1vw] ${line.active ? 'text-[#1B2A4A] font-bold' : 'text-slate-500'}`}>{line.text}</span>
-                        {line.active && (
-                          <motion.div
-                            className="ml-auto w-[0.6vw] h-[0.6vw] rounded-full bg-rose-500"
-                            animate={{ opacity: [1, 0.3, 1] }}
-                            transition={{ duration: 1, repeat: Infinity }}
-                          />
-                        )}
+                <p className="text-[1.05vw] text-slate-600 leading-relaxed mb-[1.8vw]">
+                  {currentApi.description}
+                </p>
+
+                <div className="bg-slate-50 rounded-2xl p-[1.5vw] mb-[1.8vw]">
+                  <div className="text-[0.8vw] font-bold text-slate-400 uppercase tracking-widest mb-[1vw]">How we use it</div>
+                  <div className="flex flex-col gap-[0.7vw]">
+                    {currentApi.uses.map((use, i) => (
+                      <motion.div key={i} className="flex items-start gap-[0.8vw]"
+                        initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: i * 0.12 + 0.2 }}>
+                        <div className="w-[0.5vw] h-[0.5vw] rounded-full bg-[#FF5C49] mt-[0.5vw] shrink-0" />
+                        <span className="text-[#1B2A4A] text-[0.98vw] font-medium">{use}</span>
                       </motion.div>
                     ))}
                   </div>
                 </div>
 
-                <div className="flex gap-[1.5vw]">
-                  <div className="flex-1 bg-white rounded-xl border border-slate-100 p-[1.2vw] shadow-sm flex items-center gap-[1vw]">
-                    <Sparkles className="w-[1.5vw] h-[1.5vw] text-rose-500" />
-                    <div>
-                      <div className="font-bold text-[#1B2A4A] text-[0.95vw]">Genre Classification</div>
-                      <div className="text-slate-500 text-[0.8vw]">Blues · Soul</div>
-                    </div>
-                  </div>
-                  <div className="flex-1 bg-white rounded-xl border border-slate-100 p-[1.2vw] shadow-sm flex items-center gap-[1vw]">
-                    <Music className="w-[1.5vw] h-[1.5vw] text-rose-500" />
-                    <div>
-                      <div className="font-bold text-[#1B2A4A] text-[0.95vw]">Taste Seeding</div>
-                      <div className="text-slate-500 text-[0.8vw]">Listener preference matching</div>
-                    </div>
-                  </div>
+                <div className="flex flex-wrap gap-[0.6vw]">
+                  {currentApi.tags.map(tag => (
+                    <span key={tag} className={`${currentApi.tagColor} text-[0.78vw] font-bold px-[0.9vw] py-[0.35vw] rounded-full`}>{tag}</span>
+                  ))}
                 </div>
               </motion.div>
             )}
 
-            {/* CYANITE + SONGSTATS side by side */}
-            {phase === 4 && (
+            {/* All 3 together — footer lockup */}
+            {phase >= 5 && (
               <motion.div
-                key="integrations"
-                initial={{ opacity: 0, scale: 0.85 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 1.05, filter: 'blur(8px)' }}
-                className="w-full flex gap-[2vw] justify-center"
+                key="all"
+                className="w-full max-w-[72vw] flex flex-col items-center gap-[2vw]"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.55, ease }}
               >
-                <div className="w-[26vw] bg-white rounded-3xl p-[2vw] shadow-2xl flex flex-col items-center text-center">
-                  <div className="w-[5vw] h-[5vw] rounded-full bg-blue-50 flex items-center justify-center mb-[1vw]">
-                    <Sparkles className="w-[2.5vw] h-[2.5vw] text-blue-500" />
-                  </div>
-                  <h3 className="text-[#1B2A4A] font-bold text-[1.5vw]">Cyanite</h3>
-                  <p className="text-slate-500 text-[1vw] mt-[0.5vw] leading-snug">AI mood detection, energy, genre tagging &amp; cosine-based sound similarity ranking</p>
-                  <div className="mt-[1.5vw] flex flex-wrap gap-[0.5vw] justify-center">
-                    {['Mood', 'Energy', 'Genre', 'Similarity'].map(tag => (
-                      <span key={tag} className="bg-blue-50 text-blue-600 text-[0.8vw] font-bold px-[0.8vw] py-[0.3vw] rounded-full">{tag}</span>
-                    ))}
-                  </div>
+                <div className="flex gap-[2vw] w-full">
+                  {apis.map((api, i) => (
+                    <motion.div key={api.key}
+                      className="flex-1 bg-white/10 border border-white/15 rounded-2xl p-[1.5vw] flex flex-col items-center text-center gap-[0.8vw]"
+                      initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: i * 0.1 }}>
+                      <div className={`w-[3.5vw] h-[3.5vw] rounded-xl ${api.iconBg} flex items-center justify-center`}>
+                        <api.icon className={`w-[1.8vw] h-[1.8vw] ${api.iconColor}`} />
+                      </div>
+                      <div className="text-white font-black text-[1.3vw]">{api.name}</div>
+                      <div className="text-slate-400 text-[0.82vw] leading-snug">{api.role}</div>
+                    </motion.div>
+                  ))}
                 </div>
-                <div className="w-[26vw] bg-white rounded-3xl p-[2vw] shadow-2xl flex flex-col items-center text-center">
-                  <div className="w-[5vw] h-[5vw] rounded-full bg-emerald-50 flex items-center justify-center mb-[1vw]">
-                    <Upload className="w-[2.5vw] h-[2.5vw] text-emerald-500" />
-                  </div>
-                  <h3 className="text-[#1B2A4A] font-bold text-[1.5vw]">Songstats Enterprise</h3>
-                  <p className="text-slate-500 text-[1vw] mt-[0.5vw] leading-snug">Post-release cross-platform performance — Spotify, Apple Music, playlist reach, chart entries</p>
-                  <div className="mt-[1.5vw] flex flex-wrap gap-[0.5vw] justify-center">
-                    {['Streams', 'Playlists', 'Charts', 'ISRC lookup'].map(tag => (
-                      <span key={tag} className="bg-emerald-50 text-emerald-600 text-[0.8vw] font-bold px-[0.8vw] py-[0.3vw] rounded-full">{tag}</span>
-                    ))}
-                  </div>
-                </div>
+                <motion.p
+                  className="text-slate-400 text-[1vw] text-center"
+                  initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}>
+                  Every feature degrades gracefully — missing key → tasteful fallback, never broken.
+                </motion.p>
               </motion.div>
             )}
 
