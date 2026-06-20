@@ -1,0 +1,31 @@
+kind = "video"
+previewPath = "/pulzz-pitch-video/"
+title = "Pulzz — Pitch Video"
+version = "1.0.0"
+id = "artifacts/pulzz-pitch-video"
+router = "path"
+
+[[integratedSkills]]
+name = "video-js"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/pulzz-pitch-video/" ]
+localPort = 24558
+
+[services.development]
+run = "pnpm --filter @workspace/pulzz-pitch-video run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/pulzz-pitch-video", "run", "build" ]
+publicDir = "artifacts/pulzz-pitch-video/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "24558"
+BASE_PATH = "/pulzz-pitch-video/"

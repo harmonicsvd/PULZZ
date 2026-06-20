@@ -30,3 +30,21 @@ id = "MXrdpBaRRQj8DZzoaA7Wz"
 uri = "file://artifacts/api-server/public/media/art-3.png"
 type = "image"
 title = "generated_image"
+
+[[generated]]
+id = "uEgr7_MeIvKB9Q66wkPqK"
+uri = "file://artifacts/pulzz-pitch-video/public/images/bg-waves.png"
+type = "image"
+title = "Abstract purple pink waves"
+
+[[generated]]
+id = "As_JZ8oRW9T9lnwfhZRz6"
+uri = "file://artifacts/pulzz-pitch-video/public/images/bg-audio.png"
+type = "image"
+title = "Audio waveform abstract data"
+
+[[generated]]
+id = "yldfWHx5RhHe_FWlWW9aE"
+uri = "file://artifacts/pulzz-pitch-video/public/images/avatar.png"
+type = "image"
+title = "Listener avatar profile"
