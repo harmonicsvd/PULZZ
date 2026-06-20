@@ -10,8 +10,8 @@ import { Scene5Outro } from './video_scenes/Scene5Outro';
 export const SCENE_DURATIONS = {
   hook: 8000,
   concept: 12000,
-  listener: 25000,
-  artist: 25000,
+  listener: 32000,
+  artist: 32000,
   outro: 15000
 };
 
