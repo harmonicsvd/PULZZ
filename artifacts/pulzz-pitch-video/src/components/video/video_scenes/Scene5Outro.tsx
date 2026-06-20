@@ -27,20 +27,18 @@ export function Scene5Outro() {
       
       <div className="relative z-10 flex flex-col items-center justify-center">
         <motion.div
-          className="flex items-center gap-6"
+          className="flex items-center gap-[2vw]"
           initial={{ scale: 0.5, opacity: 0, y: 50 }}
           animate={phase >= 1 ? { scale: 1, opacity: 1, y: 0 } : { scale: 0.5, opacity: 0, y: 50 }}
           transition={{ duration: 1.5, type: 'spring', bounce: 0.4 }}
         >
           {/* Logo Mark */}
-          <div className="w-[6vw] h-[6vw] rounded-2xl bg-[#FF5C49] flex items-center justify-center shadow-[0_20px_40px_rgba(255,92,73,0.3)]">
-            <svg viewBox="0 0 24 24" className="w-[3vw] h-[3vw] text-white" fill="currentColor">
-              <path d="M12 2L2 22h20L12 2zm0 4.5l6.5 13h-13L12 6.5z" />
-            </svg>
+          <div className="w-[6vw] h-[6vw] rounded-[1.5vw] bg-[#FF5C49] flex items-center justify-center shadow-[0_20px_40px_rgba(255,92,73,0.3)]">
+            <div className="w-[2vw] h-[2vw] rounded-full bg-[#FBF8F2]" />
           </div>
           {/* Wordmark */}
-          <h1 className="text-[6vw] font-black text-[#1B2A4A] tracking-tighter" style={{ fontFamily: 'var(--font-display)' }}>
-            Pulzz.
+          <h1 className="text-[8vw] font-bold tracking-tight" style={{ fontFamily: 'var(--font-display)' }}>
+            <span className="text-[#1B2A4A]">Pul</span><span className="text-[#FF5C49]">zz</span>
           </h1>
         </motion.div>
 

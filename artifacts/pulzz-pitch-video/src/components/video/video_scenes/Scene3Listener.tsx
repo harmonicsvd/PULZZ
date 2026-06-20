@@ -71,8 +71,8 @@ export function Scene3Listener() {
                 />
               </div>
               
-              <div className="text-[#1B2A4A] text-[1.5vw] font-bold">Midnight City</div>
-              <div className="text-[#1B2A4A]/60 text-[1vw]">The Midnight</div>
+              <div className="text-[#1B2A4A] text-[1.5vw] font-bold text-center px-4">After You've Gone</div>
+              <div className="text-[#1B2A4A]/60 text-[1vw] mt-1">Marion Harris</div>
               
               {/* Progress Bar */}
               <div className="w-[18vw] h-[0.5vw] bg-[#1B2A4A]/10 rounded-full mt-[3vw] relative overflow-hidden">

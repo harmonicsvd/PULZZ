@@ -60,21 +60,26 @@ export function Scene2Concept() {
             style={{ perspective: 1000 }}
           >
             <div className="p-8 h-full flex flex-col gap-6">
-              <div className="h-8 w-1/3 bg-[#1B2A4A]/5 rounded-md" />
-              {[1, 2, 3, 4].map((i) => (
+              <div className="h-[2vw] w-1/3 bg-[#1B2A4A]/5 rounded-md mb-[1vw]" />
+              {[
+                { title: "Danny Boy", artist: "Ernestine Schumann-Heink" },
+                { title: "Swing Low, Sweet Chariot", artist: "Fisk Jubilee Quartet" },
+                { title: "After You've Gone", artist: "Marion Harris" },
+                { title: "Some of These Days", artist: "Sophie Tucker" },
+              ].map((song, i) => (
                 <motion.div 
                   key={i}
-                  className="flex items-center gap-6 p-4 rounded-xl bg-white border border-[#1B2A4A]/5 shadow-sm"
+                  className="flex items-center gap-[1vw] p-[1vw] rounded-xl bg-white border border-[#1B2A4A]/5 shadow-sm"
                   initial={{ opacity: 0, x: 50 }}
                   animate={phase >= 3 ? { opacity: 1, x: 0 } : { opacity: 0, x: 50 }}
                   transition={{ delay: i * 0.15 + (phase >= 3 ? 0 : 0) }}
                 >
-                  <div className="w-16 h-16 rounded-md bg-[#FF5C49]/10" />
+                  <div className="w-[4vw] h-[4vw] rounded-md bg-[#FF5C49]/10" />
                   <div className="flex-1">
-                    <div className="h-5 w-1/2 bg-[#1B2A4A]/20 rounded mb-2" />
-                    <div className="h-3 w-1/3 bg-[#1B2A4A]/10 rounded" />
+                    <div className="text-[#1B2A4A] text-[1.1vw] font-bold mb-[0.2vw]">{song.title}</div>
+                    <div className="text-[#1B2A4A]/60 text-[0.9vw]">{song.artist}</div>
                   </div>
-                  <div className="px-3 py-1 rounded-full bg-[#FF5C49]/10 text-[#FF5C49] text-[0.8vw] font-bold">Unreleased</div>
+                  <div className="px-[0.8vw] py-[0.3vw] rounded-full bg-[#FF5C49]/10 text-[#FF5C49] text-[0.8vw] font-bold">Unreleased</div>
                 </motion.div>
               ))}
             </div>

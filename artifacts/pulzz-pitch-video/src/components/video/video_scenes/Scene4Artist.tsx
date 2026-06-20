@@ -98,7 +98,12 @@ export function Scene4Artist() {
             </div>
             
             <div className="flex flex-col gap-[1vw]">
-              {[1, 2, 3, 4].map((i) => (
+              {[
+                { user: "User_8492", song: "After You've Gone" },
+                { user: "User_8509", song: "Danny Boy" },
+                { user: "User_8526", song: "St. Louis Blues" },
+                { user: "User_8543", song: "Some of These Days" }
+              ].map((discovery, i) => (
                 <motion.div 
                   key={i}
                   className="bg-white p-[1vw] rounded-lg border border-[#1B2A4A]/5 shadow-sm flex gap-[1vw] items-center"
@@ -107,9 +112,9 @@ export function Scene4Artist() {
                   transition={{ delay: phase >= 4 ? i * 0.2 : 0 }}
                 >
                   <img src={`${import.meta.env.BASE_URL}images/avatar.png`} className="w-[3vw] h-[3vw] rounded-full object-cover border border-[#FF5C49]/20" />
-                  <div>
-                    <div className="text-[#1B2A4A] text-[1vw] font-bold">User_{8492 + i*17}</div>
-                    <div className="text-[#FF5C49] text-[0.8vw]">Just discovered "Midnight City"</div>
+                  <div className="flex-1">
+                    <div className="text-[#1B2A4A] text-[1vw] font-bold">{discovery.user}</div>
+                    <div className="text-[#FF5C49] text-[0.8vw]">Just discovered "{discovery.song}"</div>
                   </div>
                 </motion.div>
               ))}
