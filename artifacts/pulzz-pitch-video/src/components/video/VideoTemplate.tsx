@@ -1,26 +1,29 @@
 import { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useVideoPlayer } from '@/lib/video';
-import { Scene1Hook } from './video_scenes/Scene1Hook';
-import { Scene2Concept } from './video_scenes/Scene2Concept';
+import { Scene1Problem } from './video_scenes/Scene1Problem';
+import { Scene2Why } from './video_scenes/Scene2Why';
 import { Scene3Listener } from './video_scenes/Scene3Listener';
-import { Scene4Artist } from './video_scenes/Scene4Artist';
-import { Scene5Outro } from './video_scenes/Scene5Outro';
+import { Scene4Dashboard } from './video_scenes/Scene4Dashboard';
+import { Scene5Features } from './video_scenes/Scene5Features';
+import { Scene6Impact } from './video_scenes/Scene6Impact';
 
 export const SCENE_DURATIONS = {
-  hook: 8000,
-  concept: 12000,
-  listener: 32000,
-  artist: 32000,
-  outro: 15000
+  problem: 9000,
+  why: 9000,
+  listener: 26000,
+  dashboard: 28000,
+  features: 18000,
+  impact: 14000
 };
 
 const SCENE_COMPONENTS: Record<string, React.ComponentType> = {
-  hook: Scene1Hook,
-  concept: Scene2Concept,
+  problem: Scene1Problem,
+  why: Scene2Why,
   listener: Scene3Listener,
-  artist: Scene4Artist,
-  outro: Scene5Outro
+  dashboard: Scene4Dashboard,
+  features: Scene5Features,
+  impact: Scene6Impact
 };
 
 export default function VideoTemplate({

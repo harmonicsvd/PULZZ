@@ -17,3 +17,4 @@
 - [Prod demo-data backfill](prod-demo-data-backfill.md) — prod DB is separate; publish migrates schema not data; ensureSeeded must backfill stale demo rows (DNA/lyrics) on startup, not just seed empty DB
 - [Smooth audio progress bar](smooth-audio-progress.md) — expo-av status callbacks are too coarse; drive the bar with an rAF loop extrapolating from a position anchor + Animated.Value.setValue (no native driver for width/left %)
 - [Artist-overall streaming stats demo](artist-streaming-stats-demo.md) — dashboard "Artist overall" tab is intentional deterministic demo data (labelled), NOT real Songstats; don't "fix" it — real integration is the "Your songs" tab only
+- [lucide Feather icon trap](lucide-feather-icon-trap.md) — `<Feather name="x"/>` ignores name and renders a literal feather everywhere; use named lucide imports, not a generic icon-by-name component
