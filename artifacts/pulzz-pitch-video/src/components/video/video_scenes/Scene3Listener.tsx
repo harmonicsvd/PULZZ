@@ -7,13 +7,14 @@ export function Scene3Listener() {
 
   useEffect(() => {
     const timers = [
-      setTimeout(() => setPhase(1), 350),
-      setTimeout(() => setPhase(2), 2000),
-      setTimeout(() => setPhase(3), 5500),
-      setTimeout(() => setPhase(4), 8000),
-      setTimeout(() => setPhase(5), 10200),
-      setTimeout(() => setPhase(6), 13000),
-      setTimeout(() => setPhase(7), 16500),
+      setTimeout(() => setPhase(1), 500),   // Big tagline
+      setTimeout(() => setPhase(2), 3800),  // Phone + copy appears
+      setTimeout(() => setPhase(3), 7500),  // Song playing
+      setTimeout(() => setPhase(4), 11500), // Moment marked
+      setTimeout(() => setPhase(5), 15000), // Reactions unlocked
+      setTimeout(() => setPhase(6), 18000), // Discovered tapped
+      setTimeout(() => setPhase(7), 21500), // Discoveries view
+      setTimeout(() => setPhase(8), 25000), // Notification
     ];
     return () => timers.forEach(t => clearTimeout(t));
   }, []);
@@ -26,46 +27,80 @@ export function Scene3Listener() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0, scale: 1.04 }}
-      transition={{ duration: 0.4 }}
+      transition={{ duration: 0.6 }}
     >
-      <div className="absolute inset-0 flex px-[10vw]">
+      {/* Full-screen tagline — phase 1 only */}
+      <motion.div
+        className="absolute inset-0 flex flex-col items-center justify-center text-center px-[10vw] z-30"
+        initial={{ opacity: 0 }}
+        animate={phase === 1 ? { opacity: 1 } : { opacity: 0, pointerEvents: 'none' }}
+        transition={{ duration: 0.9, ease }}
+      >
+        <motion.p
+          className="text-[1.2vw] font-bold text-slate-400 uppercase tracking-[0.3em] mb-[2vw]"
+          initial={{ opacity: 0, y: 16 }}
+          animate={phase === 1 ? { opacity: 1, y: 0 } : { opacity: 0, y: -16 }}
+          transition={{ duration: 0.8, ease, delay: 0.2 }}
+        >
+          For Listeners
+        </motion.p>
+        <motion.h2
+          className="text-[5.5vw] font-black text-[#1B2A4A] leading-tight tracking-tight"
+          style={{ fontFamily: 'var(--font-display)' }}
+          initial={{ opacity: 0, y: 24 }}
+          animate={phase === 1 ? { opacity: 1, y: 0 } : { opacity: 0, y: -24 }}
+          transition={{ duration: 0.9, ease, delay: 0.35 }}
+        >
+          Catch a song's pulse<br />
+          <span className="text-[#FF5C49]">before the drop.</span>
+        </motion.h2>
+      </motion.div>
 
+      {/* Phone layout — phase 2+ */}
+      <motion.div
+        className="absolute inset-0 flex px-[10vw]"
+        initial={{ opacity: 0 }}
+        animate={phase >= 2 ? { opacity: 1 } : { opacity: 0 }}
+        transition={{ duration: 0.8, ease }}
+      >
         {/* Left copy */}
         <div className="w-[45%] h-full flex flex-col justify-center pr-[4vw] z-20">
           <motion.div
             initial={{ opacity: 0, y: 22 }}
-            animate={phase >= 1 ? { opacity: 1, y: 0 } : { opacity: 0, y: 22 }}
-            transition={{ duration: 0.6, ease }}
+            animate={phase >= 2 ? { opacity: 1, y: 0 } : { opacity: 0, y: 22 }}
+            transition={{ duration: 0.8, ease }}
           >
-            <h2 className="text-[4.5vw] font-black text-[#1B2A4A] leading-tight tracking-tight mb-[1.5vw]"
-              style={{ fontFamily: 'var(--font-display)' }}>
-              {phase < 6 ? (
+            <h2
+              className="text-[4.5vw] font-black text-[#1B2A4A] leading-tight tracking-tight mb-[1.5vw]"
+              style={{ fontFamily: 'var(--font-display)' }}
+            >
+              {phase < 7 ? (
                 <>Listen.<br /><span className="text-[#FF5C49]">Mark Moments.</span><br />React.</>
               ) : (
                 <>Never Miss<br /><span className="text-[#FF5C49]">Drop Day.</span></>
               )}
             </h2>
             <p className="text-[1.3vw] text-slate-600 max-w-[26vw] leading-snug">
-              {phase < 6
+              {phase < 7
                 ? 'The Discovery Pool has unheard tracks from emerging artists. Pin the exact seconds that move you — and build your discoverer reputation.'
                 : 'Get notified the moment your early discoveries officially release. You were first.'}
             </p>
           </motion.div>
         </div>
 
-        {/* Phone */}
+        {/* Phone mockup */}
         <div className="w-[55%] h-full relative z-10 flex items-center justify-center">
           <motion.div
             className="w-[24vw] h-[48vw] bg-[#FBF8F2] rounded-[3vw] border-[0.8vw] border-[#1B2A4A] overflow-hidden relative shadow-[0_30px_60px_rgba(27,42,74,0.2)]"
-            initial={{ opacity: 0, y: 70, rotateY: 18 }}
-            animate={phase >= 1 ? { opacity: 1, y: 0, rotateY: -12 } : { opacity: 0, y: 70, rotateY: 18 }}
-            transition={{ duration: 0.9, type: 'spring', bounce: 0.18 }}
+            initial={{ opacity: 0, y: 80, rotateY: 18 }}
+            animate={phase >= 2 ? { opacity: 1, y: 0, rotateY: -12 } : { opacity: 0, y: 80, rotateY: 18 }}
+            transition={{ duration: 1.1, type: 'spring', bounce: 0.18 }}
           >
             {/* Player screen */}
             <motion.div
               className="absolute inset-0 bg-[#FBF8F2] flex flex-col pt-[3vw] px-[1.5vw]"
-              animate={phase >= 6 ? { opacity: 0, scale: 0.92 } : { opacity: 1, scale: 1 }}
-              transition={{ duration: 0.35 }}
+              animate={phase >= 7 ? { opacity: 0, scale: 0.92 } : { opacity: 1, scale: 1 }}
+              transition={{ duration: 0.4 }}
             >
               <div className="flex flex-col items-center mb-[1.8vw]">
                 <div className="text-[1vw] font-black text-[#1B2A4A]">PULZZ</div>
@@ -77,9 +112,9 @@ export function Scene3Listener() {
                 <motion.div
                   className="absolute inset-0 bg-white/20"
                   animate={{ scale: [1, 1.15, 1], opacity: [0, 0.35, 0] }}
-                  transition={{ duration: 2, repeat: Infinity }}
+                  transition={{ duration: 2.5, repeat: Infinity }}
                 />
-                {phase >= 3 && (
+                {phase >= 4 && (
                   <motion.div
                     className="absolute bottom-[1vw] right-[1vw] bg-white/90 backdrop-blur-md px-[0.8vw] py-[0.4vw] rounded-full flex items-center gap-[0.3vw]"
                     initial={{ scale: 0 }}
@@ -95,17 +130,18 @@ export function Scene3Listener() {
               <div className="text-[#1B2A4A] text-[1.35vw] font-bold truncate">After You've Gone</div>
               <div className="text-[#3E5C99] text-[0.95vw] font-semibold mt-0.5 truncate">Marion Harris · Jazz · 1918</div>
 
+              {/* Progress bar */}
               <div className="w-full h-[0.4vw] bg-[#1B2A4A]/10 rounded-full mt-[1.4vw] relative overflow-hidden">
                 <motion.div
                   className="absolute left-0 top-0 bottom-0 bg-[#FF5C49] rounded-full"
                   initial={{ width: '0%' }}
-                  animate={phase >= 2 ? { width: phase >= 4 ? '100%' : '60%' } : { width: '0%' }}
-                  transition={{ duration: phase >= 4 ? 0.6 : 5, ease: 'linear' }}
+                  animate={phase >= 3 ? { width: phase >= 5 ? '100%' : '58%' } : { width: '0%' }}
+                  transition={{ duration: phase >= 5 ? 0.8 : 8, ease: 'linear' }}
                 />
-                {phase >= 3 && (
+                {phase >= 4 && (
                   <motion.div
                     className="absolute top-1/2 -translate-y-1/2 w-[0.8vw] h-[0.8vw] bg-amber-500 rounded-full shadow-[0_0_8px_rgba(245,158,11,0.5)]"
-                    style={{ left: '60%' }}
+                    style={{ left: '58%' }}
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     transition={{ type: 'spring', bounce: 0.55 }}
@@ -113,6 +149,7 @@ export function Scene3Listener() {
                 )}
               </div>
 
+              {/* Controls */}
               <div className="flex justify-between items-center mt-[1.4vw] px-[1vw]">
                 <div className="opacity-60"><SkipBack className="w-[1.2vw] h-[1.2vw] text-[#3E5C99]" /></div>
                 <div className="w-[4vw] h-[4vw] rounded-full bg-[#FF5C49] flex items-center justify-center shadow-lg">
@@ -120,26 +157,27 @@ export function Scene3Listener() {
                 </div>
                 <motion.div
                   className="w-[2.5vw] h-[2.5vw] rounded-full bg-amber-500 flex items-center justify-center shadow-md"
-                  animate={phase >= 3 ? { scale: [1, 1.3, 1] } : {}}
-                  transition={{ duration: 0.4 }}
+                  animate={phase === 4 ? { scale: [1, 1.3, 1] } : {}}
+                  transition={{ duration: 0.45 }}
                 >
                   <Zap className="w-[1.2vw] h-[1.2vw] text-white" />
                 </motion.div>
               </div>
 
+              {/* Reaction area */}
               <div className="mt-auto pb-[2vw]">
-                {phase < 4 ? (
+                {phase < 5 ? (
                   <div className="border border-[#1B2A4A]/12 bg-[#1B2A4A]/5 rounded-full py-[0.8vw] flex justify-center">
                     <span className="text-[0.85vw] font-bold text-slate-500">Finish to react</span>
                   </div>
                 ) : (
                   <div className="flex gap-[1vw]">
                     <motion.div
-                      className={`flex-1 rounded-full py-[0.8vw] flex justify-center items-center gap-[0.5vw] ${phase >= 5 ? 'bg-[#FF5C49]' : 'bg-[#E2E8F0]'}`}
-                      animate={phase >= 5 ? { scale: 1.04 } : {}}
+                      className={`flex-1 rounded-full py-[0.8vw] flex justify-center items-center gap-[0.5vw] ${phase >= 6 ? 'bg-[#FF5C49]' : 'bg-[#E2E8F0]'}`}
+                      animate={phase >= 6 ? { scale: 1.04 } : {}}
                     >
-                      <Star className={`w-[1vw] h-[1vw] ${phase >= 5 ? 'text-white' : 'text-[#3E5C99]'}`} />
-                      <span className={`text-[0.9vw] font-bold ${phase >= 5 ? 'text-white' : 'text-[#3E5C99]'}`}>Discovered</span>
+                      <Star className={`w-[1vw] h-[1vw] ${phase >= 6 ? 'text-white' : 'text-[#3E5C99]'}`} />
+                      <span className={`text-[0.9vw] font-bold ${phase >= 6 ? 'text-white' : 'text-[#3E5C99]'}`}>Discovered</span>
                     </motion.div>
                     <div className="flex-1 border border-[#E2E8F0] rounded-full py-[0.8vw] flex justify-center items-center gap-[0.5vw]">
                       <X className="w-[1vw] h-[1vw] text-slate-500" />
@@ -150,13 +188,13 @@ export function Scene3Listener() {
               </div>
             </motion.div>
 
-            {/* Discoveries screen */}
-            {phase >= 6 && (
+            {/* Discoveries screen — phase 7+ */}
+            {phase >= 7 && (
               <motion.div
                 className="absolute inset-0 bg-[#FBF8F2] flex flex-col pt-[3vw]"
                 initial={{ opacity: 0, x: '100%' }}
                 animate={{ opacity: 1, x: '0%' }}
-                transition={{ type: 'spring', bounce: 0.08, duration: 0.55 }}
+                transition={{ type: 'spring', bounce: 0.08, duration: 0.65 }}
               >
                 <div className="px-[1.5vw] mb-[1.2vw] flex justify-between items-end">
                   <div className="text-[1.8vw] font-black text-[#1B2A4A]">My Discoveries</div>
@@ -166,10 +204,10 @@ export function Scene3Listener() {
                   </div>
                 </div>
 
-                {phase >= 7 && (
+                {phase >= 8 && (
                   <motion.div
                     className="mx-[1vw] bg-[#FF5C49] rounded-[1vw] p-[1vw] flex items-center gap-[0.8vw] shadow-lg mb-[0.8vw]"
-                    initial={{ opacity: 0, y: -14, scale: 0.95 }}
+                    initial={{ opacity: 0, y: -16, scale: 0.95 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     transition={{ type: 'spring', bounce: 0.38 }}
                   >
@@ -185,7 +223,7 @@ export function Scene3Listener() {
 
                 <div className="px-[1vw] flex flex-col gap-[0.8vw]">
                   {[
-                    { title: "After You've Gone", artist: 'Marion Harris', released: phase >= 7, color: 'from-[#FF5C49] to-[#FF8A7A]' },
+                    { title: "After You've Gone", artist: 'Marion Harris', released: phase >= 8, color: 'from-[#FF5C49] to-[#FF8A7A]' },
                     { title: 'Danny Boy', artist: 'Ernestine S.', released: false, color: 'from-[#3E5C99] to-[#5C7EBE]' },
                   ].map((item, i) => (
                     <motion.div
@@ -193,7 +231,7 @@ export function Scene3Listener() {
                       className="bg-white rounded-[1vw] p-[0.9vw] flex items-center gap-[0.8vw] border border-[#1B2A4A]/5 shadow-sm"
                       initial={{ opacity: 0, y: 14 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: i * 0.07 + 0.18 }}
+                      transition={{ delay: i * 0.09 + 0.2 }}
                     >
                       <div className={`w-[3vw] h-[3vw] rounded-[0.8vw] bg-gradient-to-br ${item.color} flex items-center justify-center shrink-0`}>
                         <Check className="w-[1.2vw] h-[1.2vw] text-white" />
@@ -235,7 +273,7 @@ export function Scene3Listener() {
             )}
           </motion.div>
         </div>
-      </div>
+      </motion.div>
     </motion.div>
   );
 }

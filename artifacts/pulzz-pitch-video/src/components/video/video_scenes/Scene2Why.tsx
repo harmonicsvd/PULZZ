@@ -7,9 +7,9 @@ export function Scene2Why() {
 
   useEffect(() => {
     const timers = [
-      setTimeout(() => setPhase(1), 300),
-      setTimeout(() => setPhase(2), 1600),
-      setTimeout(() => setPhase(3), 4200),
+      setTimeout(() => setPhase(1), 600),
+      setTimeout(() => setPhase(2), 4500),
+      setTimeout(() => setPhase(3), 9500),
     ];
     return () => timers.forEach(t => clearTimeout(t));
   }, []);
@@ -21,37 +21,46 @@ export function Scene2Why() {
       className="absolute inset-0 overflow-hidden bg-[#FBF8F2]"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      exit={{ opacity: 0, filter: 'blur(6px)' }}
-      transition={{ duration: 0.4 }}
+      exit={{ opacity: 0, filter: 'blur(8px)' }}
+      transition={{ duration: 0.7 }}
     >
       <motion.div
-        className="absolute w-[60vw] h-[60vw] bg-[#FF5C49]/8 rounded-full blur-[120px] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-        animate={{ scale: [1, 1.12, 1] }}
-        transition={{ duration: 5, ease: 'easeInOut', repeat: Infinity }}
+        className="absolute w-[65vw] h-[65vw] bg-[#FF5C49]/8 rounded-full blur-[140px] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+        animate={{ scale: [1, 1.1, 1] }}
+        transition={{ duration: 6, ease: 'easeInOut', repeat: Infinity }}
       />
 
       <div className="absolute inset-0 flex flex-col items-center justify-center px-[8vw]">
 
+        {/* Intro: "Introducing" eyebrow + big PULZZ wordmark */}
         <motion.div
-          className="text-center mb-[3vh]"
-          initial={{ opacity: 0, y: 28 }}
-          animate={phase >= 1 ? { opacity: 1, y: 0 } : { opacity: 0, y: 28 }}
-          transition={{ duration: 0.6, ease }}
+          className="text-center mb-[4vh]"
+          initial={{ opacity: 0, y: 36 }}
+          animate={phase >= 1 ? { opacity: 1, y: 0 } : { opacity: 0, y: 36 }}
+          transition={{ duration: 1.0, ease }}
         >
-          <div className="bg-[#FF5C49]/10 px-[1.5vw] py-[0.5vw] rounded-full text-[#FF5C49] font-bold text-[1vw] uppercase tracking-widest inline-block mb-[1.5vw]">
-            Introducing Pulzz
+          <p className="text-[1.1vw] font-bold text-slate-400 uppercase tracking-[0.35em] mb-[1.2vw]">
+            Introducing
+          </p>
+          <div className="flex items-center justify-center gap-[1.5vw] mb-[2vw]">
+            <div className="w-[5vw] h-[5vw] rounded-[1.2vw] bg-[#FF5C49] flex items-center justify-center shadow-[0_12px_32px_rgba(255,92,73,0.35)]">
+              <div className="w-[1.8vw] h-[1.8vw] rounded-full bg-[#FBF8F2]" />
+            </div>
+            <h1 className="text-[7vw] font-black tracking-tight leading-none" style={{ fontFamily: 'var(--font-display)' }}>
+              <span className="text-[#1B2A4A]">Pul</span><span className="text-[#FF5C49]">zz</span>
+            </h1>
           </div>
-          <h2 className="text-[4.8vw] font-black leading-tight tracking-tight text-[#1B2A4A]" style={{ fontFamily: 'var(--font-display)' }}>
-            A space <span className="text-[#FF5C49]">before release day</span><br />
-            where emerging artists find their<br />first audience.
-          </h2>
+          <p className="text-[2vw] font-black text-[#1B2A4A] tracking-tight leading-tight">
+            A space <span className="text-[#FF5C49]">before release day</span> where emerging artists<br />find their first audience.
+          </p>
         </motion.div>
 
+        {/* Two-column cards */}
         <motion.div
           className="flex gap-[2.5vw] w-full max-w-[84vw]"
-          initial={{ opacity: 0, y: 20 }}
-          animate={phase >= 2 ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-          transition={{ duration: 0.6, ease }}
+          initial={{ opacity: 0, y: 24 }}
+          animate={phase >= 2 ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
+          transition={{ duration: 0.9, ease }}
         >
           <div className="flex-1 bg-white rounded-2xl shadow-lg border border-[#1B2A4A]/8 p-[1.8vw] text-left">
             <div className="flex items-center gap-[0.8vw] mb-[1.2vw]">
@@ -60,7 +69,7 @@ export function Scene2Why() {
               </div>
               <h3 className="text-[#3E5C99] font-black text-[1.3vw]">For Listeners</h3>
             </div>
-            <ul className="space-y-[0.5vw]">
+            <ul className="space-y-[0.55vw]">
               {[
                 'Discover unreleased tracks before anyone else',
                 'Mark the exact seconds that move you',
@@ -82,7 +91,7 @@ export function Scene2Why() {
               </div>
               <h3 className="text-[#FF5C49] font-black text-[1.3vw]">For Artists</h3>
             </div>
-            <ul className="space-y-[0.5vw]">
+            <ul className="space-y-[0.55vw]">
               {[
                 'Submit tracks to the Discovery Pool pre-release',
                 'Real-time reactions & moment-mark analytics',
@@ -102,7 +111,7 @@ export function Scene2Why() {
           className="mt-[2.5vh] flex items-center gap-[1.5vw]"
           initial={{ opacity: 0, y: 10 }}
           animate={phase >= 3 ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.7 }}
         >
           <div className="flex items-center gap-[0.5vw] bg-amber-50 border border-amber-200 px-[1.2vw] py-[0.5vw] rounded-full">
             <Star className="w-[1vw] h-[1vw] text-amber-500" fill="currentColor" />
