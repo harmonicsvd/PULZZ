@@ -7,8 +7,9 @@ export function Scene1Problem() {
   useEffect(() => {
     const timers = [
       setTimeout(() => setPhase(1), 500),
-      setTimeout(() => setPhase(2), 3500),
+      setTimeout(() => setPhase(2), 3000),
       setTimeout(() => setPhase(3), 6000),
+      setTimeout(() => setPhase(4), 9000),
     ];
     return () => timers.forEach(t => clearTimeout(t));
   }, []);
@@ -32,27 +33,66 @@ export function Scene1Problem() {
       />
 
       <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-[10vw]">
+        
+        {/* Phase 1 & 2 */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={phase >= 1 ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.95 }}
-          transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
-          className="text-[#FBF8F2]"
+          initial={{ opacity: 0, y: 20 }}
+          animate={
+            phase === 0 ? { opacity: 0, y: 20 } :
+            phase === 1 ? { opacity: 1, y: 0 } :
+            phase === 2 ? { opacity: 0.3, y: -20, scale: 0.95 } :
+            { opacity: 0, y: -40 }
+          }
+          transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+          className="absolute top-[30%]"
         >
-          <h2 className="text-[5vw] font-black leading-tight tracking-tight max-w-[60vw]" style={{ fontFamily: 'var(--font-display)' }}>
-            Artists release into <span className="text-white/40">silence.</span>
+          <h2 className="text-[3vw] font-medium text-[#FBF8F2] opacity-80" style={{ fontFamily: 'var(--font-display)' }}>
+            Listening has never been easier.
           </h2>
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={phase >= 2 ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-          transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
-          className="mt-[4vh]"
+          initial={{ opacity: 0, y: 20 }}
+          animate={
+            phase <= 1 ? { opacity: 0, y: 20 } :
+            phase === 2 ? { opacity: 1, y: 0 } :
+            { opacity: 0, y: -20 }
+          }
+          transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+          className="absolute top-[40%]"
         >
-          <p className="text-[2.2vw] text-slate-300/80 max-w-[55vw] font-medium leading-snug">
-            With no pre-release signal, great unreleased music has nowhere to be discovered early.
+          <h2 className="text-[3vw] font-medium text-[#FBF8F2] opacity-80" style={{ fontFamily: 'var(--font-display)' }}>
+            Distributing has never been easier.
+          </h2>
+        </motion.div>
+
+        {/* Phase 3: Discovery is broken */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={
+            phase >= 3 ? { opacity: 1, scale: 1, y: phase >= 4 ? -40 : 0 } : { opacity: 0, scale: 0.9 }
+          }
+          transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+          className="absolute z-10"
+        >
+          <h2 className="text-[6vw] font-black leading-tight tracking-tight text-[#FF5C49]" style={{ fontFamily: 'var(--font-display)' }}>
+            But discovery is broken.
+          </h2>
+        </motion.div>
+
+        {/* Phase 4: Artists can't... Listeners can't... */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={phase >= 4 ? { opacity: 1, y: 50 } : { opacity: 0, y: 30 }}
+          transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+          className="absolute z-10"
+        >
+          <p className="text-[2.2vw] text-slate-300 max-w-[60vw] font-medium leading-snug">
+            Artists can't get discovered.<br/>
+            <span className="opacity-80">Listeners can't find new talent.</span>
           </p>
         </motion.div>
+
       </div>
     </motion.div>
   );

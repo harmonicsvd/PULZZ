@@ -48,11 +48,11 @@ export function Scene2Why() {
           className="mt-[4vh] flex gap-[4vw]"
         >
           <div className="bg-white p-[2vw] rounded-2xl shadow-xl shadow-[#1B2A4A]/5 border border-[#1B2A4A]/10 w-[24vw]">
-            <h3 className="text-[#3E5C99] font-bold text-[1.5vw] mb-[1vw]">For Listeners</h3>
-            <p className="text-[1.2vw] text-slate-600 leading-snug">Hear tomorrow's music today and build your discovery reputation.</p>
+            <h3 className="text-[#3E5C99] font-bold text-[1.5vw] mb-[1vw]" style={{ fontFamily: 'var(--font-display)' }}>For Listeners</h3>
+            <p className="text-[1.2vw] text-slate-600 leading-snug">Catch a song's pulse before the drop and discover new music first.</p>
           </div>
           <div className="bg-white p-[2vw] rounded-2xl shadow-xl shadow-[#1B2A4A]/5 border border-[#1B2A4A]/10 w-[24vw]">
-            <h3 className="text-[#FF5C49] font-bold text-[1.5vw] mb-[1vw]">For Artists</h3>
+            <h3 className="text-[#FF5C49] font-bold text-[1.5vw] mb-[1vw]" style={{ fontFamily: 'var(--font-display)' }}>For Artists</h3>
             <p className="text-[1.2vw] text-slate-600 leading-snug">Get real feedback and find collaborators BEFORE release day.</p>
           </div>
         </motion.div>

@@ -9,12 +9,12 @@ import { Scene5Features } from './video_scenes/Scene5Features';
 import { Scene6Impact } from './video_scenes/Scene6Impact';
 
 export const SCENE_DURATIONS = {
-  problem: 9000,
-  why: 9000,
-  listener: 26000,
-  dashboard: 28000,
-  features: 18000,
-  impact: 14000
+  problem: 14000,
+  why: 12000,
+  listener: 32000,
+  dashboard: 32000,
+  features: 22000,
+  impact: 16000
 };
 
 const SCENE_COMPONENTS: Record<string, React.ComponentType> = {

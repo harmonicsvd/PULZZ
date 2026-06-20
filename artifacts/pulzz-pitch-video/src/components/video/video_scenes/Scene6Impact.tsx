@@ -8,9 +8,9 @@ export function Scene6Impact() {
     const timers = [
       setTimeout(() => setPhase(1), 500),
       setTimeout(() => setPhase(2), 2000), // Core message
-      setTimeout(() => setPhase(3), 5000), // Logo lockup
-      setTimeout(() => setPhase(4), 8000), // Tagline
-      setTimeout(() => setPhase(5), 13000),
+      setTimeout(() => setPhase(3), 5500), // Logo lockup
+      setTimeout(() => setPhase(4), 8500), // Tagline
+      setTimeout(() => setPhase(5), 14000),
     ];
     return () => timers.forEach(t => clearTimeout(t));
   }, []);
@@ -35,8 +35,8 @@ export function Scene6Impact() {
             transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
             className="absolute top-1/2 -translate-y-1/2"
           >
-            <h2 className="text-[3.5vw] font-medium text-[#1B2A4A] leading-snug max-w-[60vw]">
-              Release with <span className="font-bold text-[#FF5C49]">confidence</span>, <span className="font-bold text-[#FF5C49]">audience</span>, and <span className="font-bold text-[#FF5C49]">collaborators</span> already in place.
+            <h2 className="text-[5vw] font-black text-[#1B2A4A] leading-snug max-w-[60vw]" style={{ fontFamily: 'var(--font-display)' }}>
+              Discovery, <span className="text-[#FF5C49]">fixed.</span>
             </h2>
           </motion.div>
         )}
@@ -66,7 +66,7 @@ export function Scene6Impact() {
               className="mt-[2vh]"
             >
               <p className="text-[2vw] text-slate-500 font-medium tracking-wide">
-                The pre-release discovery platform.
+                Catch a song's pulse before the drop.
               </p>
             </motion.div>
           </motion.div>
