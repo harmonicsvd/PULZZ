@@ -42,12 +42,12 @@ export default function VideoTemplate({
   const SceneComponent = SCENE_COMPONENTS[baseSceneKey];
 
   return (
-    <div className="relative w-full h-screen overflow-hidden bg-[#0A0A0F]">
+    <div className="relative w-full h-screen overflow-hidden bg-[#FBF8F2]">
       {/* Persistent background layers */}
       <div className="absolute inset-0 pointer-events-none">
         <motion.div
           className="absolute w-[800px] h-[800px] rounded-full blur-[120px]"
-          style={{ background: 'radial-gradient(circle, rgba(123,97,255,0.4), transparent 70%)' }}
+          style={{ background: 'radial-gradient(circle, rgba(255,92,73,0.15), transparent 70%)' }}
           animate={{
             x: ['-20%', '40%', '-10%'],
             y: ['-20%', '30%', '-10%'],
@@ -57,7 +57,7 @@ export default function VideoTemplate({
         />
         <motion.div
           className="absolute w-[600px] h-[600px] rounded-full blur-[100px]"
-          style={{ background: 'radial-gradient(circle, rgba(255,60,110,0.3), transparent 70%)' }}
+          style={{ background: 'radial-gradient(circle, rgba(27,42,74,0.05), transparent 70%)' }}
           animate={{
             x: ['80%', '20%', '70%'],
             y: ['60%', '-10%', '50%'],

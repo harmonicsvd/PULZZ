@@ -25,9 +25,9 @@ export function Scene1Hook() {
     >
       <motion.img
         src={`${import.meta.env.BASE_URL}images/bg-waves.png`}
-        className="absolute inset-0 w-full h-full object-cover opacity-40 mix-blend-screen"
+        className="absolute inset-0 w-full h-full object-cover opacity-10 mix-blend-overlay invert"
         initial={{ scale: 1.2, opacity: 0 }}
-        animate={{ scale: 1, opacity: 0.4 }}
+        animate={{ scale: 1, opacity: 0.1 }}
         transition={{ duration: 8, ease: "easeOut" }}
       />
       
@@ -39,7 +39,7 @@ export function Scene1Hook() {
           className="overflow-hidden"
         >
           <h1 className="text-[8vw] font-black leading-[1.1] tracking-tight uppercase" style={{ fontFamily: 'var(--font-display)' }}>
-            <motion.span className="block text-white">Hear tomorrow's</motion.span>
+            <motion.span className="block text-[#1B2A4A]">Hear tomorrow's</motion.span>
           </h1>
         </motion.div>
         
@@ -50,7 +50,7 @@ export function Scene1Hook() {
           className="overflow-hidden"
         >
           <h1 className="text-[8vw] font-black leading-[1.1] tracking-tight uppercase" style={{ fontFamily: 'var(--font-display)' }}>
-            <motion.span className="block text-[#FF3C6E]">hits today.</motion.span>
+            <motion.span className="block text-[#FF5C49]">hits today.</motion.span>
           </h1>
         </motion.div>
 
@@ -58,14 +58,14 @@ export function Scene1Hook() {
           initial={{ scaleX: 0 }}
           animate={phase >= 3 ? { scaleX: 1 } : { scaleX: 0 }}
           transition={{ duration: 0.8, ease: "easeInOut" }}
-          className="w-[20vw] h-[4px] bg-[#7B61FF] mt-[4vh] origin-left"
+          className="w-[20vw] h-[4px] bg-[#1B2A4A]/20 mt-[4vh] origin-left"
         />
 
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={phase >= 4 ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ duration: 1, ease: "easeOut" }}
-          className="text-[2vw] text-white/70 mt-[4vh] font-medium tracking-wide max-w-[60vw]"
+          className="text-[2vw] text-[#1B2A4A]/70 mt-[4vh] font-medium tracking-wide max-w-[60vw]"
         >
           Before the release radar. Before the playlists.
         </motion.p>

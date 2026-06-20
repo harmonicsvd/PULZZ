@@ -19,7 +19,7 @@ export function Scene3Listener() {
 
   return (
     <motion.div
-      className="absolute inset-0 overflow-hidden bg-[#0A0A0F]"
+      className="absolute inset-0 overflow-hidden bg-[#FBF8F2]"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0, scale: 1.1 }}
@@ -27,7 +27,7 @@ export function Scene3Listener() {
     >
       <motion.img
         src={`${import.meta.env.BASE_URL}images/bg-audio.png`}
-        className="absolute inset-0 w-full h-full object-cover opacity-20 mix-blend-lighten"
+        className="absolute inset-0 w-full h-full object-cover opacity-[0.03] mix-blend-multiply invert"
         initial={{ x: '10%' }}
         animate={{ x: '-10%' }}
         transition={{ duration: 30, repeat: Infinity, ease: 'linear' }}
@@ -39,15 +39,15 @@ export function Scene3Listener() {
             initial={{ opacity: 0, y: 30 }}
             animate={phase >= 1 ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
           >
-            <h2 className="text-[4vw] font-black text-white leading-tight tracking-tight mb-4" style={{ fontFamily: 'var(--font-display)' }}>
+            <h2 className="text-[4vw] font-black text-[#1B2A4A] leading-tight tracking-tight mb-4" style={{ fontFamily: 'var(--font-display)' }}>
               Listen.<br/>
               <motion.span 
-                className="text-[#7B61FF] inline-block"
-                animate={phase >= 4 ? { scale: 1.1, color: '#FF3C6E' } : { scale: 1, color: '#7B61FF' }}
+                className="text-[#FF5C49] inline-block"
+                animate={phase >= 4 ? { scale: 1.1, color: '#FF5C49' } : { scale: 1, color: '#FF5C49' }}
               >Mark Moments.</motion.span><br/>
               React.
             </h2>
-            <p className="text-[1.5vw] text-white/70 mt-6 max-w-[25vw]">
+            <p className="text-[1.5vw] text-slate-600 mt-6 max-w-[25vw]">
               Be the first to discover. Drop pins on the exact seconds you love.
             </p>
           </motion.div>
@@ -56,28 +56,28 @@ export function Scene3Listener() {
         <div className="w-1/2 h-full relative z-10 flex items-center justify-center perspective-[1200px]">
           {/* Phone Mockup */}
           <motion.div
-            className="w-[22vw] h-[45vw] bg-[#1A1A24] rounded-[3vw] border-[0.8vw] border-[#2A2A35] overflow-hidden relative shadow-2xl"
+            className="w-[22vw] h-[45vw] bg-[#FEFCF7] rounded-[3vw] border-[0.8vw] border-[#1B2A4A] overflow-hidden relative shadow-2xl"
             initial={{ opacity: 0, y: 100, rotateY: 25, rotateX: 10 }}
             animate={phase >= 2 ? { opacity: 1, y: 0, rotateY: -15, rotateX: 5 } : { opacity: 0, y: 100, rotateY: 25, rotateX: 10 }}
             transition={{ duration: 1.5, type: 'spring', bounce: 0.2 }}
           >
             {/* App UI */}
-            <div className="absolute inset-0 bg-[#0A0A0F] flex flex-col items-center pt-[4vw]">
-              <div className="w-[16vw] h-[16vw] rounded-2xl bg-gradient-to-br from-[#7B61FF] to-[#FF3C6E] shadow-[0_0_40px_rgba(255,60,110,0.3)] mb-[2vw] relative overflow-hidden">
+            <div className="absolute inset-0 bg-[#FBF8F2] flex flex-col items-center pt-[4vw]">
+              <div className="w-[16vw] h-[16vw] rounded-2xl bg-gradient-to-br from-[#FF5C49] to-[#FF8A7A] shadow-[0_20px_40px_rgba(255,92,73,0.2)] mb-[2vw] relative overflow-hidden">
                 <motion.div 
-                  className="absolute inset-0 bg-white/20"
+                  className="absolute inset-0 bg-white/30"
                   animate={{ scale: [1, 1.2, 1], opacity: [0, 0.5, 0] }}
                   transition={{ duration: 2, repeat: Infinity }}
                 />
               </div>
               
-              <div className="text-white text-[1.5vw] font-bold">Midnight City</div>
-              <div className="text-white/60 text-[1vw]">The Midnight</div>
+              <div className="text-[#1B2A4A] text-[1.5vw] font-bold">Midnight City</div>
+              <div className="text-[#1B2A4A]/60 text-[1vw]">The Midnight</div>
               
               {/* Progress Bar */}
-              <div className="w-[18vw] h-[0.5vw] bg-white/10 rounded-full mt-[3vw] relative overflow-hidden">
+              <div className="w-[18vw] h-[0.5vw] bg-[#1B2A4A]/10 rounded-full mt-[3vw] relative overflow-hidden">
                 <motion.div 
-                  className="absolute left-0 top-0 bottom-0 bg-[#7B61FF] rounded-full"
+                  className="absolute left-0 top-0 bottom-0 bg-[#FF5C49] rounded-full"
                   initial={{ width: '0%' }}
                   animate={phase >= 3 ? { width: '60%' } : { width: '0%' }}
                   transition={{ duration: 8, ease: "linear" }}
@@ -86,7 +86,7 @@ export function Scene3Listener() {
                 {/* Moment Mark */}
                 {phase >= 4 && (
                   <motion.div 
-                    className="absolute top-1/2 -translate-y-1/2 w-[1vw] h-[1vw] bg-[#FF3C6E] rounded-full shadow-[0_0_10px_#FF3C6E]"
+                    className="absolute top-1/2 -translate-y-1/2 w-[1vw] h-[1vw] bg-[#1B2A4A] rounded-full shadow-[0_0_10px_rgba(27,42,74,0.3)]"
                     initial={{ scale: 0, left: '60%' }}
                     animate={{ scale: 1, left: '60%' }}
                     transition={{ type: 'spring', bounce: 0.6 }}
@@ -96,17 +96,17 @@ export function Scene3Listener() {
 
               {/* Action Buttons */}
               <div className="flex gap-[2vw] mt-[4vw]">
-                <div className="w-[4vw] h-[4vw] rounded-full bg-white/10 flex items-center justify-center">
-                  <div className="w-[1.5vw] h-[1.5vw] border-t-2 border-l-2 border-white -rotate-45" />
+                <div className="w-[4vw] h-[4vw] rounded-full bg-[#1B2A4A]/5 flex items-center justify-center">
+                  <div className="w-[1.5vw] h-[1.5vw] border-t-2 border-l-2 border-[#1B2A4A]/50 -rotate-45" />
                 </div>
                 <motion.div 
-                  className="w-[4vw] h-[4vw] rounded-full bg-[#7B61FF] flex items-center justify-center relative"
-                  animate={phase >= 5 ? { scale: [1, 1.2, 1], backgroundColor: '#10B981' } : {}}
+                  className="w-[4vw] h-[4vw] rounded-full bg-[#FF5C49] flex items-center justify-center relative"
+                  animate={phase >= 5 ? { scale: [1, 1.2, 1] } : {}}
                 >
                   <div className="w-[1vw] h-[1vw] border-r-2 border-b-2 border-white rotate-45 mb-[0.2vw]" />
                   {phase >= 5 && (
                     <motion.div 
-                      className="absolute -top-12 text-[#10B981] font-bold text-[1.2vw] whitespace-nowrap"
+                      className="absolute -top-12 text-[#FF5C49] font-bold text-[1.2vw] whitespace-nowrap"
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: -20 }}
                       exit={{ opacity: 0 }}
@@ -120,19 +120,19 @@ export function Scene3Listener() {
               {/* Earned Points Overlay */}
               {phase >= 6 && (
                 <motion.div 
-                  className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center"
+                  className="absolute inset-0 bg-white/90 backdrop-blur-sm flex flex-col items-center justify-center"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                 >
                   <motion.div 
-                    className="text-[#FF3C6E] text-[4vw] font-black"
+                    className="text-[#FF5C49] text-[4vw] font-black"
                     initial={{ scale: 0.5 }}
                     animate={{ scale: 1 }}
                     transition={{ type: 'spring' }}
                   >
                     +50
                   </motion.div>
-                  <div className="text-white text-[1.2vw] font-bold uppercase tracking-widest mt-2">Points Earned</div>
+                  <div className="text-[#1B2A4A] text-[1.2vw] font-bold uppercase tracking-widest mt-2">Points Earned</div>
                 </motion.div>
               )}
             </div>
