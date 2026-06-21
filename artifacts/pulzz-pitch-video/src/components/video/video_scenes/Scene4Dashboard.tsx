@@ -11,8 +11,8 @@ export function Scene4Dashboard() {
       setTimeout(() => setPhase(2), 2200),
       setTimeout(() => setPhase(3), 7000),  // Discovery Pool → 4.8 s
       setTimeout(() => setPhase(4), 12000), // Per-song → 5 s
-      setTimeout(() => setPhase(5), 19000), // Artist overall (collab wall = 7 s)
-      setTimeout(() => setPhase(6), 23500), // Your songs (artist overall = 4.5 s)
+      setTimeout(() => setPhase(5), 17000), // Artist overall (collab wall = 5 s)
+      setTimeout(() => setPhase(6), 21000), // Your songs (artist overall = 4 s)
     ];
     return () => timers.forEach(t => clearTimeout(t));
   }, []);

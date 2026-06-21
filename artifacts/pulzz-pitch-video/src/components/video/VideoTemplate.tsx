@@ -11,10 +11,10 @@ import { Scene6Impact } from './video_scenes/Scene6Impact';
 export const SCENE_DURATIONS = {
   problem: 13000,  // "Discovery is broken" at 11.2 s → 1.8 s linger
   why: 12000,      // last badge at 10.5 s → 1.5 s linger
-  listener: 27000,
-  dashboard: 29000,
-  features: 18000, // "all 3 together" at 13.5 s → 4.5 s linger
-  impact: 17000,
+  listener: 25000, // notification at 23 s → 2 s linger
+  dashboard: 23000, // "your songs" at 21 s → 2 s linger
+  features: 15500, // "all 3 together" at 13.5 s → 2 s linger
+  impact: 12000,   // partners at 10 s → 2 s linger
 };
 
 const SCENE_LABELS: Record<string, string> = {
