@@ -10,7 +10,7 @@ export function Scene6Impact() {
       setTimeout(() => setPhase(2), 1900),  // "new music." slides in from behind Discover
       setTimeout(() => setPhase(3), 4200),  // text fades OUT quicker → Pulzz enters sooner
       setTimeout(() => setPhase(4), 5800),  // tagline — 1.6 s after Pulzz appears
-      setTimeout(() => setPhase(5), 10000), // partners — ~7 s before scene end at 17000
+      setTimeout(() => setPhase(5), 7000),  // partners — appear earlier (~5 s visible before scene end)
     ];
     return () => timers.forEach(t => clearTimeout(t));
   }, []);

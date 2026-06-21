@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Repeat, ChevronDown, ChevronUp } from 'lucide-react';
+import { Repeat, ChevronDown, ChevronUp, Volume2, VolumeX } from 'lucide-react';
 import VideoTemplate, { SCENE_DURATIONS } from './VideoTemplate';
 import { useSceneControls } from './useSceneControls';
 
@@ -9,6 +9,8 @@ interface ControlBarProps {
   visible: boolean;
   collapsed: boolean;
   locked: boolean;
+  muted: boolean;
+  audioReady: boolean;
   sceneKeys: string[];
   activeIndex: number;
   activeDuration: number;
@@ -16,6 +18,7 @@ interface ControlBarProps {
   onToggleLock: () => void;
   onJumpTo: (index: number) => void;
   onToggleCollapsed: () => void;
+  onToggleMute: () => void;
 }
 
 function ProgressSegments({
@@ -65,8 +68,9 @@ function ProgressSegments({
 }
 
 function ControlBar({
-  visible, collapsed, locked, sceneKeys, activeIndex, activeDuration, tick,
-  onToggleLock, onJumpTo, onToggleCollapsed,
+  visible, collapsed, locked, muted, audioReady,
+  sceneKeys, activeIndex, activeDuration, tick,
+  onToggleLock, onJumpTo, onToggleCollapsed, onToggleMute,
 }: ControlBarProps) {
   return (
     <div
@@ -105,6 +109,23 @@ function ControlBar({
         {activeIndex + 1}/{sceneKeys.length}
       </div>
 
+      {/* Sound toggle — only shown once audio is ready */}
+      {audioReady && (
+        <button
+          onClick={onToggleMute}
+          className={`w-14 h-14 flex items-center justify-center transition-colors rounded-lg shrink-0 ${
+            muted
+              ? 'text-white/40 hover:text-white hover:bg-white/10'
+              : 'text-white bg-white/15 hover:bg-white/25'
+          }`}
+          title={muted ? 'Unmute background music' : 'Mute background music'}
+          aria-label={muted ? 'Unmute background music' : 'Mute background music'}
+          aria-pressed={!muted}
+        >
+          {muted ? <VolumeX className="w-8 h-8" /> : <Volume2 className="w-8 h-8" />}
+        </button>
+      )}
+
       <button
         onClick={onToggleCollapsed}
         className="w-14 h-14 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/10 transition-colors rounded-lg shrink-0"
@@ -127,26 +148,67 @@ export default function VideoWithControls() {
   } = useSceneControls(SCENE_DURATIONS);
 
   const sensorRef = useRef<HTMLDivElement | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const [collapsed, setCollapsed] = useState(false);
   const [hovering, setHovering] = useState(false);
   const [tapPinned, setTapPinned] = useState(false);
+  const [muted, setMuted] = useState(false);
+  const [audioReady, setAudioReady] = useState(false);
+  const audioStartedRef = useRef(false);
+
+  // Create audio element once on mount
+  useEffect(() => {
+    if (!isIframed) return;
+    const audio = new Audio('/audio/background.mp3');
+    audio.loop = true;
+    audio.volume = 0.35;
+    audio.preload = 'auto';
+    audioRef.current = audio;
+    audio.addEventListener('canplaythrough', () => setAudioReady(true), { once: true });
+    return () => {
+      audio.pause();
+      audioRef.current = null;
+    };
+  }, [isIframed]);
+
+  // Start playing on first user interaction (browsers require it)
+  const tryStartAudio = useCallback(() => {
+    if (audioStartedRef.current) return;
+    const audio = audioRef.current;
+    if (!audio) return;
+    audio.play().then(() => {
+      audioStartedRef.current = true;
+    }).catch(() => {
+      // autoplay blocked — user can toggle manually
+    });
+  }, []);
 
   const handlePointerEnter = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
-    if (e.pointerType === 'mouse') setHovering(true);
-  }, []);
+    if (e.pointerType === 'mouse') { setHovering(true); tryStartAudio(); }
+  }, [tryStartAudio]);
   const handlePointerLeave = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
     if (e.pointerType === 'mouse') setHovering(false);
   }, []);
   const handlePointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    tryStartAudio();
     if (e.pointerType === 'mouse') return;
     if (collapsed) setTapPinned(true);
-  }, [collapsed]);
+  }, [collapsed, tryStartAudio]);
   const handleToggleCollapsed = useCallback(() => {
     setCollapsed(c => {
       if (!c) { setHovering(false); setTapPinned(false); }
       return !c;
     });
   }, []);
+
+  const handleToggleMute = useCallback(() => {
+    setMuted(m => {
+      const next = !m;
+      if (audioRef.current) audioRef.current.muted = next;
+      if (!next) tryStartAudio();
+      return next;
+    });
+  }, [tryStartAudio]);
 
   useEffect(() => {
     if (!(collapsed && tapPinned)) return;
@@ -165,7 +227,10 @@ export default function VideoWithControls() {
   if (!isIframed) return <VideoTemplate />;
 
   return (
-    <div className="relative w-full h-screen">
+    <div
+      className="relative w-full h-screen"
+      onClick={tryStartAudio}
+    >
       <VideoTemplate
         key={mountKey}
         durations={durations}
@@ -186,6 +251,8 @@ export default function VideoWithControls() {
           visible={barVisible}
           collapsed={collapsed}
           locked={locked}
+          muted={muted}
+          audioReady={audioReady}
           sceneKeys={sceneKeys}
           activeIndex={activeIndex}
           activeDuration={activeDuration}
@@ -193,6 +260,7 @@ export default function VideoWithControls() {
           onToggleLock={toggleLock}
           onJumpTo={jumpTo}
           onToggleCollapsed={handleToggleCollapsed}
+          onToggleMute={handleToggleMute}
         />
       </div>
     </div>

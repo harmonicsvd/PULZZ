@@ -303,6 +303,7 @@ export function Scene4Dashboard() {
                     <div className="text-[#1B2A4A] text-[1.1vw] font-bold">
                       {phase >= 6 ? 'Your Songs' : 'Streaming Stats'}
                     </div>
+                    <span className="text-[0.82vw] font-semibold text-[#1B2A4A]/60 ml-[0.2vw]">· Bessie Smith</span>
                     <span className="text-[0.72vw] text-slate-400 ml-[0.4vw]">Songstats Enterprise</span>
                     <span className="bg-emerald-100 text-emerald-700 text-[0.65vw] font-bold px-[0.6vw] py-[0.15vw] rounded-full ml-auto flex items-center gap-[0.3vw]">
                       <div className="w-[0.4vw] h-[0.4vw] bg-emerald-500 rounded-full" />Live
@@ -336,8 +337,8 @@ export function Scene4Dashboard() {
                     <div className="flex flex-col gap-[0.9vw]">
                       {[
                         { title: 'St. Louis Blues', artist: 'Bessie Smith', spotify: '480K', apple: '320K', playlist: '1.8M', trend: '+12%' },
-                        { title: "After You've Gone", artist: 'Marion Harris', spotify: '390K', apple: '280K', playlist: '1.2M', trend: '+8%' },
-                        { title: 'Danny Boy', artist: 'Ernestine S.', spotify: '210K', apple: '180K', playlist: '900K', trend: '+5%' },
+                        { title: 'Downhearted Blues', artist: 'Bessie Smith', spotify: '390K', apple: '280K', playlist: '1.2M', trend: '+8%' },
+                        { title: 'Back Water Blues', artist: 'Bessie Smith', spotify: '210K', apple: '180K', playlist: '900K', trend: '+5%' },
                       ].map((song, i) => (
                         <motion.div
                           key={i}
