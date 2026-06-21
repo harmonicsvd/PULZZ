@@ -9,12 +9,12 @@ export function Scene3Listener() {
     const timers = [
       setTimeout(() => setPhase(1), 500),   // Full-screen tagline — 2.5 s
       setTimeout(() => setPhase(2), 3000),  // Phone + copy appears
-      setTimeout(() => setPhase(3), 7700),  // Song playing
-      setTimeout(() => setPhase(4), 11700), // Moment marked
-      setTimeout(() => setPhase(5), 15200), // Reactions unlocked
-      setTimeout(() => setPhase(6), 18200), // Discovered tapped
-      setTimeout(() => setPhase(7), 21700), // Discoveries view
-      setTimeout(() => setPhase(8), 25200), // Notification
+      setTimeout(() => setPhase(3), 6000),  // Song playing (progress bar starts)
+      setTimeout(() => setPhase(4), 9500),  // Moment marked (mark pops sooner)
+      setTimeout(() => setPhase(5), 13000), // Reactions unlocked
+      setTimeout(() => setPhase(6), 16000), // Discovered tapped
+      setTimeout(() => setPhase(7), 19500), // Discoveries view
+      setTimeout(() => setPhase(8), 23000), // Notification
     ];
     return () => timers.forEach(t => clearTimeout(t));
   }, []);
@@ -26,8 +26,8 @@ export function Scene3Listener() {
       className="absolute inset-0 overflow-hidden bg-[#FBF8F2]"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      exit={{ opacity: 0, scale: 1.04 }}
-      transition={{ duration: 0.6 }}
+      exit={{ opacity: 0, scale: 1.03 }}
+      transition={{ duration: 0.4 }}
     >
       {/* Full-screen tagline — phase 1 only */}
       <motion.div

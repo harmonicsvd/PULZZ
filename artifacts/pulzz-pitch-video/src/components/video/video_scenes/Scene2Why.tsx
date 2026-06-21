@@ -19,7 +19,7 @@ export function Scene2Why() {
     const timers = [
       setTimeout(() => setPhase(1), 400),  // "Introducing" label + logo spring-in
       setTimeout(() => setPhase(2), 2000), // subtitle fades in — right as logo settles
-      setTimeout(() => setPhase(3), 5500), // cards slide in
+      setTimeout(() => setPhase(3), 4000), // cards slide in
       setTimeout(() => setPhase(4), 10500),// badges
     ];
     return () => timers.forEach(t => clearTimeout(t));
@@ -32,8 +32,8 @@ export function Scene2Why() {
       className="absolute inset-0 overflow-hidden bg-[#FBF8F2]"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      exit={{ opacity: 0, filter: 'blur(8px)' }}
-      transition={{ duration: 0.7 }}
+      exit={{ opacity: 0, filter: 'blur(6px)' }}
+      transition={{ duration: 0.4 }}
     >
       <motion.div
         className="absolute w-[65vw] h-[65vw] bg-[#FF5C49]/8 rounded-full blur-[140px] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"

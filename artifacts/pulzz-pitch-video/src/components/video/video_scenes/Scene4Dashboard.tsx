@@ -9,10 +9,10 @@ export function Scene4Dashboard() {
     const timers = [
       setTimeout(() => setPhase(1), 500),
       setTimeout(() => setPhase(2), 2200),
-      setTimeout(() => setPhase(3), 7000),  // Discovery Pool → 4.8 s (was 7.3 s)
-      setTimeout(() => setPhase(4), 14500), // Per-song → 7.5 s (was 8.5 s)
-      setTimeout(() => setPhase(5), 26000), // Artist overall
-      setTimeout(() => setPhase(6), 30000), // Your songs
+      setTimeout(() => setPhase(3), 7000),  // Discovery Pool → 4.8 s
+      setTimeout(() => setPhase(4), 12000), // Per-song → 5 s
+      setTimeout(() => setPhase(5), 19000), // Artist overall (collab wall = 7 s)
+      setTimeout(() => setPhase(6), 23500), // Your songs (artist overall = 4.5 s)
     ];
     return () => timers.forEach(t => clearTimeout(t));
   }, []);
@@ -70,13 +70,14 @@ export function Scene4Dashboard() {
           animate={phase >= 2 ? { y: '0%' } : { y: '100%' }}
           transition={{ duration: 1.0, ease }}
         >
-          <AnimatePresence mode="popLayout">
+          {/* mode="wait" — each panel fully exits before the next enters */}
+          <AnimatePresence mode="wait">
 
             {/* DISCOVERY POOL OVERVIEW */}
             {phase === 2 && (
               <motion.div key="overview" className="flex flex-col gap-[1.6vw] flex-1"
                 initial={{ opacity: 0, x: -18 }} animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 18 }} transition={{ duration: 0.55 }}>
+                exit={{ opacity: 0, x: 18 }} transition={{ duration: 0.3 }}>
                 <div className="grid grid-cols-4 gap-[1vw]">
                   {[
                     { label: 'Listeners', val: '12,408', icon: Users, color: '#3E5C99' },
@@ -124,7 +125,7 @@ export function Scene4Dashboard() {
             {phase === 3 && (
               <motion.div key="per-song" className="flex flex-col gap-[1.4vw] flex-1"
                 initial={{ opacity: 0, x: -18 }} animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 18 }} transition={{ duration: 0.55 }}>
+                exit={{ opacity: 0, x: 18 }} transition={{ duration: 0.3 }}>
                 <div className="flex items-center gap-[1vw]">
                   <div className="w-[3.5vw] h-[3.5vw] rounded-lg bg-[#1B2A4A]" />
                   <div>
@@ -231,7 +232,7 @@ export function Scene4Dashboard() {
             {phase === 4 && (
               <motion.div key="collab" className="flex flex-col gap-[1.8vw] flex-1 items-center justify-center"
                 initial={{ opacity: 0, scale: 0.92 }} animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 1.05 }} transition={{ duration: 0.6 }}>
+                exit={{ opacity: 0, scale: 1.05 }} transition={{ duration: 0.3 }}>
                 <div className="text-center mb-[1vw]">
                   <div className="flex items-center justify-center gap-[0.8vw] mb-[1vw]">
                     <Handshake className="w-[2vw] h-[2vw] text-[#FF5C49]" />
@@ -276,7 +277,7 @@ export function Scene4Dashboard() {
                 className="flex flex-col gap-[1.6vw] flex-1"
                 initial={{ opacity: 0, x: phase >= 6 ? 18 : -18 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.55 }}>
+                transition={{ duration: 0.3 }}>
 
                 {/* Tab bar — active tab animates */}
                 <div className="flex gap-[0.8vw] mb-[0.4vw]">

@@ -9,11 +9,11 @@ import { Scene5Features } from './video_scenes/Scene5Features';
 import { Scene6Impact } from './video_scenes/Scene6Impact';
 
 export const SCENE_DURATIONS = {
-  problem: 13000,  // "Discovery is broken" appears at 11.2 s → 1.8 s then next scene
-  why: 13000,      // last badge at 10.5 s → 2.5 s then next scene
-  listener: 29000,
-  dashboard: 34000,
-  features: 18000, // "all 3 together" appears at 13.5 s → 4.5 s then next scene
+  problem: 13000,  // "Discovery is broken" at 11.2 s → 1.8 s linger
+  why: 12000,      // last badge at 10.5 s → 1.5 s linger
+  listener: 27000,
+  dashboard: 29000,
+  features: 18000, // "all 3 together" at 13.5 s → 4.5 s linger
   impact: 17000,
 };
 
@@ -130,7 +130,8 @@ export default function VideoTemplate({
 
   return (
     <div className="relative w-full h-screen overflow-hidden bg-[#0A1122]">
-      <AnimatePresence mode="popLayout">
+      {/* mode="wait" — outgoing scene fully exits before incoming one enters (no overlap) */}
+      <AnimatePresence mode="wait">
         {SceneComponent && <SceneComponent key={currentSceneKey} />}
       </AnimatePresence>
 

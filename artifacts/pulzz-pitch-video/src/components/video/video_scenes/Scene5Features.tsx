@@ -98,7 +98,7 @@ export function Scene5Features() {
         </motion.div>
 
         <div className="flex-1 flex items-center justify-center">
-          <AnimatePresence mode="popLayout">
+          <AnimatePresence mode="wait">
 
             {currentApi && (
               <motion.div
@@ -107,7 +107,7 @@ export function Scene5Features() {
                 initial={{ opacity: 0, scale: 0.88, y: 16 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 1.04, y: -16 }}
-                transition={{ duration: 0.45, ease }}
+                transition={{ duration: 0.3, ease }}
               >
                 <div className="flex items-start gap-[1.5vw] mb-[2vw]">
                   <div className={`w-[4.5vw] h-[4.5vw] rounded-2xl ${currentApi.iconBg} flex items-center justify-center shrink-0`}>
