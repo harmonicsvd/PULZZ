@@ -11,7 +11,8 @@ export function Scene4Dashboard() {
       setTimeout(() => setPhase(2), 2200),
       setTimeout(() => setPhase(3), 9500),
       setTimeout(() => setPhase(4), 18000),
-      setTimeout(() => setPhase(5), 26000),
+      setTimeout(() => setPhase(5), 26000), // Artist overall
+      setTimeout(() => setPhase(6), 30000), // Your songs
     ];
     return () => timers.forEach(t => clearTimeout(t));
   }, []);
@@ -23,6 +24,7 @@ export function Scene4Dashboard() {
     3: 'Per-song analytics: reactions, moment marks, Sound DNA and lyric analysis.',
     4: 'Find collaborators whose sound matches yours — on the Collaboration Wall.',
     5: 'Post-release: track your song across every streaming platform via Songstats.',
+    6: 'Drill into each song — see which tracks are breaking out on which platforms.',
   };
 
   return (
@@ -268,42 +270,108 @@ export function Scene4Dashboard() {
               </motion.div>
             )}
 
-            {/* SONGSTATS POST-RELEASE */}
+            {/* SONGSTATS — Artist overall (phase 5) then Your songs (phase 6) */}
             {phase >= 5 && (
-              <motion.div key="streaming" className="flex flex-col gap-[1.6vw] flex-1"
-                initial={{ opacity: 0, x: -18 }} animate={{ opacity: 1, x: 0 }}
+              <motion.div key={phase >= 6 ? 'your-songs' : 'artist-overall'}
+                className="flex flex-col gap-[1.6vw] flex-1"
+                initial={{ opacity: 0, x: phase >= 6 ? 18 : -18 }}
+                animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.55 }}>
+
+                {/* Tab bar — active tab animates */}
                 <div className="flex gap-[0.8vw] mb-[0.4vw]">
-                  <div className="bg-[#1B2A4A] text-white px-[1.3vw] py-[0.45vw] rounded-full font-bold text-[0.9vw]">Artist overall</div>
-                  <div className="bg-slate-100 text-slate-400 px-[1.3vw] py-[0.45vw] rounded-full font-bold text-[0.9vw]">Your songs</div>
+                  <motion.div
+                    className="px-[1.3vw] py-[0.45vw] rounded-full font-bold text-[0.9vw]"
+                    animate={phase >= 6
+                      ? { backgroundColor: '#F1F5F9', color: '#94a3b8' }
+                      : { backgroundColor: '#1B2A4A', color: '#ffffff' }}
+                    transition={{ duration: 0.35 }}
+                  >Artist overall</motion.div>
+                  <motion.div
+                    className="px-[1.3vw] py-[0.45vw] rounded-full font-bold text-[0.9vw]"
+                    animate={phase >= 6
+                      ? { backgroundColor: '#1B2A4A', color: '#ffffff' }
+                      : { backgroundColor: '#F1F5F9', color: '#94a3b8' }}
+                    transition={{ duration: 0.35 }}
+                  >Your songs</motion.div>
                 </div>
+
                 <div className="bg-white rounded-xl border border-[#1B2A4A]/5 p-[1.4vw] shadow-sm flex-1">
-                  <div className="flex items-center gap-[0.5vw] mb-[1.6vw]">
+                  <div className="flex items-center gap-[0.5vw] mb-[1.4vw]">
                     <BarChart2 className="w-[1.4vw] h-[1.4vw] text-[#3E5C99]" />
-                    <div className="text-[#1B2A4A] text-[1.1vw] font-bold">Streaming Stats</div>
+                    <div className="text-[#1B2A4A] text-[1.1vw] font-bold">
+                      {phase >= 6 ? 'Your Songs' : 'Streaming Stats'}
+                    </div>
                     <span className="text-[0.72vw] text-slate-400 ml-[0.4vw]">Songstats Enterprise</span>
                     <span className="bg-emerald-100 text-emerald-700 text-[0.65vw] font-bold px-[0.6vw] py-[0.15vw] rounded-full ml-auto flex items-center gap-[0.3vw]">
                       <div className="w-[0.4vw] h-[0.4vw] bg-emerald-500 rounded-full" />Live
                     </span>
                   </div>
-                  <div className="grid grid-cols-2 gap-[1.4vw]">
-                    {[
-                      { label: 'Spotify Streams', val: '1.2M', color: '#1DB954', Icon: Music2 },
-                      { label: 'Apple Music', val: '850K', color: '#FA243C', Icon: Music2 },
-                      { label: 'Playlist Reach', val: '4.5M', color: '#f59e0b', Icon: Globe },
-                      { label: 'Chart Entries', val: '12', color: '#8b5cf6', Icon: Activity },
-                    ].map(({ label, val, color, Icon }, i) => (
-                      <div key={i} className="bg-slate-50 p-[1.2vw] rounded-xl border border-slate-100 flex items-center gap-[0.9vw]">
-                        <div className="w-[2.8vw] h-[2.8vw] rounded-full flex items-center justify-center" style={{ background: `${color}20` }}>
-                          <Icon className="w-[1.4vw] h-[1.4vw]" style={{ color }} />
+
+                  {/* Artist overall content */}
+                  {phase < 6 && (
+                    <div className="grid grid-cols-2 gap-[1.4vw]">
+                      {[
+                        { label: 'Spotify Streams', val: '1.2M', color: '#1DB954', Icon: Music2 },
+                        { label: 'Apple Music', val: '850K', color: '#FA243C', Icon: Music2 },
+                        { label: 'Playlist Reach', val: '4.5M', color: '#f59e0b', Icon: Globe },
+                        { label: 'Chart Entries', val: '12', color: '#8b5cf6', Icon: Activity },
+                      ].map(({ label, val, color, Icon }, i) => (
+                        <div key={i} className="bg-slate-50 p-[1.2vw] rounded-xl border border-slate-100 flex items-center gap-[0.9vw]">
+                          <div className="w-[2.8vw] h-[2.8vw] rounded-full flex items-center justify-center" style={{ background: `${color}20` }}>
+                            <Icon className="w-[1.4vw] h-[1.4vw]" style={{ color }} />
+                          </div>
+                          <div>
+                            <div className="text-[0.8vw] text-slate-500">{label}</div>
+                            <div className="text-[1.8vw] font-bold text-[#1B2A4A]">{val}</div>
+                          </div>
                         </div>
-                        <div>
-                          <div className="text-[0.8vw] text-slate-500">{label}</div>
-                          <div className="text-[1.8vw] font-bold text-[#1B2A4A]">{val}</div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Your songs content */}
+                  {phase >= 6 && (
+                    <div className="flex flex-col gap-[0.9vw]">
+                      {[
+                        { title: 'St. Louis Blues', artist: 'Bessie Smith', spotify: '480K', apple: '320K', playlist: '1.8M', trend: '+12%' },
+                        { title: "After You've Gone", artist: 'Marion Harris', spotify: '390K', apple: '280K', playlist: '1.2M', trend: '+8%' },
+                        { title: 'Danny Boy', artist: 'Ernestine S.', spotify: '210K', apple: '180K', playlist: '900K', trend: '+5%' },
+                      ].map((song, i) => (
+                        <motion.div
+                          key={i}
+                          className="bg-slate-50 rounded-xl border border-slate-100 p-[1vw] flex items-center gap-[1vw]"
+                          initial={{ opacity: 0, y: 12 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: i * 0.1 + 0.15 }}
+                        >
+                          <div className="w-[3vw] h-[3vw] rounded-lg bg-[#1B2A4A] shrink-0" style={{ opacity: 0.65 + i * 0.12 }} />
+                          <div className="flex-1 min-w-0">
+                            <div className="text-[0.95vw] font-bold text-[#1B2A4A] truncate">{song.title}</div>
+                            <div className="text-[0.72vw] text-slate-500 truncate">{song.artist}</div>
+                          </div>
+                          <div className="flex gap-[1.5vw] shrink-0">
+                            <div className="text-center">
+                              <div className="text-[0.65vw] text-slate-400 mb-[0.1vw]">Spotify</div>
+                              <div className="text-[0.9vw] font-bold text-[#1DB954]">{song.spotify}</div>
+                            </div>
+                            <div className="text-center">
+                              <div className="text-[0.65vw] text-slate-400 mb-[0.1vw]">Apple</div>
+                              <div className="text-[0.9vw] font-bold text-[#FA243C]">{song.apple}</div>
+                            </div>
+                            <div className="text-center">
+                              <div className="text-[0.65vw] text-slate-400 mb-[0.1vw]">Playlists</div>
+                              <div className="text-[0.9vw] font-bold text-amber-500">{song.playlist}</div>
+                            </div>
+                            <div className="text-center">
+                              <div className="text-[0.65vw] text-slate-400 mb-[0.1vw]">7d</div>
+                              <div className="text-[0.9vw] font-bold text-emerald-500">{song.trend}</div>
+                            </div>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </motion.div>
             )}

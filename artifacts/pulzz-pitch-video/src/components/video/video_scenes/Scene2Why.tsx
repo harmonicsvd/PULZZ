@@ -18,7 +18,7 @@ export function Scene2Why() {
   useEffect(() => {
     const timers = [
       setTimeout(() => setPhase(1), 400),  // "Introducing" label + logo spring-in
-      setTimeout(() => setPhase(2), 3200), // subtitle fades in
+      setTimeout(() => setPhase(2), 2000), // subtitle fades in — right as logo settles
       setTimeout(() => setPhase(3), 5500), // cards slide in
       setTimeout(() => setPhase(4), 10500),// badges
     ];

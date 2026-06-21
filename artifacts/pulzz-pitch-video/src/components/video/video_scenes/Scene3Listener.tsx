@@ -144,7 +144,7 @@ export function Scene3Listener() {
                 {phase >= 4 && (
                   <motion.div
                     className="absolute top-1/2 w-[0.8vw] h-[0.8vw] bg-amber-500 rounded-full shadow-[0_0_8px_rgba(245,158,11,0.5)]"
-                    style={{ left: '58%', transform: 'translate(-50%, -50%)' }}
+                    style={{ left: '29%', transform: 'translate(-50%, -50%)' }}
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     transition={{ type: 'spring', bounce: 0.55 }}
