@@ -171,6 +171,7 @@ export default function VideoWithControls() {
         durations={durations}
         loop
         onSceneChange={onSceneChange}
+        controlled
       />
       <div
         ref={sensorRef}

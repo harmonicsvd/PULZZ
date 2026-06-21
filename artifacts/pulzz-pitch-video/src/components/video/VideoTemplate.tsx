@@ -41,10 +41,12 @@ export default function VideoTemplate({
   durations = SCENE_DURATIONS,
   loop = true,
   onSceneChange,
+  controlled = false,
 }: {
   durations?: Record<string, number>;
   loop?: boolean;
   onSceneChange?: (sceneKey: string) => void;
+  controlled?: boolean;
 } = {}) {
   const { currentScene, currentSceneKey, paused, jumpToScene, togglePause } = useVideoPlayer({ durations, loop });
   const [progress, setProgress] = useState(0);
@@ -131,7 +133,8 @@ export default function VideoTemplate({
   return (
     <div className="relative w-full h-screen overflow-hidden bg-[#0A1122]">
       {/* mode="wait" — outgoing scene fully exits before incoming one enters (no overlap) */}
-      <AnimatePresence mode="wait">
+      {/* initial={false} — first scene skips entrance animation (avoids opacity:0 stall on mount) */}
+      <AnimatePresence mode="wait" initial={false}>
         {SceneComponent && <SceneComponent key={currentSceneKey} />}
       </AnimatePresence>
 
@@ -156,8 +159,8 @@ export default function VideoTemplate({
         )}
       </AnimatePresence>
 
-      {/* Scene Navigator — positioned clear of the bottom edge */}
-      <motion.div
+      {/* Scene Navigator — hidden when an external control bar is managing the UI */}
+      {!controlled && <motion.div
         className="absolute left-0 right-0 z-50 flex justify-center"
         style={{ bottom: '7vh' }}
         animate={{ opacity: navVisible ? 1 : 0, y: navVisible ? 0 : 10 }}
@@ -209,7 +212,7 @@ export default function VideoTemplate({
             ))}
           </div>
         </div>
-      </motion.div>
+      </motion.div>}
     </div>
   );
 }

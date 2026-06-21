@@ -18,10 +18,6 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Landing Page"
-
-[[workflows.workflow.tasks]]
-task = "workflow.run"
 args = "API Server"
 
 [[workflows.workflow.tasks]]
@@ -32,17 +28,9 @@ args = "Artist Dashboard"
 task = "workflow.run"
 args = "pulzz-pitch-video"
 
-[[workflows.workflow]]
-name = "Landing Page"
-author = "agent"
-
 [[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "PORT=5000 BASE_PATH=/ pnpm --filter @workspace/pulzz-landing run dev"
-waitForPort = 5000
-
-[workflows.workflow.metadata]
-outputType = "webview"
+task = "workflow.run"
+args = "Pitch Video"
 
 [[workflows.workflow]]
 name = "API Server"
@@ -79,6 +67,18 @@ waitForPort = 4200
 
 [workflows.workflow.metadata]
 outputType = "console"
+
+[[workflows.workflow]]
+name = "Pitch Video"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "PORT=5000 BASE_PATH=/ pnpm --filter @workspace/pulzz-pitch-video run dev"
+waitForPort = 5000
+
+[workflows.workflow.metadata]
+outputType = "webview"
 
 [agent]
 stack = "BEST_EFFORT_FALLBACK"
@@ -123,6 +123,10 @@ externalPort = 5000
 [[ports]]
 localPort = 24558
 externalPort = 4200
+
+[[ports]]
+localPort = 5000
+externalPort = 80
 
 [nix]
 channel = "stable-25_05"

@@ -7,7 +7,7 @@ export function Scene1Problem() {
   useEffect(() => {
     // Even spacing — each line shows for ~3.5 s before the next
     const timers = [
-      setTimeout(() => setPhase(1), 700),   // "Streaming is a crowded jungle."
+      setTimeout(() => setPhase(1), 50),    // "Streaming is a crowded jungle." — near-instant so screen isn't blank
       setTimeout(() => setPhase(2), 4200),  // "Emerging artists get buried…"
       setTimeout(() => setPhase(3), 7700),  // "Listeners miss rising talent…"
       setTimeout(() => setPhase(4), 11200), // "Discovery is broken." — lingers ~5.8 s
