@@ -10,7 +10,7 @@ export function Scene6Impact() {
       setTimeout(() => setPhase(2), 1900),  // "new music." slides in from behind Discover
       setTimeout(() => setPhase(3), 5500),  // text fades OUT → Pulzz waits for exit (mode="wait")
       setTimeout(() => setPhase(4), 7200),  // tagline — 1.7 s after Pulzz appears
-      setTimeout(() => setPhase(5), 12000), // partners — ~5 s before scene end at 17000
+      setTimeout(() => setPhase(5), 10000), // partners — ~7 s before scene end at 17000
     ];
     return () => timers.forEach(t => clearTimeout(t));
   }, []);
@@ -63,16 +63,22 @@ export function Scene6Impact() {
                   Discover
                 </motion.span>
 
-                {/* "new music." starts AT the position of Discover (x = -100% of its own width)
-                    then springs right to its natural position — looks like it slides from behind. */}
-                <motion.span
-                  className="text-[#FF5C49]"
-                  initial={{ x: '-100%', opacity: 0 }}
-                  animate={phase >= 2 ? { x: 0, opacity: 1 } : { x: '-100%', opacity: 0 }}
-                  transition={{ type: 'spring', stiffness: 55, damping: 11, delay: 0.04 }}
-                >
-                  &nbsp;new music.
-                </motion.span>
+                {/*
+                  Clipping wrapper — same inline-block width as the text inside.
+                  overflow:hidden clips the child while it starts at x:-100%
+                  (fully to the left, hidden behind "Discover"), then springs
+                  rightward into its final position.
+                */}
+                <span style={{ overflow: 'hidden', display: 'inline-block', verticalAlign: 'baseline' }}>
+                  <motion.span
+                    className="text-[#FF5C49] inline-block"
+                    initial={{ x: '-100%' }}
+                    animate={phase >= 2 ? { x: 0 } : { x: '-100%' }}
+                    transition={{ type: 'spring', stiffness: 55, damping: 11, delay: 0.06 }}
+                  >
+                    &nbsp;new music.
+                  </motion.span>
+                </span>
               </h2>
             </motion.div>
           )}
