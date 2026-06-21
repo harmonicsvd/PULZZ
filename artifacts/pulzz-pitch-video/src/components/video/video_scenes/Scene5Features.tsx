@@ -8,7 +8,7 @@ export function Scene5Features() {
   useEffect(() => {
     const timers = [
       setTimeout(() => setPhase(1), 300),
-      setTimeout(() => setPhase(2), 1600),
+      setTimeout(() => setPhase(2), 700),  // Cyanite card fades in sooner
       setTimeout(() => setPhase(3), 5800),
       setTimeout(() => setPhase(4), 10000),
       setTimeout(() => setPhase(5), 13500),

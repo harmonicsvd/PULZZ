@@ -9,7 +9,7 @@ import { Scene5Features } from './video_scenes/Scene5Features';
 import { Scene6Impact } from './video_scenes/Scene6Impact';
 
 export const SCENE_DURATIONS = {
-  problem: 14500,  // "Discovery is broken" appears at 11.2 s → 3.3 s then next scene
+  problem: 13000,  // "Discovery is broken" appears at 11.2 s → 1.8 s then next scene
   why: 13000,      // last badge at 10.5 s → 2.5 s then next scene
   listener: 29000,
   dashboard: 34000,

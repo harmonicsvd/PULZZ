@@ -8,7 +8,7 @@ export function Scene6Impact() {
     const timers = [
       setTimeout(() => setPhase(1), 600),   // "Discover" appears solo ~1.3 s
       setTimeout(() => setPhase(2), 1900),  // "new music." slides in from behind Discover
-      setTimeout(() => setPhase(3), 5500),  // text fades OUT → Pulzz waits for exit (mode="wait")
+      setTimeout(() => setPhase(3), 4200),  // text fades OUT quicker → Pulzz enters sooner
       setTimeout(() => setPhase(4), 7200),  // tagline — 1.7 s after Pulzz appears
       setTimeout(() => setPhase(5), 10000), // partners — ~7 s before scene end at 17000
     ];

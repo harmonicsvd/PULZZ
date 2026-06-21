@@ -9,8 +9,8 @@ export function Scene4Dashboard() {
     const timers = [
       setTimeout(() => setPhase(1), 500),
       setTimeout(() => setPhase(2), 2200),
-      setTimeout(() => setPhase(3), 9500),
-      setTimeout(() => setPhase(4), 18000),
+      setTimeout(() => setPhase(3), 7000),  // Discovery Pool → 4.8 s (was 7.3 s)
+      setTimeout(() => setPhase(4), 14500), // Per-song → 7.5 s (was 8.5 s)
       setTimeout(() => setPhase(5), 26000), // Artist overall
       setTimeout(() => setPhase(6), 30000), // Your songs
     ];

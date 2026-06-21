@@ -7,8 +7,8 @@ export function Scene3Listener() {
 
   useEffect(() => {
     const timers = [
-      setTimeout(() => setPhase(1), 500),   // Full-screen tagline — 3.5 s
-      setTimeout(() => setPhase(2), 4000),  // Phone + copy appears
+      setTimeout(() => setPhase(1), 500),   // Full-screen tagline — 2.5 s
+      setTimeout(() => setPhase(2), 3000),  // Phone + copy appears
       setTimeout(() => setPhase(3), 7700),  // Song playing
       setTimeout(() => setPhase(4), 11700), // Moment marked
       setTimeout(() => setPhase(5), 15200), // Reactions unlocked
