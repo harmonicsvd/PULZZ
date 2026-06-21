@@ -274,8 +274,8 @@ export function Scene4Dashboard() {
                 initial={{ opacity: 0, x: -18 }} animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.55 }}>
                 <div className="flex gap-[0.8vw] mb-[0.4vw]">
-                  <div className="bg-[#1B2A4A] text-white px-[1.3vw] py-[0.45vw] rounded-full font-bold text-[0.9vw]">Your songs</div>
-                  <div className="bg-slate-100 text-slate-400 px-[1.3vw] py-[0.45vw] rounded-full font-bold text-[0.9vw]">Artist overall</div>
+                  <div className="bg-[#1B2A4A] text-white px-[1.3vw] py-[0.45vw] rounded-full font-bold text-[0.9vw]">Artist overall</div>
+                  <div className="bg-slate-100 text-slate-400 px-[1.3vw] py-[0.45vw] rounded-full font-bold text-[0.9vw]">Your songs</div>
                 </div>
                 <div className="bg-white rounded-xl border border-[#1B2A4A]/5 p-[1.4vw] shadow-sm flex-1">
                   <div className="flex items-center gap-[0.5vw] mb-[1.6vw]">

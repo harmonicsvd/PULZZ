@@ -5,14 +5,12 @@ export function Scene6Impact() {
   const [phase, setPhase] = useState(0);
 
   useEffect(() => {
-    // To change timings: edit the ms values below.
-    // Phase 5 controls when partners appear — move it closer to scene end to reduce their screen time.
     const timers = [
-      setTimeout(() => setPhase(1), 600),   // "Discover" — ~1.3 s solo
-      setTimeout(() => setPhase(2), 1900),  // "new music." joins — phrase shows ~3.1 s
-      setTimeout(() => setPhase(3), 5000),  // Pulzz logo springs in
-      setTimeout(() => setPhase(4), 8500),  // Tagline fades in
-      setTimeout(() => setPhase(5), 14500), // Partners — ~2.5 s before scene ends at 17000
+      setTimeout(() => setPhase(1), 600),   // "Discover" appears solo ~1.3 s
+      setTimeout(() => setPhase(2), 1900),  // "new music." slides in from behind Discover
+      setTimeout(() => setPhase(3), 5500),  // text fades OUT → Pulzz waits for exit (mode="wait")
+      setTimeout(() => setPhase(4), 9500),  // tagline
+      setTimeout(() => setPhase(5), 14500), // partners (~2.5 s before scene end at 17000)
     ];
     return () => timers.forEach(t => clearTimeout(t));
   }, []);
@@ -35,83 +33,99 @@ export function Scene6Impact() {
 
       <div className="relative z-10 flex flex-col items-center justify-center text-center px-[10vw]">
 
-        {/* "Discover new music." — exits at phase 3 */}
-        <AnimatePresence mode="popLayout">
+        {/*
+          mode="wait" — the "discover-text" block fully exits before "pulzz-logo" enters.
+          This prevents the two from ever being on screen at the same time.
+        */}
+        <AnimatePresence mode="wait">
+
+          {/* ── "Discover new music." ── */}
           {phase >= 1 && phase < 3 && (
             <motion.div
               key="discover-text"
-              className="flex flex-col items-center"
-              initial={{ opacity: 0, y: 36 }}
+              className="flex items-baseline justify-center"
+              initial={{ opacity: 0, y: 32 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -36, filter: 'blur(8px)' }}
-              transition={{ duration: 0.85, ease }}
+              exit={{ opacity: 0, scale: 0.94, filter: 'blur(10px)' }}
+              transition={{ duration: 0.75, ease }}
             >
               <h2
-                className="text-[7vw] font-black leading-tight tracking-tight"
+                className="text-[7vw] font-black leading-tight tracking-tight flex items-baseline"
                 style={{ fontFamily: 'var(--font-display)' }}
               >
-                <span className="text-[#1B2A4A]">Discover</span>
-                {phase >= 2 && (
-                  <motion.span
-                    className="text-[#FF5C49]"
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.65, ease }}
-                  >
-                    {' '}new music.
-                  </motion.span>
-                )}
+                {/* "Discover" fades in first */}
+                <motion.span
+                  className="text-[#1B2A4A]"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.75, ease }}
+                >
+                  Discover
+                </motion.span>
+
+                {/* "new music." starts AT the position of Discover (x = -100% of its own width)
+                    then springs right to its natural position — looks like it slides from behind. */}
+                <motion.span
+                  className="text-[#FF5C49]"
+                  initial={{ x: '-100%', opacity: 0 }}
+                  animate={phase >= 2 ? { x: 0, opacity: 1 } : { x: '-100%', opacity: 0 }}
+                  transition={{ type: 'spring', stiffness: 55, damping: 11, delay: 0.04 }}
+                >
+                  &nbsp;new music.
+                </motion.span>
               </h2>
             </motion.div>
           )}
-        </AnimatePresence>
 
-        {/* Pulzz logo lockup — phase 3+ */}
-        {phase >= 3 && (
-          <motion.div
-            className="flex flex-col items-center"
-            initial={{ opacity: 0, scale: 0.88, y: 24 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ duration: 1.0, type: 'spring', bounce: 0.22 }}
-          >
-            <div className="flex items-center gap-[2vw] mb-[2vh]">
-              <div className="w-[7vw] h-[7vw] rounded-[1.8vw] bg-[#FF5C49] flex items-center justify-center shadow-[0_20px_48px_rgba(255,92,73,0.4)]">
-                <div className="w-[2.5vw] h-[2.5vw] rounded-full bg-[#FBF8F2]" />
-              </div>
-              <h1
-                className="text-[9vw] font-black tracking-tight leading-none"
-                style={{ fontFamily: 'var(--font-display)' }}
-              >
-                <span className="text-[#1B2A4A]">Pul</span><span className="text-[#FF5C49]">zz</span>
-              </h1>
-            </div>
-
-            {/* Tagline — below logo */}
-            <motion.p
-              className="text-[2vw] font-black text-slate-500 tracking-tight"
-              initial={{ opacity: 0, y: 12 }}
-              animate={phase >= 4 ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
-              transition={{ duration: 0.75, ease }}
-            >
-              Catch a song's pulse before the drop.
-            </motion.p>
-
-            {/* Partner footer — appears near end, ~2.5 s before scene ends */}
+          {/* ── Pulzz logo — only enters after text fully exits ── */}
+          {phase >= 3 && (
             <motion.div
-              className="flex items-center gap-[2vw] mt-[3vh]"
-              initial={{ opacity: 0, y: 10 }}
-              animate={phase >= 5 ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
-              transition={{ duration: 0.65 }}
+              key="pulzz-logo"
+              className="flex flex-col items-center"
+              initial={{ opacity: 0, scale: 0.88, y: 28 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={{ duration: 1.0, type: 'spring', bounce: 0.22 }}
             >
-              <span className="text-[0.85vw] text-slate-400 font-medium tracking-widest uppercase">Powered by</span>
-              {['Musixmatch', 'Cyanite', 'Songstats'].map(name => (
-                <span key={name} className="text-[0.9vw] font-bold text-slate-500 bg-slate-100 px-[1vw] py-[0.4vw] rounded-full">
-                  {name}
-                </span>
-              ))}
+              <div className="flex items-center gap-[2vw] mb-[2vh]">
+                <div className="w-[7vw] h-[7vw] rounded-[1.8vw] bg-[#FF5C49] flex items-center justify-center shadow-[0_20px_48px_rgba(255,92,73,0.4)]">
+                  <div className="w-[2.5vw] h-[2.5vw] rounded-full bg-[#FBF8F2]" />
+                </div>
+                <h1
+                  className="text-[9vw] font-black tracking-tight leading-none"
+                  style={{ fontFamily: 'var(--font-display)' }}
+                >
+                  <span className="text-[#1B2A4A]">Pul</span><span className="text-[#FF5C49]">zz</span>
+                </h1>
+              </div>
+
+              {/* Tagline */}
+              <motion.p
+                className="text-[2vw] font-black text-slate-500 tracking-tight"
+                initial={{ opacity: 0, y: 12 }}
+                animate={phase >= 4 ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
+                transition={{ duration: 0.75, ease }}
+              >
+                Catch a song's pulse before the drop.
+              </motion.p>
+
+              {/* Partners — ~2.5 s before scene ends */}
+              <motion.div
+                className="flex items-center gap-[2vw] mt-[3vh]"
+                initial={{ opacity: 0, y: 10 }}
+                animate={phase >= 5 ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
+                transition={{ duration: 0.65 }}
+              >
+                <span className="text-[0.85vw] text-slate-400 font-medium tracking-widest uppercase">Powered by</span>
+                {['Musixmatch', 'Cyanite', 'Songstats'].map(name => (
+                  <span key={name} className="text-[0.9vw] font-bold text-slate-500 bg-slate-100 px-[1vw] py-[0.4vw] rounded-full">
+                    {name}
+                  </span>
+                ))}
+              </motion.div>
             </motion.div>
-          </motion.div>
-        )}
+          )}
+
+        </AnimatePresence>
       </div>
     </motion.div>
   );

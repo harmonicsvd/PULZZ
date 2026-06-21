@@ -60,7 +60,7 @@ export function Scene2Why() {
             className="w-[5vw] h-[5vw] rounded-[1.2vw] bg-[#FF5C49] flex items-center justify-center shadow-[0_12px_32px_rgba(255,92,73,0.35)] shrink-0"
             initial={{ scale: 0, opacity: 0 }}
             animate={phase >= 1 ? { scale: 1, opacity: 1 } : { scale: 0, opacity: 0 }}
-            transition={{ type: 'spring', tension: 60, friction: 9, delay: 0.05 }}
+            transition={{ type: 'spring', stiffness: 150, damping: 14, delay: 0.05 }}
           >
             <div className="w-[1.8vw] h-[1.8vw] rounded-full bg-[#FBF8F2]" />
           </motion.div>
@@ -79,8 +79,8 @@ export function Scene2Why() {
                 animate={phase >= 1 ? { opacity: 1, x: 0 } : { opacity: 0, x: l.fromX }}
                 transition={{
                   type: 'spring',
-                  tension: 60,
-                  friction: 9,
+                  stiffness: 150,
+                  damping: 14,
                   delay: 0.05 + i * 0.075,
                 }}
               >
