@@ -9,76 +9,6 @@ args = ["pnpm", "store", "prune"]
 env = { "CI" = "true" }
 
 [workflows]
-runButton = "Project"
-
-[[workflows.workflow]]
-name = "Project"
-mode = "parallel"
-author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "API Server"
-
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "Artist Dashboard"
-
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "pulzz-pitch-video"
-
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "Pitch Video"
-
-[[workflows.workflow]]
-name = "API Server"
-author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "PORT=8080 pnpm --filter @workspace/api-server run dev"
-waitForPort = 8080
-
-[workflows.workflow.metadata]
-outputType = "console"
-
-[[workflows.workflow]]
-name = "Artist Dashboard"
-author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "PORT=3000 BASE_PATH=/artist/ pnpm --filter @workspace/pulzz-artist run dev"
-waitForPort = 3000
-
-[workflows.workflow.metadata]
-outputType = "console"
-
-[[workflows.workflow]]
-name = "pulzz-pitch-video"
-author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "PORT=4200 BASE_PATH=/pulzz-pitch-video/ pnpm --filter @workspace/pulzz-pitch-video run dev"
-waitForPort = 4200
-
-[workflows.workflow.metadata]
-outputType = "console"
-
-[[workflows.workflow]]
-name = "Pitch Video"
-author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "PORT=5000 BASE_PATH=/ pnpm --filter @workspace/pulzz-pitch-video run dev"
-waitForPort = 5000
-
-[workflows.workflow.metadata]
-outputType = "webview"
 
 [agent]
 stack = "BEST_EFFORT_FALLBACK"
@@ -97,8 +27,16 @@ localPort = 4200
 externalPort = 4200
 
 [[ports]]
+localPort = 5000
+externalPort = 80
+
+[[ports]]
 localPort = 8080
 externalPort = 8080
+
+[[ports]]
+localPort = 8081
+externalPort = 8081
 
 [[ports]]
 localPort = 8082
@@ -123,10 +61,6 @@ externalPort = 5000
 [[ports]]
 localPort = 24558
 externalPort = 4200
-
-[[ports]]
-localPort = 5000
-externalPort = 80
 
 [nix]
 channel = "stable-25_05"
